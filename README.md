@@ -89,3 +89,11 @@ Projeto independente, não oficial e sem vínculo com Ordem Paranormal, Cellbit 
 - A janela exibe o agente, a perícia, os dados rolados, o atributo, o treinamento, eventuais penalidades e o total.
 - A janela pode ser fechada pelo botão ×, clicando fora do cartão ou pressionando Esc.
 - As opções de Eclético e Perito continuam disponíveis dentro da janela de resultado.
+
+
+## Testes diretos de atributo — versão 2.1
+
+- Os cinco atributos da ficha (Agilidade, Força, Intelecto, Presença e Vigor) agora são clicáveis e abrem o resultado em tela.
+- O teste direto usa somente a quantidade de dados do atributo: com atributo 0, rola 2d20 e mantém o menor; com atributo 1 ou maior, rola essa quantidade de d20 e mantém o maior.
+- Perícias que exigem treinamento e estão destreinadas oferecem a opção de rolar diretamente o atributo associado, sem bônus de treinamento. Especialistas continuam podendo usar Eclético quando disponível.
+- Os testes diretos são registrados no histórico como Atributo.
