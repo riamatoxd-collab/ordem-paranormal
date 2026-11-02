@@ -57,3 +57,5 @@
 .sheet-qty:hover{background:#fff3dd}.sheet-weapon-check{display:flex;align-items:center;gap:5px;color:#f2d7b1;font-size:12px;white-space:nowrap}.sheet-weapon-check input{accent-color:#b53a42}
 .sheet-defense{color:#e8c89e;font-size:11px;display:flex;align-items:center;gap:6px;flex:1 1 130px}.sheet-defense input,.sheet-defense select{width:90px;flex:1;min-width:0}
 @media(max-width:600px){.sheet-weapon b{font-size:9px}.sheet-entry{flex-wrap:wrap}.sheet-add .sheet-weapon-check{flex:1 1 100%}}
+
+.sheet-combat-result:not(:empty){border:1px solid #b5875c;background:#e4cfad;color:#29151b;padding:12px;margin-top:8px}.sheet-combat-result p{margin:6px 0;font-size:12px}.sheet-combat-result b{color:#922833}
