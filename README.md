@@ -73,3 +73,11 @@ Projeto independente, não oficial e sem vínculo com Ordem Paranormal, Cellbit 
 - A recuperação de PE restaura PE normais até o máximo da ficha; PE temporários continuam separados.
 - Ao gastar PE manualmente, o sistema consome PE temporários primeiro, depois PE normais, e contabiliza o gasto no limite do turno.
 - Os ajustes manuais são registrados no histórico de recursos.
+
+
+## Recursos integrados aos indicadores — versão 1.9
+
+- Os controles de ajuste de PV, PE e SAN foram movidos para dentro dos próprios cartões de recursos no topo da ficha.
+- Cada cartão agora reúne valor atual, campo de quantidade e botões de redução e recuperação.
+- O painel separado de ajuste foi removido para deixar a ficha mais compacta.
+- As regras de limites, consumo prioritário de PE temporários e registro no histórico foram mantidas.
