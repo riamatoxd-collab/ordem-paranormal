@@ -111,3 +111,16 @@ Projeto independente, não oficial e sem vínculo com Ordem Paranormal, Cellbit 
 - A Espingarda de Cano Duplo tem dois comandos: disparo normal e disparo dos dois canos (6d6, com penalidade de −1d20 no ataque).
 - A Pistola Pesada aplica −1d20 quando usada com uma mão; empunhada com as duas mãos, essa penalidade é removida. Armas de duas mãos não podem atacar quando marcadas como empunhadas com apenas uma mão; a katana aceita uma mão para personagens veteranos em Luta.
 - Os ataques automáticos são registrados no histórico como Combate.
+
+
+## Rituais, poderes e Transcender — versão 2.5
+
+- Nova página **Rituais & Poderes**, acessível pelo menu lateral e vinculada ao agente ativo.
+- Exibe poderes de classe, poderes paranormais e rituais conhecidos, com o uso de rituais pela própria página.
+- O ritual **Transcender** abre uma experiência em tela central com expansão do símbolo, escolha de poder e som ambiente procedural de baixa frequência. O som começa após o clique do jogador e pode ser desligado.
+- Em cada marco de poder de classe disponível, o jogador escolhe entre um poder normal da classe ou **Transcender**. A escolha normal não reduz Sanidade; Transcender registra o poder de classe Transcender, concede um poder paranormal e reduz o máximo de SAN pelo ganho daquele aumento de NEX.
+- A seleção respeita os pré-requisitos dos poderes de classe e paranormais. Poderes paranormais elementais podem ser escolhidos uma segunda vez para o benefício de Afinidade após a escolha elemental em NEX 50% e a primeira Transcendência posterior.
+- A origem **Cultista Arrependido** tem seu poder paranormal separado do avanço Transcender e não aplica a perda de SAN do ritual.
+- A progressão de círculos e rituais conhecidos respeita classe, NEX, trilha e o poder **Aprender Ritual**. O arquivo de rituais permite filtrar por nome, elemento e círculo.
+- Os rituais conhecidos usam os controles de conjuração já existentes, com custos de PE, aprimoramentos e histórico.
+- A página apresenta a orientação de estudo de rituais de *Sobrevivendo ao Horror*. As regras opcionais de aprendizado lento não são ativadas automaticamente.
