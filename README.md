@@ -47,3 +47,19 @@ Projeto independente, não oficial e sem vínculo com Ordem Paranormal, Cellbit 
 - Perícias que exigem treinamento exibem o bloqueio quando o agente ainda não as treinou.
 - Mostra os dados, atributo, treinamento, modificadores e total no próprio painel, sem navegar para outra tela.
 - Registra cada rolagem no histórico geral e atualiza os contadores do painel inicial.
+
+
+## Gestão de Pontos de Esforço — versão 1.7
+
+- A ficha individual agora mostra PE atuais, PE temporários, limite de gasto por turno e quanto já foi gasto no turno.
+- Os botões de habilidades com custo de PE consomem os pontos automaticamente e registram o uso no histórico.
+- O sistema aplica o limite de PE por turno conforme NEX, incluindo os ajustes de Universitário, Encarar a Morte e Presença Poderosa (Intuitivo, apenas para rituais).
+- A exceção do custo mínimo é respeitada: uma habilidade pode ser usada pelo custo mínimo acima do limite normal quando for a primeira habilidade que gasta PE naquele turno.
+- PE temporários são consumidos antes dos PE normais e podem ser registrados manualmente; desaparecem ao encerrar a cena.
+- Novo turno reinicia o contador de gasto e os usos por rodada; encerrar cena limpa PE temporários e usos por cena.
+- Eclético consome 2 PE ao ativar o teste com treinamento temporário; Perito consome PE e rola o dado adicional correspondente ao custo escolhido.
+- Ações de classe, poderes paranormais, origens e trilhas com custo em PE são exibidas quando o personagem possui a habilidade.
+- Rituais usam o custo básico do círculo (1º: 1 PE; 2º: 3 PE; 3º: 6 PE; 4º: 10 PE), com campo para acréscimos de formas avançadas e opções de habilidades que alteram a conjuração.
+- Criar Selo consome PE igual ao custo do ritual e não entra no contador de gasto do turno, pois é uma ação de interlúdio.
+- O Flagelador pode marcar o pagamento do custo de um ritual com PV, à taxa de 2 PV por PE.
+- Reduções de custo de rituais respeitam o mínimo de 1 PE e a regra geral de não cumulatividade, com a exceção de Ritual Predileto prevista no poder.
