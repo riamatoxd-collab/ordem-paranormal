@@ -49,3 +49,13 @@
 .sheet-remove{border:1px solid #a87363;background:#3b1c22;color:#f5d9cb;border-radius:4px;cursor:pointer;padding:4px 8px}
 .sheet-remove:hover{background:#8d2935}
 .sheet-entry{gap:7px}
+
+.sheet-weapon{width:100%;display:flex;align-items:center;gap:12px;text-align:left;border:1px solid #a57b56;background:linear-gradient(100deg,#e3cfaf,#bfa47d);color:#291419;padding:11px;cursor:pointer}
+.sheet-weapon:hover,.sheet-weapon:focus-visible{background:#f5dfbd;outline:2px solid #c13f45;outline-offset:1px}
+.sheet-weapon>span:first-child{font-size:23px;color:#9d2932}.sheet-weapon>span:nth-child(2){display:grid;flex:1;gap:3px;min-width:0}.sheet-weapon strong{font-size:13px}.sheet-weapon small{color:#664b42;font-size:11px}.sheet-weapon b{font-size:10px;color:#71222d}
+.sheet-qty{border:1px solid #ae8a61;background:#f4e4c8;color:#381820;cursor:pointer;border-radius:3px;font-size:14px;min-width:25px;min-height:25px}
+.sheet-qty:hover{background:#fff3dd}.sheet-weapon-check{display:flex;align-items:center;gap:5px;color:#f2d7b1;font-size:12px;white-space:nowrap}.sheet-weapon-check input{accent-color:#b53a42}
+.sheet-defense{color:#e8c89e;font-size:11px;display:flex;align-items:center;gap:6px;flex:1 1 130px}.sheet-defense input,.sheet-defense select{width:90px;flex:1;min-width:0}
+@media(max-width:600px){.sheet-weapon b{font-size:9px}.sheet-entry{flex-wrap:wrap}.sheet-add .sheet-weapon-check{flex:1 1 100%}}
+
+.sheet-combat-result:not(:empty){border:1px solid #b5875c;background:#e4cfad;color:#29151b;padding:12px;margin-top:8px}.sheet-combat-result p{margin:6px 0;font-size:12px}.sheet-combat-result b{color:#922833}
