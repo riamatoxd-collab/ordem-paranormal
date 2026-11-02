@@ -63,3 +63,13 @@ Projeto independente, não oficial e sem vínculo com Ordem Paranormal, Cellbit 
 - Criar Selo consome PE igual ao custo do ritual e não entra no contador de gasto do turno, pois é uma ação de interlúdio.
 - O Flagelador pode marcar o pagamento do custo de um ritual com PV, à taxa de 2 PV por PE.
 - Reduções de custo de rituais respeitam o mínimo de 1 PE e a regra geral de não cumulatividade, com a exceção de Ritual Predileto prevista no poder.
+
+
+## Ajuste rápido de recursos — versão 1.8
+
+- A ficha do agente inclui controles individuais para PV, PE e SAN.
+- Informe a quantidade e use os botões + e − para recuperar ou reduzir o recurso.
+- PV e SAN respeitam os valores máximos calculados para o personagem e não podem ficar abaixo de zero.
+- A recuperação de PE restaura PE normais até o máximo da ficha; PE temporários continuam separados.
+- Ao gastar PE manualmente, o sistema consome PE temporários primeiro, depois PE normais, e contabiliza o gasto no limite do turno.
+- Os ajustes manuais são registrados no histórico de recursos.
