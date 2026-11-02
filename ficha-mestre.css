@@ -131,3 +131,104 @@
  .paper-v2 .paper-attr strong{font-size:11px}
  .paper-v2 .paper-attr b{font-size:17px}
 }
+
+/* Ficha 3.1 — moldura de cinco hexágonos + controles de recursos.
+   Substitui as auras antigas que ficavam no fundo do conjunto. */
+.paper-v2 .paper-attributes{
+ position:relative;
+ display:block;
+ width:min(100%,530px);
+ max-width:530px;
+ height:auto;
+ aspect-ratio:1448 / 1086;
+ margin:8px auto 18px;
+ overflow:visible;
+ isolation:isolate;
+ background:url("./assets/atributos-moldura.svg") center center / contain no-repeat;
+}
+.paper-v2 .paper-attributes::before,
+.paper-v2 .paper-attributes::after,
+.paper-v2 .paper-attr::before,
+.paper-v2 .paper-attr::after{content:none!important;display:none!important;animation:none!important}
+.paper-v2 .paper-attr{
+ position:absolute;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ width:21%;
+ height:26%;
+ min-width:0;
+ padding:0 2px;
+ margin:0;
+ border:0!important;
+ clip-path:none!important;
+ background:transparent!important;
+ box-shadow:none!important;
+ filter:none;
+ color:#f4dfcc;
+ z-index:3;
+ transform:translate(-50%,-50%);
+ transition:filter .16s ease,text-shadow .16s ease;
+}
+.paper-v2 .paper-attr:hover{transform:translate(-50%,-50%) scale(1.035);filter:drop-shadow(0 0 5px #e04b56)}
+.paper-v2 .paper-attr:focus-visible{outline:2px solid #ffcf9e;outline-offset:0;border-radius:18px}
+.paper-v2 .paper-attr small{font-size:clamp(8px,.75vw,10px);line-height:1.05;color:#e3b7a8;position:static;text-shadow:0 1px 3px #000}
+.paper-v2 .paper-attr strong{font-size:clamp(12px,1.2vw,16px);line-height:1.1;color:#f5d1b9;margin-top:2px;position:static;text-shadow:0 1px 4px #000}
+.paper-v2 .paper-attr b{font-size:clamp(21px,2.2vw,29px);line-height:1.05;color:#fff1de;margin-top:5px;position:static;text-shadow:0 0 10px #9d2835,0 2px 3px #000}
+.paper-v2 .paper-agi{left:48.9%;top:16.6%}
+.paper-v2 .paper-for{left:22.9%;top:37.3%}
+.paper-v2 .paper-int{left:76.4%;top:37.3%}
+.paper-v2 .paper-pre{left:29.1%;top:75%}
+.paper-v2 .paper-vig{left:67.2%;top:75%}
+.paper-v2 .paper-core{
+ position:absolute;
+ left:49.65%;
+ top:49.35%;
+ transform:translate(-50%,-50%);
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ width:24.7%;
+ height:14.1%;
+ min-width:0;
+ padding:0;
+ margin:0;
+ background:transparent!important;
+ border:0!important;
+ box-shadow:none!important;
+ color:#f2b78d;
+ z-index:2;
+ font-size:clamp(17px,2vw,27px);
+ line-height:1;
+}
+.paper-v2 .paper-core span{font-size:clamp(8px,.9vw,11px);line-height:1.1;color:#f1c09a;letter-spacing:.055em}
+.paper-v2 .paper-resources{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.paper-v2 .paper-resource{min-width:0;display:flex;flex-direction:column;gap:4px;padding:12px;background:linear-gradient(145deg,#4c1a22,#1d1015);border:1px solid #b78a5b;border-radius:4px}
+.paper-v2 .paper-resource small{color:#e0b68d;letter-spacing:.04em}
+.paper-v2 .paper-resource strong{color:#fff0d9;font-size:clamp(20px,2.3vw,28px)}
+.paper-resource-controls{display:flex;gap:5px;align-items:center;margin-top:auto;padding-top:7px}
+.paper-resource-controls input{flex:0 0 48px;width:48px;min-width:0;background:#e9d6b6;color:#251015;border:1px solid #b98c5e;border-radius:4px;padding:6px;text-align:center;font-size:13px}
+.paper-resource-controls .sheet-resource-btn{flex:0 0 32px;display:grid;place-items:center;height:32px;width:32px;min-width:0;padding:0;border-radius:4px;font-weight:800;font-size:18px}
+.paper-resource-controls .sheet-resource-btn:hover{filter:brightness(1.18)}
+.resource-amount-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:600px){
+ .paper-v2 .paper-attributes{width:min(100%,430px);max-width:430px;margin:8px auto 12px}
+ .paper-v2 .paper-attr small{font-size:8px}
+ .paper-v2 .paper-attr strong{font-size:11px}
+ .paper-v2 .paper-attr b{font-size:20px;margin-top:3px}
+ .paper-v2 .paper-core{font-size:19px}
+ .paper-v2 .paper-core span{font-size:8px}
+ .paper-v2 .paper-resource{padding:9px}
+ .paper-resource-controls{gap:4px}
+ .paper-resource-controls input{flex-basis:42px;width:42px}
+ .paper-resource-controls .sheet-resource-btn{flex-basis:29px;width:29px;height:29px}
+}
+@media(max-width:370px){
+ .paper-v2 .paper-resources{grid-template-columns:1fr}
+ .paper-v2 .paper-attr small{font-size:7px}
+ .paper-v2 .paper-attr strong{font-size:10px}
+ .paper-v2 .paper-attr b{font-size:17px}
+}
+@media(prefers-reduced-motion:reduce){.paper-v2 .paper-attr{transition:none}}
