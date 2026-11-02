@@ -81,3 +81,11 @@ Projeto independente, não oficial e sem vínculo com Ordem Paranormal, Cellbit 
 - Cada cartão agora reúne valor atual, campo de quantidade e botões de redução e recuperação.
 - O painel separado de ajuste foi removido para deixar a ficha mais compacta.
 - As regras de limites, consumo prioritário de PE temporários e registro no histórico foram mantidas.
+
+
+## Resultado de perícias em tela — versão 2.0
+
+- Ao clicar em uma perícia na ficha, o resultado aparece em uma janela sobreposta à tela, em vez de ocupar espaço dentro da ficha.
+- A janela exibe o agente, a perícia, os dados rolados, o atributo, o treinamento, eventuais penalidades e o total.
+- A janela pode ser fechada pelo botão ×, clicando fora do cartão ou pressionando Esc.
+- As opções de Eclético e Perito continuam disponíveis dentro da janela de resultado.
