@@ -39,3 +39,13 @@
 .sheet-block>.btn{align-self:start;margin-top:auto}
 @media(max-width:850px){.sheet-lower{grid-template-columns:1fr}}
 @media(max-width:600px){.paper-v2{padding:12px}.paper-v2 .paper-head h2{font-size:23px}.sheet-ornament{font-size:11px}.sheet-block{padding:10px}.sheet-block h3{margin:-10px -10px 0}}
+
+/* Edição direta na ficha: sem formulários duplicados fora do pergaminho */
+#v-agents #agentInventory{display:none!important}
+.sheet-add{display:flex;align-items:stretch;flex-wrap:wrap;gap:7px;margin-top:auto;padding-top:10px;border-top:1px solid #815b46}
+.sheet-add input,.sheet-add select{min-width:0;flex:1 1 145px;border:1px solid #b98d5c;background:#e3d1b3;color:#27151a;padding:9px;border-radius:3px;font:inherit;font-size:12px}
+.sheet-add input[type=number]{flex:0 0 65px;width:65px}
+.sheet-add .btn{white-space:nowrap}
+.sheet-remove{border:1px solid #a87363;background:#3b1c22;color:#f5d9cb;border-radius:4px;cursor:pointer;padding:4px 8px}
+.sheet-remove:hover{background:#8d2935}
+.sheet-entry{gap:7px}
