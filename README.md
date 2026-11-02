@@ -37,3 +37,13 @@ As fichas, inventários e histórico são salvos no armazenamento local do naveg
 As opções de criação, classes, origens, poderes, trilhas e rituais foram estruturadas com base no livro básico *Ordem Paranormal RPG v1.3* fornecido nesta conversa. O inventário também considera as regras de *Sobrevivendo ao Horror v1.3.1*. A ferramenta apresenta resumos curtos para facilitar a escolha; consulte os livros para o texto completo e para resolver exceções.
 
 Projeto independente, não oficial e sem vínculo com Ordem Paranormal, Cellbit ou Ordo Realitas.
+
+## Painel de perícias — versão 1.6
+
+- Todas as 28 perícias aparecem diretamente na página individual do agente.
+- Cada perícia é um botão clicável: ao selecionar, a ficha rola automaticamente os d20 correspondentes ao atributo.
+- O resultado considera o maior dado quando o atributo é maior que zero; com atributo 0, rola 2d20 e mantém o menor.
+- Aplica automaticamente o bônus de treinamento (+5, +10 ou +15) e a penalidade de sobrecarga nas perícias indicadas.
+- Perícias que exigem treinamento exibem o bloqueio quando o agente ainda não as treinou.
+- Mostra os dados, atributo, treinamento, modificadores e total no próprio painel, sem navegar para outra tela.
+- Registra cada rolagem no histórico geral e atualiza os contadores do painel inicial.
