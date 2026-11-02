@@ -96,3 +96,38 @@
 .paper-v2 .paper-attr:hover{z-index:6}
 @keyframes aura-respirar{0%,100%{opacity:.83;filter:drop-shadow(0 0 4px #aa2637)}50%{opacity:1;filter:drop-shadow(0 0 11px #e0444d)}}
 @media(prefers-reduced-motion:reduce){.paper-v2 .paper-attributes::after{animation:none}}
+
+/* Ajuste solicitado: hexágonos menores e fumaça visível sem cobrir números */
+.paper-v2 .paper-attributes{
+  width:min(100%,410px);
+  max-width:410px;
+  margin:8px auto 24px;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  grid-template-rows:repeat(3,70px);
+  column-gap:5px;
+  row-gap:2px;
+  overflow:visible;
+}
+.paper-v2 .paper-attributes::after{
+  inset:-20px -18px;
+  background-size:100% 100%;
+  opacity:.95;
+  z-index:3;
+}
+.paper-v2 .paper-attr{
+  padding:3px;
+  z-index:4;
+  filter:drop-shadow(0 1px 3px #0009);
+}
+.paper-v2 .paper-attr small{font-size:8px}
+.paper-v2 .paper-attr strong{font-size:12px}
+.paper-v2 .paper-attr b{font-size:19px}
+.paper-v2 .paper-core{z-index:4;font-size:24px}
+.paper-v2 .paper-core span{font-size:8px}
+@media(max-width:600px){
+ .paper-v2 .paper-attributes{width:min(100%,340px);grid-template-rows:repeat(3,61px);column-gap:3px}
+ .paper-v2 .paper-attributes::after{inset:-15px -12px}
+ .paper-v2 .paper-attr small{font-size:7px}
+ .paper-v2 .paper-attr strong{font-size:11px}
+ .paper-v2 .paper-attr b{font-size:17px}
+}
