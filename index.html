@@ -109,6 +109,53 @@
 @media(max-width:850px){.agent-workspace{grid-template-columns:1fr}.agent-roster{position:static;max-height:none}.agent-combat-controls{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.agent-combat-controls{grid-template-columns:1fr}.agent-inventory-layout{grid-template-columns:1fr}#agentSkillsPanel .skill-roll-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
+
+/* Inventário compacto: informações essenciais primeiro */
+.inv-add-card>summary,.inv-more>summary,.inv-advanced>summary,.inv-target-settings>summary,.inv-item-menu>summary{cursor:pointer;list-style:none;font-weight:750;color:#e5e0d6}
+.inv-add-card>summary::-webkit-details-marker,.inv-more>summary::-webkit-details-marker,.inv-advanced>summary::-webkit-details-marker,.inv-target-settings>summary::-webkit-details-marker,.inv-item-menu>summary::-webkit-details-marker{display:none}
+.inv-add-card>summary:after,.inv-more>summary:after,.inv-advanced>summary:after,.inv-target-settings>summary:after{content:'＋';float:right;color:#cfc5b0}
+.inv-add-card[open]>summary:after,.inv-more[open]>summary:after,.inv-advanced[open]>summary:after,.inv-target-settings[open]>summary:after{content:'−'}
+.agent-inventory-layout{grid-template-columns:minmax(230px,.7fr) minmax(300px,1.3fr);gap:12px}
+.inv-add-form{border-top:1px solid #393733;padding-top:12px}
+.inv-add-form .inventory-form{grid-template-columns:repeat(2,minmax(0,1fr))}
+.inv-add-form .inventory-form .wide{grid-column:1/-1}
+.inv-advanced{margin-top:12px;padding-top:10px;border-top:1px solid #393733}
+.inv-advanced summary{font-size:11px;color:#aaa59b}
+.inv-overview{display:grid;gap:10px}
+.inv-load-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.inv-load-row>div{display:grid;gap:2px}
+.inv-load-row small,.inv-detail-grid small,.inv-category-grid small{font-size:9px;color:#aaa59b;letter-spacing:.06em}
+.inv-load-row strong{font-size:26px;line-height:1.15}
+.inv-load-row strong span{font-size:16px;color:#aaa59b;font-weight:500}
+.inv-load-row .goodbox,.inv-load-row .warnbox{margin:0;padding:7px 9px;white-space:nowrap}
+.inv-progress{height:7px;background:#292723;border-radius:99px;overflow:hidden}
+.inv-progress span{display:block;height:100%;background:linear-gradient(90deg,#9c927f,#e2d8c5);border-radius:99px}
+.inv-more{border-top:1px solid #393733;padding-top:9px}
+.inv-more>summary{font-size:11px;color:#bdb5a8}
+.inv-detail-grid,.inv-category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.inv-detail-grid>div,.inv-category-grid>div{display:flex;justify-content:space-between;align-items:center;padding:7px 9px;border:1px solid #393733;border-radius:8px;background:#0d0d0d}
+.inv-detail-grid b,.inv-category-grid b{font-size:12px}
+.inv-category-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.inv-list-heading{align-items:center}
+.inv-target-settings{position:relative}
+.inv-target-settings>summary{font-size:11px;border:1px solid #44413a;padding:8px 10px;border-radius:9px}
+.inv-target-settings[open] .agent-combat-controls{position:absolute;right:0;top:40px;z-index:4;padding:12px;border:1px solid #514c42;border-radius:10px;background:#111;box-shadow:0 12px 30px #000b}
+.invitem-compact{grid-template-columns:minmax(0,1fr) auto;align-items:center;padding:10px 12px}
+.invitem-main{min-width:0}
+.invitem-main strong{font-size:13px}
+.invitem-main small{display:block;margin-top:3px}
+.invitem-actions{gap:6px}
+.invitem-actions select{max-width:110px}
+.inv-item-menu{position:relative}
+.inv-item-menu>summary{font-size:16px;letter-spacing:1px;padding:6px 8px;border:1px solid #44413a;border-radius:8px;color:#d4cbbd}
+.inv-item-menu-content{position:absolute;right:0;top:35px;z-index:5;display:grid;gap:6px;min-width:160px;padding:9px;border:1px solid #514c42;border-radius:10px;background:#111;box-shadow:0 12px 30px #000b}
+.inv-qty{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:10px;color:#bdb5a8}
+.inv-qty .btn{min-width:28px;padding:5px}
+.inv-status{color:#d9c79f!important}
+.agent-rules{margin-top:12px}
+@media(max-width:1100px){.agent-inventory-layout{grid-template-columns:1fr}}
+@media(max-width:700px){.invitem-compact{grid-template-columns:1fr}.invitem-actions{justify-content:flex-start;flex-wrap:wrap}.inv-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.inv-target-settings[open] .agent-combat-controls{right:0;left:auto}.inv-load-row{align-items:flex-start}}
+
 </style></head><body>
 <div class="app"><aside class="side"><div class="brand"><span class="sig">✣</span> O OUTRO LADO<span>ARQUIVO DE OPERAÇÕES</span></div><nav class="nav"><button class="active" data-view="home">⌂ &nbsp;Painel</button><button data-view="agents">♙ &nbsp;Agentes</button><button data-view="roll">⚄ &nbsp;Rolagens</button><button data-view="combat">⚔ &nbsp;Combate</button><button data-view="history">◷ &nbsp;Histórico</button></nav><small>PROTOCOLO 0-01<br>Registros salvos neste navegador.<br>Versão 2.4 • Ficha unificada do agente e armas corrigidas</small></aside>
 <main><header class="top"><div><div class="eyebrow">SISTEMA DE APOIO À MESA</div><h1 id="title">Painel de operações</h1></div><button class="btn primary" onclick="openModal()">＋ Novo agente</button></header>
@@ -125,31 +172,44 @@
    <div class="skill-roll-grid" id="skillRollGridPage"></div>
   </section>
   <section class="agent-panel" id="agentInventory">
-   <div class="section" style="margin-top:0;align-items:center;flex-wrap:wrap"><div><h2>Armas e inventário</h2><p>Adicione equipamentos, equipe armas e ataque sem sair da ficha.</p></div><div class="agent-combat-controls"><div class="field"><label>DEFESA DO ALVO</label><input id="invTargetDefense" type="number" min="0" max="99" value="15"></div><div class="field"><label>DISTÂNCIA DO ALVO</label><select id="invTargetRange"><option value="adjacente">Adjacente</option><option value="curto">Curto</option><option value="medio">Médio</option><option value="longo">Longo</option><option value="extremo">Extremo</option></select></div></div></div>
+   <div class="section" style="margin-top:0"><div><h2>Armas e inventário</h2><p>Seus equipamentos e armas em um só lugar.</p></div></div>
    <div class="agent-inventory-layout">
     <div class="card" id="inventorySummary"><div class="empty"><strong>▣</strong>Selecione um agente para consultar a carga.</div></div>
-    <div class="card">
-     <div class="eyebrow">ADICIONAR EQUIPAMENTO</div>
-     <div class="inventory-form" style="margin-top:12px">
-      <div class="field wide"><label>MODELO DO LIVRO</label><select id="invPreset" onchange="applyInventoryPreset()"><option value="">Item personalizado</option></select></div>
-      <div class="field wide"><label>NOME DO ITEM *</label><input id="invName" placeholder="Ex.: Kit de primeiros socorros"></div>
-      <div class="field"><label>CATEGORIA</label><select id="invCategory"><option value="0">0</option><option value="1">I</option><option value="2">II</option><option value="3">III</option><option value="4">IV</option></select></div>
-      <div class="field"><label>ESPAÇOS POR UNIDADE</label><input id="invSpaces" type="number" min="0" max="100" step="0.25" value="1"></div>
-      <div class="field"><label>QUANTIDADE</label><input id="invQty" type="number" min="1" max="999" value="1"></div>
-      <div class="field"><label>EMPUNHADURA / ESTADO</label><select id="invMode"><option value="stored">Guardado</option><option value="held1">Empunhado • 1 mão</option><option value="held2">Empunhado • 2 mãos</option><option value="worn">Vestido</option></select></div>
-      <div class="field full"><label>OPÇÕES DO ITEM</label><div class="form" style="gap:7px"><label class="checkline"><input id="invWeapon" type="checkbox"> É uma arma</label><label class="checkline"><input id="invBenefit" type="checkbox"> Concede benefício quando vestido</label><label class="checkline"><input id="invReq" type="checkbox"> Requisitado da Ordem nesta missão</label><label class="checkline"><input id="invUtility" type="checkbox"> Aplicar Mochila de Utilidades</label></div></div>
+    <details class="card inv-add-card">
+     <summary>＋ Adicionar equipamento</summary>
+     <div class="inv-add-form" style="margin-top:12px">
+      <div class="inventory-form">
+       <div class="field wide"><label>MODELO DO LIVRO</label><select id="invPreset" onchange="applyInventoryPreset()"><option value="">Item personalizado</option></select></div>
+       <div class="field wide"><label>NOME DO ITEM</label><input id="invName" placeholder="Ex.: Kit de primeiros socorros"></div>
+       <div class="field"><label>QUANTIDADE</label><input id="invQty" type="number" min="1" max="999" value="1"></div>
+       <div class="field"><label>ESTADO</label><select id="invMode"><option value="stored">Guardado</option><option value="held1">Empunhado • 1 mão</option><option value="held2">Empunhado • 2 mãos</option><option value="worn">Vestido</option></select></div>
+      </div>
+      <details class="inv-advanced">
+       <summary>Opções avançadas</summary>
+       <div class="inventory-form" style="margin-top:10px">
+        <div class="field"><label>CATEGORIA</label><select id="invCategory"><option value="0">0</option><option value="1">I</option><option value="2">II</option><option value="3">III</option><option value="4">IV</option></select></div>
+        <div class="field"><label>ESPAÇOS POR UNIDADE</label><input id="invSpaces" type="number" min="0" max="100" step="0.25" value="1"></div>
+        <div class="field full"><label>OPÇÕES</label><div class="form" style="gap:7px"><label class="checkline"><input id="invWeapon" type="checkbox"> É uma arma</label><label class="checkline"><input id="invBenefit" type="checkbox"> Benefício ao vestir</label><label class="checkline"><input id="invReq" type="checkbox"> Requisitado da Ordem</label><label class="checkline"><input id="invUtility" type="checkbox"> Mochila de Utilidades</label></div></div>
+       </div>
+      </details>
+      <button class="btn primary" style="margin-top:13px" onclick="addInventoryItem()">＋ Adicionar</button>
      </div>
-     <button class="btn primary" style="margin-top:13px" onclick="addInventoryItem()">＋ Adicionar ao inventário</button>
-     <div class="note">Selecione um modelo oficial para preencher categoria, espaços e tipo de item automaticamente. Itens personalizados podem receber um perfil de ataque manual no Terminal de Combate.</div>
-    </div>
+    </details>
    </div>
-   <div class="section"><div><h2>Armas e equipamentos carregados</h2><p>Os botões de ataque aparecem nas armas reconhecidas pelo catálogo.</p></div><label class="checkline"><input id="invFourLimit" type="checkbox" onchange="setWornLimit(this.checked)"> Regra opcional: máximo de 4 itens vestidos com benefício</label></div>
+   <div class="section inv-list-heading"><div><h2>Equipamentos</h2><p>Armas, munições e itens carregados.</p></div>
+    <details class="inv-target-settings"><summary>⚙ Ataque</summary><div class="agent-combat-controls"><div class="field"><label>DEFESA DO ALVO</label><input id="invTargetDefense" type="number" min="0" max="99" value="15"></div><div class="field"><label>DISTÂNCIA</label><select id="invTargetRange"><option value="curto">Curto</option><option value="medio">Médio</option><option value="longo">Longo</option><option value="extremo">Extremo</option></select></div></div></details>
+   </div>
    <div class="card list" id="inventoryItems"><div class="empty"><strong>▣</strong>Nenhum item cadastrado.</div></div>
-   <details class="card agent-rules"><summary>Regras de carga, requisição e equipamentos</summary>
-    <div class="note" style="margin-top:12px">Livro básico, p. 53: capacidade padrão de 5 espaços por ponto de Força (Força 0: 2 espaços), limite absoluto igual ao dobro, sobrecarga acima da capacidade, penalidade de –5 na Defesa e em testes de perícia afetados pela carga e redução de deslocamento de 3 m. Armas de duas mãos e proteções leves normalmente ocupam 2 espaços; proteções pesadas, 5; objetos extremamente volumosos, 10.</div>
-    <div class="note">Sobrevivendo ao Horror: Inventário Organizado soma Intelecto à capacidade e transforma itens de 0,5 espaço em 0,25. A regra opcional de itens vestidos limita a quatro os itens com benefícios mecânicos. Trilha Técnico (NEX 10%): soma Intelecto à Força para calcular a capacidade. Mochila militar: +2 espaços.</div>
-    <div class="smalltext" style="margin-top:10px">Os limites por categoria são limites de requisição por missão, não de capacidade física. Marque “Requisitado da Ordem nesta missão” para acompanhar esses limites. Itens encontrados, emprestados ou obtidos por outros meios podem ser registrados sem marcar essa opção.</div>
+   <details class="card agent-rules"><summary>⚙ Regras e limites avançados</summary>
+    <div class="form" style="margin-top:12px">
+     <div class="field"><label>PATENTE / REQUISIÇÃO</label><select id="invPatentSelect" onchange="setPatent(this.value)"></select></div>
+     <div class="field"><label>DEFESA BASE</label><input id="invDefenseBase" type="number" min="0" max="99" placeholder="Não informada" onchange="setDefenseBase(this.value)"></div>
+     <label class="checkline full"><input id="invFourLimit" type="checkbox" onchange="setWornLimit(this.checked)"> Limitar a quatro itens vestidos com benefício</label>
+    </div>
+    <div id="inventoryAdvancedInfo" class="smalltext" style="margin-top:10px"></div>
+    <div class="note">A capacidade considera Força, poderes aplicáveis e equipamentos. Sobrecarga e limites de mãos são calculados automaticamente. Os limites de categoria controlam apenas itens requisitados da Ordem.</div>
    </details>
+
   </section>
  </div>
 </div>
@@ -334,10 +394,28 @@ function rollInventoryWeapon(agentId,itemId,bothBarrels=false){
  box.innerHTML='<div class="skill-roll-top"><div><small>'+esc(c.name)+' • ATAQUE AUTOMÁTICO</small><b id="skillRollOverlayTitle">'+esc(it.name)+(bothBarrels?' • DOIS CANOS':'')+'</b></div><span class="skill-roll-total">'+total+'</span></div><b class="'+(hit?'success':'fail')+'">'+(hit?'ATAQUE ACERTOU':'ATAQUE ERROU')+(critical?' • ACERTO CRÍTICO':'')+'</b><div class="skill-roll-dice">'+dice.map(v=>'<span class="die '+(v===chosen?(keepWorst?'worst':'best'):'')+'">'+v+'</span>').join('')+'</div><div class="skill-roll-breakdown"><span>'+esc(skill)+' • '+esc(AN[attr])+' '+attribute+'</span><span>Treinamento +'+training+'</span><span>Defesa do alvo '+defense+'</span><span>Maior/menor dado: '+chosen+'</span><strong>Total do ataque: '+total+'</strong></div>'+(hit?'<div class="skill-roll-breakdown" style="margin-top:14px;padding-top:12px;border-top:1px solid #ffffff20"><span>Dano '+esc(criticalExpr)+' • '+esc(profile.type)+'</span><strong class="skill-roll-total" style="font-size:30px">Dano: '+damage+'</strong><small>'+damageParts.map(esc).join(' • ')+(halfDamage?' • metade do dano aplicada':'')+'</small></div>':'<p class="build-description" style="margin-top:12px">Nenhum dano: o ataque não alcançou a Defesa do alvo.</p>')+(warnings.length?'<div class="note" style="margin-top:13px">'+warnings.map(esc).join('<br>')+'</div>':'');
  addHist({agent:c.name,label:it.name+(bothBarrels?' • Dois canos':''),detail:skill+' '+total+' vs Defesa '+defense+' • '+(hit?'Acertou':'Errou')+(critical?' • crítico x'+profile.multiplier:'')+(damage!==null?' • dano '+damage+' '+profile.type:''),total,dt:defense,passed:hit,status:hit?(critical?'ACERTO CRÍTICO':'ACERTOU'):'ERROU',kind:'Combate'});
 }
-function renderInventory(){let c=agents.find(x=>x.id===$('invAgent')?.value)||current();let summary=$('inventorySummary'),list=$('inventoryItems');if(!summary||!list)return;if(!c){summary.innerHTML='<div class="empty"><strong>▣</strong>Cadastre um agente para usar o inventário.</div>';list.innerHTML='<div class="empty">Nenhum agente selecionado.</div>';$('invFourLimit').checked=false;return}if($('invFourLimit'))$('invFourLimit').checked=!!c.limitWorn;let info=capacityInfo(c),counts=requisitionCounts(c),limits=PATENT_LIMITS[c.patent||'Recruta']||PATENT_LIMITS['Recruta'];let warnings=[];if(c.powerInventoryOrganized&&(+c.attrs.int||0)<2)warnings.push('PRÉ-REQUISITO: Inventário Organizado exige Intelecto 2. O bônus foi marcado na ficha, mas confira a elegibilidade.');if(normalized(c.trail).includes('tecnico')&&(c.class!=='especialista'||+c.nex<10))warnings.push('TRILHA TÉCNICO: Inventário Otimizado exige Especialista com Técnico a partir de NEX 10%.');if(info.overloaded)warnings.push('SOBRECARGA: –5 na Defesa e em testes de perícia afetados pela carga; deslocamento –3 m.');if(info.overMax)warnings.push('LIMITE ABSOLUTO EXCEDIDO: o agente não pode carregar mais que '+info.max+' espaços.');if(info.overHands)warnings.push('MAIS DE DUAS MÃOS OCUPADAS: revise os itens empunhados.');if(c.limitWorn&&info.worn>4)warnings.push('LIMITE DE ITENS VESTIDOS: somente quatro benefícios mecânicos ficam ativos; os demais não fornecem benefício até liberar espaço.');for(let cat=1;cat<=4;cat++)if(counts[cat]>limits[cat-1])warnings.push('REQUISIÇÃO categoria '+categoryLabel(cat)+': '+counts[cat]+' de '+limits[cat-1]+' permitido(s) nesta missão para a patente '+(c.patent||'Recruta')+'.');let defense=c.defenseBase===null||c.defenseBase===undefined?'—':Math.max(0,+c.defenseBase-(info.overloaded?5:0));summary.innerHTML=`<div class="eyebrow">CAPACIDADE DE CARGA</div><div class="invmetrics"><div class="invmetric"><small>ESPAÇOS OCUPADOS</small><b>${Number(info.total.toFixed(2))}</b></div><div class="invmetric"><small>CAPACIDADE SEM PENALIDADE</small><b>${info.capacity}</b></div><div class="invmetric"><small>LIMITE ABSOLUTO</small><b>${info.max}</b></div><div class="invmetric"><small>MÃOS OCUPADAS</small><b>${info.hands}/2</b></div></div><div class="${info.overloaded?'warnbox':'goodbox'}">${info.overMax?'O agente ultrapassou o dobro da capacidade e não pode carregar esse volume.':info.overloaded?'Agente sobrecarregado: –5 Defesa, –5 em testes de perícia afetados pela carga e –3 m de deslocamento.':'Carga dentro do limite: sem penalidade por sobrecarga.'}</div><div class="smalltext">${defense==='—'?'Defesa base não informada.':`Defesa base ${c.defenseBase} → Defesa com carga ${defense}.`}</div><div class="smalltext">Força ${c.attrs.for} ${info.tech?'+ Intelecto '+c.attrs.int+' (Trilha Técnico)':''}${info.organizedBonus?' • Inventário Organizado +'+info.organizedBonus+' espaço(s)':''}${info.backpackBonus?' • Mochila militar +2 espaços':''} • Capacidade calculada: ${info.capacity} espaços.</div><div class="form" style="margin-top:13px"><div class="field"><label>PATENTE / REQUISIÇÃO DA ORDEM</label><select id="invPatentSelect" onchange="setPatent(this.value)">${Object.keys(PATENT_LIMITS).map(p=>`<option ${p===(c.patent||'Recruta')?'selected':''}>${p}</option>`).join('')}</select></div><div class="field"><label>DEFESA BASE (SEM SOBRECARGA)</label><input type="number" min="0" max="99" value="${c.defenseBase??''}" placeholder="Não informada" onchange="setDefenseBase(this.value)"></div></div><div class="section"><h2>Limites de requisição por missão</h2></div><div class="resource">${[1,2,3,4].map(cat=>`<div class="res"><label>CATEGORIA ${categoryLabel(cat)}</label><strong>${counts[cat]}/${limits[cat-1]}</strong><small class="muted">${counts[cat]<=limits[cat-1]?'Dentro do limite':'Limite excedido'}</small></div>`).join('')}</div><div class="smalltext" style="margin-top:8px">Categoria 0: sem limite de quantidade, ainda sujeita à capacidade de carga.</div><div class="smalltext" style="margin-top:8px">Limites de uso (livro básico, p. 53): no máximo dois itens empunhados, um por mão. Guardar um item empunhado é ação de movimento; largá-lo é ação livre. Vestir um item é ação padrão e removê-lo é ação de movimento (salvo itens com regra específica).</div>${warnings.map(w=>`<div class="warnbox">${esc(w)}</div>`).join('')}`;
- let wornUsed=0;let html=itemList(c).map(it=>{let e=itemEffective(c,it),wornTotal=it.mode==='worn'&&it.benefit?e.qty:0,activeWorn=c.limitWorn?Math.max(0,Math.min(wornTotal,4-wornUsed)):wornTotal;wornUsed+=wornTotal;let status=it.mode==='worn'&&it.benefit?(c.limitWorn?(activeWorn===wornTotal?'Benefício ativo':activeWorn>0?activeWorn+' benefício(s) ativo(s); restante inativo':'Benefício inativo pelo limite de 4'):'Benefício vestido ativo'):'';return `<div class="invitem"><div><strong>${esc(it.name)} <span class="mini-badge">x${e.qty}</span></strong><small>Categoria ${categoryLabel(e.category)}${e.utility?' • Mochila de Utilidades aplicada':''} • ${Number(e.total.toFixed(2))} espaço(s) ocupado(s) • ${modeLabel(it.mode)}</small><div class="inv-badges">${it.weapon?'<span class="mini-badge">Arma</span>':''}${it.requisitioned?'<span class="mini-badge gold">Requisitado</span>':''}${it.benefit?`<span class="mini-badge ${status.includes('inativo')?'red':'gold'}">${esc(status||'Benefício mecânico')}</span>`:''}${normalized(it.name)==='mochila militar'?'<span class="mini-badge gold">+2 capacidade</span>':''}</div></div><div class="invitem-actions">${it.weapon?'<button class="btn small primary" data-agent="'+esc(c.id)+'" data-item="'+esc(it.id)+'" onclick="rollInventoryWeapon(this.dataset.agent,this.dataset.item)">'+(weaponProfileFor(it)?'⚔ Atacar':'Configurar ataque')+'</button>'+(weaponProfileFor(it)?.doubleBarrel?'<button class="btn small" data-agent="'+esc(c.id)+'" data-item="'+esc(it.id)+'" onclick="rollInventoryWeapon(this.dataset.agent,this.dataset.item,true)">2 canos</button>':''):''}<button class="btn small" onclick="adjustInventoryQty('${it.id}',-1)">−</button><button class="btn small" onclick="adjustInventoryQty('${it.id}',1)">＋</button><select onchange="changeInventoryItem('${it.id}','mode',this.value)"><option value="stored" ${it.mode==='stored'?'selected':''}>Guardado</option><option value="held1" ${it.mode==='held1'?'selected':''}>Empunhado 1 mão</option><option value="held2" ${it.mode==='held2'?'selected':''}>Empunhado 2 mãos</option><option value="worn" ${it.mode==='worn'?'selected':''}>Vestido</option></select><button class="btn small" onclick="editInventoryItem('${it.id}')">Editar</button><button class="btn small ghost" onclick="removeInventoryItem('${it.id}')">✕</button></div></div>`}).join('');list.innerHTML=html||'<div class="empty"><strong>▣</strong>Nenhum item cadastrado. Adicione equipamentos no formulário acima.</div>';
+function renderInventory(){
+ let c=current(),summary=$('inventorySummary'),list=$('inventoryItems');
+ if(!summary||!list)return;
+ if(!c){summary.innerHTML='<div class="empty">Selecione um agente.</div>';list.innerHTML='<div class="empty">Nenhum item cadastrado.</div>';return}
+ let info=capacityInfo(c),counts=requisitionCounts(c),limits=PATENT_LIMITS[c.patent||'Recruta']||PATENT_LIMITS.Recruta;
+ let status=info.overMax?'Limite excedido':info.overloaded?'Sobrecarregado':info.overHands?'Mãos ocupadas':'Carga normal';
+ let statusClass=info.overloaded||info.overMax||info.overHands?'warnbox':'goodbox';
+ let pct=info.capacity>0?Math.min(100,info.total/info.capacity*100):0;
+ summary.innerHTML='<div class="inv-overview"><div class="inv-load-row"><div><small>CARGA</small><strong>'+Number(info.total.toFixed(2))+' <span>/ '+info.capacity+'</span></strong><small>espaços ocupados</small></div><span class="'+statusClass+'">'+status+'</span></div><div class="inv-progress"><span style="width:'+pct+'%"></span></div><details class="inv-more"><summary>Ver capacidade e limites</summary><div class="inv-detail-grid"><div><small>Limite absoluto</small><b>'+info.max+'</b></div><div><small>Mãos ocupadas</small><b>'+info.hands+'/2</b></div><div><small>Força</small><b>'+c.attrs.for+'</b></div><div><small>Defesa com carga</small><b>'+(c.defenseBase===null||c.defenseBase===undefined?'—':Math.max(0,+c.defenseBase-(info.overloaded?5:0)))+'</b></div></div><div class="smalltext">'+(info.tech?'Bônus Técnico: +'+c.attrs.int+' espaços. ':'')+(info.organizedBonus?'Inventário Organizado: +'+info.organizedBonus+' espaços. ':'')+(info.backpackBonus?'Mochila militar: +2 espaços.':'')+'</div><div class="inv-category-grid">'+[1,2,3,4].map(cat=>'<div><small>Cat. '+categoryLabel(cat)+'</small><b>'+counts[cat]+'/'+limits[cat-1]+'</b></div>').join('')+'</div>'+((info.overloaded||info.overMax||info.overHands)?'<div class="warnbox">'+(info.overMax?'O limite absoluto de carga foi excedido.':info.overloaded?'Sobrecarga: –5 Defesa, –5 em testes afetados e –3 m de deslocamento.':'Há mais de duas mãos ocupadas.')+'</div>':'')+'</details></div>';
+ let patent=$('invPatentSelect');if(patent){patent.innerHTML=Object.keys(PATENT_LIMITS).map(p=>'<option value="'+p+'" '+(p===(c.patent||'Recruta')?'selected':'')+'>'+p+'</option>').join('')}
+ let def=$('invDefenseBase');if(def&&document.activeElement!==def)def.value=c.defenseBase??'';
+ let worn=$('invFourLimit');if(worn)worn.checked=!!c.limitWorn;
+ let adv=$('inventoryAdvancedInfo');if(adv)adv.textContent='Capacidade: '+info.capacity+' espaços • Limite absoluto: '+info.max+' • Itens requisitados: '+[1,2,3,4].map(cat=>categoryLabel(cat)+' '+counts[cat]+'/'+limits[cat-1]).join(' • ');
+ let wornUsed=0;
+ let html=itemList(c).map(it=>{
+  let e=itemEffective(c,it),wornTotal=it.mode==='worn'&&it.benefit?e.qty:0,activeWorn=c.limitWorn?Math.max(0,Math.min(wornTotal,4-wornUsed)):wornTotal;wornUsed+=wornTotal;
+  let status=it.mode==='worn'&&it.benefit?(c.limitWorn?(activeWorn===wornTotal?'Benefício ativo':activeWorn>0?'Parcialmente ativo':'Benefício inativo'):'Benefício ativo'):'';
+  let profile=it.weapon?weaponProfileFor(it):null;
+  return '<div class="invitem invitem-compact"><div class="invitem-main"><strong>'+esc(it.name)+' <span class="mini-badge">×'+e.qty+'</span></strong><small>'+modeLabel(it.mode)+' • '+Number(e.total.toFixed(2))+' espaço(s)'+(it.requisitioned?' • Requisitado':'')+'</small>'+(it.benefit?'<small class="inv-status">'+esc(status)+'</small>':'')+'</div><div class="invitem-actions">'+(it.weapon?'<button class="btn small primary" data-agent="'+esc(c.id)+'" data-item="'+esc(it.id)+'" onclick="rollInventoryWeapon(this.dataset.agent,this.dataset.item)">'+(profile?'⚔ Atacar':'Configurar')+'</button>':'')+'<select aria-label="Estado do item" onchange="changeInventoryItem(\''+it.id+'\',\'mode\',this.value)"><option value="stored" '+(it.mode==='stored'?'selected':'')+'>Guardado</option><option value="held1" '+(it.mode==='held1'?'selected':'')+'>1 mão</option><option value="held2" '+(it.mode==='held2'?'selected':'')+'>2 mãos</option><option value="worn" '+(it.mode==='worn'?'selected':'')+'>Vestido</option></select><details class="inv-item-menu"><summary>•••</summary><div class="inv-item-menu-content"><div class="inv-qty"><span>Quantidade</span><button class="btn small" onclick="adjustInventoryQty(\''+it.id+'\',-1)">−</button><b>'+e.qty+'</b><button class="btn small" onclick="adjustInventoryQty(\''+it.id+'\',1)">＋</button></div>'+(profile&&profile.doubleBarrel?'<button class="btn small" data-agent="'+esc(c.id)+'" data-item="'+esc(it.id)+'" onclick="rollInventoryWeapon(this.dataset.agent,this.dataset.item,true)">Atirar com 2 canos</button>':'')+'<button class="btn small" onclick="editInventoryItem(\''+it.id+'\')">Editar item</button><button class="btn small ghost" onclick="removeInventoryItem(\''+it.id+'\')">Remover</button></div></details></div></div>';
+ }).join('');
+ list.innerHTML=html||'<div class="empty"><strong>▣</strong>Nenhum equipamento adicionado.</div>';
 }
-
 function renderSkillPage(){
  let grid=$('skillRollGridPage'),toggle=$('skillVisibilityToggle'),message=$('skillHiddenMessage'),c=current();if(!grid||!toggle||!message)return;
  if(!c){grid.innerHTML='<div class="empty">Cadastre um agente para consultar as perícias.</div>';toggle.disabled=true;message.style.display='none';return}
