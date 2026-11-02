@@ -86,3 +86,13 @@
 .paper-v2 .paper-attr:focus-visible{outline:3px solid #f4c17d;outline-offset:3px}
 .paper-v2 .paper-attr small,.paper-v2 .paper-attr strong,.paper-v2 .paper-attr b{position:relative;z-index:1;text-shadow:0 1px 2px #f7e4c5}
 @media(prefers-reduced-motion:reduce){.paper-v2 .paper-attr{transition:none}}
+
+/* CORREÇÃO: aura acima do fundo dos hexágonos e ao redor do conjunto */
+.paper-v2 .paper-attributes{position:relative;isolation:isolate;overflow:visible}
+.paper-v2 .paper-attributes::after{content:"";position:absolute;z-index:5;pointer-events:none;inset:-9% -5%;background:url("./assets/aura-fumaca.svg") center center/100% 100% no-repeat;opacity:.96;filter:drop-shadow(0 0 6px #b52538);animation:aura-respirar 5s ease-in-out infinite}
+.paper-v2 .paper-attr{position:relative;z-index:2;isolation:auto;overflow:visible}
+.paper-v2 .paper-attr::before{content:none!important}
+.paper-v2 .paper-core{position:relative;z-index:2}
+.paper-v2 .paper-attr:hover{z-index:6}
+@keyframes aura-respirar{0%,100%{opacity:.83;filter:drop-shadow(0 0 4px #aa2637)}50%{opacity:1;filter:drop-shadow(0 0 11px #e0444d)}}
+@media(prefers-reduced-motion:reduce){.paper-v2 .paper-attributes::after{animation:none}}
