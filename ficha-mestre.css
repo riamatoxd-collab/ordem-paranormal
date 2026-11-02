@@ -232,3 +232,183 @@
  .paper-v2 .paper-attr b{font-size:17px}
 }
 @media(prefers-reduced-motion:reduce){.paper-v2 .paper-attr{transition:none}}
+
+/* =============================================
+   Ficha • cartões de recursos (PV / PE / SAN)
+   ============================================= */
+.paper-v2 .paper-columns>div:first-child{container-type:inline-size}
+.paper-v2 .paper-resources{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:10px;
+ margin:12px 0 16px;
+}
+.paper-v2 .paper-resource{
+ --resource-tone:#caab78;
+ --resource-fill:#d6b57a;
+ position:relative;
+ isolation:isolate;
+ overflow:hidden;
+ display:flex;
+ flex-direction:column;
+ min-width:0;
+ min-height:170px;
+ padding:12px;
+ gap:0;
+ border:1px solid color-mix(in srgb,var(--resource-tone) 63%,#67433c);
+ border-radius:11px;
+ background:radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--resource-tone) 20%,transparent),transparent 55%),linear-gradient(150deg,#28151b,#110e12 84%);
+ box-shadow:inset 0 1px 0 #ffffff13,0 8px 22px #0004;
+ color:#f8e8d6;
+}
+.paper-v2 .paper-resource::before{
+ content:"";
+ position:absolute;
+ top:0;left:0;right:0;height:3px;
+ background:linear-gradient(90deg,transparent,var(--resource-tone),transparent);
+ opacity:.88;
+ pointer-events:none;
+}
+.paper-v2 .paper-resource::after{
+ content:"";
+ position:absolute;
+ width:105px;height:105px;right:-40px;top:-43px;
+ border:1px solid color-mix(in srgb,var(--resource-tone) 24%,transparent);
+ border-radius:50%;
+ box-shadow:0 0 0 15px color-mix(in srgb,var(--resource-tone) 5%,transparent),0 0 0 34px color-mix(in srgb,var(--resource-tone) 4%,transparent);
+ pointer-events:none;
+}
+.paper-v2 .paper-resource-pv{--resource-tone:#e36972;--resource-fill:linear-gradient(90deg,#78202f,#e96e79)}
+.paper-v2 .paper-resource-pe{--resource-tone:#e4bc77;--resource-fill:linear-gradient(90deg,#926130,#f0c67e)}
+.paper-v2 .paper-resource-san{--resource-tone:#b5a0ec;--resource-fill:linear-gradient(90deg,#5a478c,#c4b0f6)}
+.paper-v2 .paper-resource-def{--resource-tone:#d5a968;--resource-fill:linear-gradient(90deg,#916739,#d7b47b)}
+.paper-v2 .sheet-resource-top{display:flex;align-items:center;gap:7px;min-width:0;position:relative;z-index:1}
+.paper-v2 .sheet-resource-icon{
+ display:grid;place-items:center;
+ flex:0 0 29px;height:29px;width:29px;
+ border-radius:9px;
+ color:var(--resource-tone);
+ border:1px solid color-mix(in srgb,var(--resource-tone) 45%,transparent);
+ background:color-mix(in srgb,var(--resource-tone) 9%,#190f15);
+ font-size:18px;
+ font-weight:800;
+}
+.paper-v2 .sheet-resource-top small{
+ display:block;
+ color:#f0ddc9;
+ letter-spacing:.045em;
+ font-size:clamp(8px,.85vw,10px);
+ font-weight:750;
+ line-height:1.3;
+}
+.paper-v2 .sheet-resource-reading{
+ display:flex;align-items:baseline;gap:6px;
+ position:relative;z-index:1;
+ margin:10px 0 8px;
+ white-space:nowrap;
+}
+.paper-v2 .sheet-resource-reading strong{
+ font-size:clamp(23px,2.6vw,35px);
+ font-weight:850;
+ color:#fff1dd;
+ letter-spacing:-.04em;
+ line-height:1;
+ font-variant-numeric:tabular-nums;
+}
+.paper-v2 .sheet-resource-reading em{
+ color:#d4bfae;
+ font-size:clamp(11px,1.1vw,14px);
+ font-style:normal;
+ font-weight:600;
+}
+.paper-v2 .sheet-resource-temp{
+ position:relative;z-index:1;
+ color:#f0d9a5;font-size:10px;
+ margin:-3px 0 4px;
+}
+.paper-v2 .sheet-resource-meter{
+ position:relative;z-index:1;
+ width:100%;height:7px;
+ flex:0 0 7px;
+ border:1px solid #ffffff19;
+ background:#080709;
+ border-radius:100px;
+ overflow:hidden;
+ margin-top:auto;
+}
+.paper-v2 .sheet-resource-meter>span{
+ display:block;width:0;height:100%;
+ background:var(--resource-fill);
+ border-radius:100px;
+ box-shadow:0 0 8px color-mix(in srgb,var(--resource-tone) 50%,transparent);
+ transition:width .25s ease;
+}
+.paper-v2 .paper-resource-controls{
+ position:relative;z-index:1;
+ display:flex;align-items:center;justify-content:center;
+ margin-top:10px;padding-top:0;gap:5px;
+}
+.paper-v2 .paper-resource-controls input{
+ flex:1 1 35px;
+ width:0;
+ min-width:35px;
+ max-width:75px;
+ height:32px;
+ text-align:center;
+ padding:4px;
+ border-radius:6px;
+ border:1px solid #a88669;
+ background:#e9d8bd;
+ color:#271216;
+ font-size:12px;
+ font-weight:700;
+}
+.paper-v2 .paper-resource-controls .sheet-resource-btn{
+ display:grid;place-items:center;
+ flex:0 0 32px;
+ min-width:32px;width:32px;height:32px;
+ padding:0;border-radius:6px;
+ font-weight:800;font-size:18px;line-height:1;
+}
+.paper-v2 .paper-resource-controls .sheet-resource-btn:first-of-type{
+ background:#25171b;border-color:#7a5552;color:#f4dad0;
+}
+.paper-v2 .paper-resource-controls .sheet-resource-btn:last-of-type{
+ background:linear-gradient(140deg,var(--resource-tone),color-mix(in srgb,var(--resource-tone) 65%,#3a1820));
+ color:#1a1013;border-color:var(--resource-tone);
+}
+.paper-v2 .paper-resource-controls .sheet-resource-btn:hover{filter:brightness(1.12)}
+.paper-v2 .paper-resource-controls .sheet-resource-btn:focus-visible{outline:2px solid #fff2d8;outline-offset:2px}
+.paper-v2 .paper-resource-def .sheet-resource-suffix{
+ margin-left:auto;
+ color:#d1aa75;
+ border:1px solid #b88d5e77;
+ padding:2px 5px;border-radius:3px;
+ letter-spacing:.08em;font-size:8px;font-weight:800;
+}
+.paper-v2 .paper-resource-def .sheet-resource-reading{margin:auto 0 0}
+@container (min-width:490px){
+ .paper-v2 .paper-resources{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .paper-v2 .paper-resource-def{
+  grid-column:1/-1;
+  min-height:76px;
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:12px;
+ }
+ .paper-v2 .paper-resource-def .sheet-resource-reading{margin:0}
+}
+@media(max-width:600px){
+ .paper-v2 .paper-resources{gap:8px}
+ .paper-v2 .paper-resource{padding:10px;min-height:164px}
+ .paper-v2 .sheet-resource-icon{width:25px;height:25px;flex-basis:25px;font-size:15px}
+ .paper-v2 .sheet-resource-reading strong{font-size:26px}
+ .paper-v2 .paper-resource-controls .sheet-resource-btn{flex-basis:30px;min-width:30px;width:30px;height:30px}
+ .paper-v2 .paper-resource-controls input{height:30px}
+}
+@media(max-width:350px){
+ .paper-v2 .paper-resources{grid-template-columns:1fr}
+ .paper-v2 .paper-resource{min-height:150px}
+}
+@media(prefers-reduced-motion:reduce){.paper-v2 .sheet-resource-meter>span{transition:none}}
