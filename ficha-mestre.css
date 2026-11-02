@@ -59,3 +59,20 @@
 @media(max-width:600px){.sheet-weapon b{font-size:9px}.sheet-entry{flex-wrap:wrap}.sheet-add .sheet-weapon-check{flex:1 1 100%}}
 
 .sheet-combat-result:not(:empty){border:1px solid #b5875c;background:#e4cfad;color:#29151b;padding:12px;margin-top:8px}.sheet-combat-result p{margin:6px 0;font-size:12px}.sheet-combat-result b{color:#922833}
+/* Habilidades com custo de PE na própria ficha */
+.sheet-pe-overview{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0 10px}
+.sheet-pe-overview span{flex:1;min-width:130px;background:#3c1a21;border:1px solid #a77854;color:#e7c7a3;padding:12px;font-size:11px;letter-spacing:.07em}
+.sheet-pe-overview b{font-size:21px;color:#f6e2c2;margin-left:8px}
+.sheet-pe-block{margin-bottom:14px}
+.sheet-pe-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sheet-pe-action{display:flex;justify-content:space-between;align-items:center;gap:10px;background:linear-gradient(115deg,#dbc6a6,#bda481);border:1px solid #aa7e59;color:#28151a;padding:12px;min-width:0}
+.sheet-pe-action>div:first-child{display:grid;gap:5px;min-width:0;flex:1}
+.sheet-pe-action strong{font:700 14px Georgia,serif}
+.sheet-pe-action small{font-size:11px;line-height:1.45;color:#513a34}
+.sheet-pe-action em{font-size:10px;font-style:normal;font-weight:700;color:#922c37}
+.sheet-pe-controls{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:flex-end}
+.sheet-pe-controls label{font-size:10px;display:grid;gap:4px}
+.sheet-pe-controls input{width:66px;background:#fff0d5;color:#25151a;border:1px solid #9b7050;padding:6px}
+.sheet-pe-controls button:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:750px){.sheet-pe-list{grid-template-columns:1fr}}
+@media(max-width:430px){.sheet-pe-action{align-items:flex-start;flex-direction:column}.sheet-pe-controls{width:100%;justify-content:space-between}}
