@@ -1,0 +1,21 @@
+/* A Maldição dos Sete Anjos — tema visual experimental */
+:root{--bg:#090708;--p:#1b1113;--p2:#110c0d;--line:#63433a;--muted:#c1aea3;--txt:#f5eadb;--red:#bc3039;--gold:#c5a16a;--green:#a8c4ad}
+body{background:radial-gradient(ellipse at 80% 10%,#711c222b,transparent 42%),radial-gradient(ellipse at 10% 75%,#98714317,transparent 35%),repeating-linear-gradient(0deg,#ffffff04 0 1px,transparent 1px 6px),linear-gradient(135deg,#120c0d,#070607 65%,#160c0d);color:var(--txt)}
+.side{background:linear-gradient(180deg,#211113f7,#0c0809f7);border-right-color:#684238}
+.brand{color:#e6c18d;letter-spacing:.13em}.brand span,.eyebrow{color:#d1a875}
+.nav button{color:#d2bdb2}.nav button.active,.nav button:hover{background:linear-gradient(90deg,#8d273c66,#8d273c12);border-color:#9f4a46;color:#fff0e0}
+.hero{background:radial-gradient(circle at 85% 20%,#9d31352a,transparent 38%),linear-gradient(120deg,#2c1419,#110b0e 70%,#241417);border-color:#805044;box-shadow:0 24px 60px #000a}
+.hero:after{content:'七';color:#d1a36c24;font-size:175px;right:7%;top:4%}
+.hero h2,h1,.section h2{color:#f6e6cd;text-shadow:0 2px 16px #0008}
+.card,.build-box{background:linear-gradient(145deg,#211619f7,#100d0ffb);border-color:#62443e}
+.btn{background:linear-gradient(180deg,#332124,#1a1215);border-color:#795047;color:#f6e6d9}
+.btn:hover{border-color:#d1a875}.primary{background:linear-gradient(135deg,#dfb87a,#a9794d);border-color:#e8c794;color:#170e0d}
+.field input,.field select,.skill select,.res input,.build-choice select{background:#140e10;border-color:#65463e;color:#f5e7d8}
+.field input:focus,.field select:focus{border-color:#c89d69;box-shadow:0 0 0 3px #c89d6925}
+.agent,.hist,.invitem,.invmetric,.attr,.skill,.res{background:#170f12;border-color:#62433d}
+.agent.selected{border-color:#d2a875;background:#b66b3920}
+.result{border-color:#9b3b45;background:radial-gradient(circle at 100% 0,#b52b3a28,transparent 50%),#170e11}
+.modal{background:linear-gradient(145deg,#28181c,#100b0d);border-color:#80584b}
+.note{border-left-color:#c7a16d;background:#c7a16d17}
+@media(max-width:850px){.side{border-bottom:1px solid #684238}}
+@media(prefers-reduced-motion:reduce){.view.active{animation:none}}
