@@ -58,6 +58,7 @@
   const sheet=$('sheet-pe-'+a.id),target=$((a.mode==='cost'?'pe-cost-':'pe-param-')+a.id);
   if(sheet&&target)target.value=sheet.value;
   usePEAction(c.id,a.id);
+  renderPaper();
  };
  window.sheetSelectPreset=function(value){const p=INVENTORY_PRESETS[Number(value)];if(value===''||!p)return;$('sheetItemName').value=p.name;$('sheetItemWeapon').checked=!!p.weapon};
  window.sheetRemoveItem=function(id){if(!confirm('Remover este item do inventário?'))return;removeInventoryItem(id)};
