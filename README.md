@@ -97,3 +97,17 @@ Projeto independente, não oficial e sem vínculo com Ordem Paranormal, Cellbit 
 - O teste direto usa somente a quantidade de dados do atributo: com atributo 0, rola 2d20 e mantém o menor; com atributo 1 ou maior, rola essa quantidade de d20 e mantém o maior.
 - Perícias que exigem treinamento e estão destreinadas oferecem a opção de rolar diretamente o atributo associado, sem bônus de treinamento. Especialistas continuam podendo usar Eclético quando disponível.
 - Os testes diretos são registrados no histórico como Atributo.
+
+
+## Perícias em página própria e ataques automáticos — versão 2.3
+
+- A lista completa de perícias saiu da ficha individual e ganhou uma aba própria chamada **Perícias**, posicionada logo abaixo de **Inventário** no menu lateral.
+- A ficha do agente ficou mais compacta e mantém um atalho para abrir o painel de perícias.
+- O painel de perícias possui controle **Ocultar perícias / Mostrar perícias**. A preferência é salva por agente e preservada ao editar a ficha.
+- Cada item marcado como arma no inventário recebe uma ação de ataque. Todos os 28 modelos de arma já existentes nos presets do site possuem perfil automático; itens personalizados sem perfil são encaminhados ao Terminal de Combate para configuração manual.
+- O ataque automático escolhe Luta ou Pontaria, rola os dados conforme o atributo, aplica o treinamento, a proficiência da classe, penalidades de alcance e de empunhadura, verifica acerto e crítico e rola o dano.
+- Dano corpo a corpo e de arremesso soma Força quando a regra da arma determina. Acertos críticos multiplicam os dados de dano, não o bônus fixo de Força.
+- O inventário permite informar a Defesa do alvo (padrão 15) e o alcance (curto, médio, longo ou extremo).
+- A Espingarda de Cano Duplo tem dois comandos: disparo normal e disparo dos dois canos (6d6, com penalidade de −1d20 no ataque).
+- A Pistola Pesada aplica −1d20 quando usada com uma mão; empunhada com as duas mãos, essa penalidade é removida. Armas de duas mãos não podem atacar quando marcadas como empunhadas com apenas uma mão; a katana aceita uma mão para personagens veteranos em Luta.
+- Os ataques automáticos são registrados no histórico como Combate.
