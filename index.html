@@ -184,6 +184,72 @@
 @media(max-width:900px){.grimorio-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.grimorio-card-grid,.grimorio-progression{grid-template-columns:1fr}.transcend-hero{grid-template-columns:1fr;text-align:center}.transcend-hero-symbol{min-height:145px}.transcend-hero-symbol img{width:150px}.transcend-hero-actions{justify-content:center}}
 
+
+/* Transcender — progressão, enquadramento do sigilo e abertura cinematográfica */
+.transcend-hero-symbol{min-width:0;overflow:visible}
+.transcend-hero-symbol img{display:block;width:min(100%,205px);height:205px;max-height:none;object-fit:contain;object-position:center;margin:auto}
+.transcend-stage{box-sizing:border-box;overflow-x:hidden;overflow-y:auto}
+.transcend-sigil{flex:0 0 auto;min-width:0;overflow:visible}
+.transcend-sigil img{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;object-position:center;margin:auto}
+.transcend-guide{margin-top:14px;padding:20px}
+.transcend-guide-head h2{margin:5px 0;font-size:21px}
+.transcend-guide-head p{margin:0;color:#aaa;font-size:11px}
+.transcend-progress-summary{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 15px;margin:8px 0 14px;border:1px solid #473b38;border-radius:11px;background:linear-gradient(110deg,#211313,#111)}
+.transcend-progress-summary b{display:block;color:#eee;font-size:13px}
+.transcend-progress-summary small{display:block;margin-top:4px;color:#aaa;font-size:10px;line-height:1.5}
+.transcend-progress-summary>strong{flex:0 0 auto;color:#d6b8b1;font-size:16px;letter-spacing:.06em}
+.transcend-progress-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.transcend-step{min-width:0;padding:13px;border:1px solid #35302f;border-radius:10px;background:#101010;transition:border-color .25s,background .25s,transform .25s}
+.transcend-step-top{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:11px}
+.transcend-step-index{color:#777;font-size:10px;letter-spacing:.12em}
+.transcend-step-status{font-size:8px;font-weight:800;letter-spacing:.08em;text-align:right;color:#888}
+.transcend-step>strong{display:block;color:#eee;font-size:17px;letter-spacing:.05em}
+.transcend-step p{margin:6px 0 0;color:#999;font-size:10px;line-height:1.55}
+.transcend-step.is-current{border-color:#a34a4a;background:linear-gradient(145deg,#291414,#111);box-shadow:inset 0 0 24px #9b29291c;transform:translateY(-2px)}
+.transcend-step.is-current .transcend-step-status{color:#e7a5a0}
+.transcend-step.is-done{border-color:#5d5145}
+.transcend-step.is-done .transcend-step-status{color:#c7b79e}
+.transcend-step.is-used{border-color:#51413b}
+.transcend-step.is-used .transcend-step-status{color:#c19a85}
+.transcend-step.is-expired{opacity:.7;border-style:dashed}
+.transcend-step.is-expired .transcend-step-status{color:#b17b70}
+.transcend-affinity-card{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:15px;margin-top:14px;border:1px solid #493535;border-radius:11px;background:linear-gradient(110deg,#1d1212,#111)}
+.transcend-affinity-card>div:first-child{max-width:560px}
+.transcend-affinity-card b{display:block;margin-top:5px;color:#eee;font-size:13px}
+.transcend-affinity-card p{margin:5px 0 0;color:#aaa;font-size:10px;line-height:1.55}
+.transcend-affinity-control{min-width:190px}
+.transcend-affinity-control .field{min-width:190px}
+.transcend-affinity-state{display:block;color:#c8b6ae;font-size:11px;text-align:right}
+.transcend-affinity-state small{display:block;margin-top:4px;color:#999;font-size:9px;line-height:1.5}
+.transcend-rules-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.transcend-rules-grid article{padding:12px;border:1px solid #302d2c;border-radius:9px;background:#0e0e0e}
+.transcend-rules-grid article>span{display:block;margin-bottom:8px;color:#a94a4a;font-size:10px;letter-spacing:.12em}
+.transcend-rules-grid article>b{display:block;color:#e5e0dc;font-size:11px}
+.transcend-rules-grid article>p{margin:5px 0 0;color:#999;font-size:9px;line-height:1.55}
+.transcend-sequence{min-height:18px;margin-top:13px;color:#d7aaa5;font-size:10px;letter-spacing:.13em;text-transform:uppercase;opacity:.65}
+.transcend-sequence.active{animation:transcendTextReveal .72s ease both}
+.transcend-overlay.open .transcend-sigil img{animation:transcendImageBreathe 4.2s ease-in-out infinite}
+.transcend-overlay.ritual-starting .transcend-sigil img{animation:transcendImageAwaken 3.5s cubic-bezier(.2,.8,.2,1) both;filter:drop-shadow(0 0 18px #d22) drop-shadow(0 0 40px #a11)}
+.transcend-overlay.ritual-starting .transcend-sigil:before{border-color:#e24b4b99;animation-duration:5s}
+.transcend-overlay.ritual-starting .transcend-sigil:after{border-color:#e24b4b88;animation-duration:3.5s}
+.transcend-overlay.ritual-starting .transcend-intro{animation:transcendIntroDrift 3.2s ease both}
+.transcend-overlay.revealed .transcend-intro{opacity:0;transform:translateY(-18px) scale(.94);max-height:0;overflow:hidden;margin:0;pointer-events:none;transition:opacity .5s,transform .5s,max-height .7s,margin .7s}
+.transcend-overlay.revealed .transcend-sigil{width:min(42vw,245px);margin-bottom:8px;transition:width .65s,margin .65s}
+.transcend-overlay.revealed .transcend-choice-panel{animation:transcendPanelIn .75s cubic-bezier(.2,.8,.2,1) both}
+.transcend-choice-card{animation:transcendCardIn .65s cubic-bezier(.2,.8,.2,1) both}
+.transcend-choice-card:nth-child(2){animation-delay:.14s}
+.transcend-option{animation:transcendCardIn .38s ease both}
+.transcend-start:disabled{opacity:.6;cursor:not-allowed;filter:grayscale(.4)}
+@keyframes transcendImageBreathe{0%,100%{transform:scale(.98);filter:drop-shadow(0 0 12px #b22)}50%{transform:scale(1.025);filter:drop-shadow(0 0 24px #e33)}}
+@keyframes transcendImageAwaken{0%{transform:scale(.72) rotate(-8deg);opacity:.45;filter:blur(5px)}45%{transform:scale(1.12) rotate(3deg);opacity:1;filter:drop-shadow(0 0 26px #e22)}75%{transform:scale(.98) rotate(-1deg)}100%{transform:scale(1);opacity:1}}
+@keyframes transcendTextReveal{0%{opacity:0;transform:translateY(7px);letter-spacing:.3em}100%{opacity:1;transform:translateY(0);letter-spacing:.13em}}
+@keyframes transcendIntroDrift{0%{opacity:1;transform:translateY(0)}35%{opacity:.9;transform:translateY(-6px)}100%{opacity:.25;transform:translateY(-18px) scale(.96)}}
+@keyframes transcendPanelIn{0%{opacity:0;transform:translateY(28px) scale(.98);filter:blur(4px)}100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@keyframes transcendCardIn{0%{opacity:0;transform:translateY(16px)}100%{opacity:1;transform:translateY(0)}}
+@media(max-width:900px){.transcend-progress-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.transcend-rules-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.transcend-hero-symbol img{width:150px;height:150px}.transcend-progress-grid,.transcend-rules-grid{grid-template-columns:1fr}.transcend-affinity-card{align-items:stretch;flex-direction:column}.transcend-affinity-control,.transcend-affinity-control .field{min-width:0;width:100%}.transcend-affinity-state{text-align:left}.transcend-stage{max-height:94vh;min-height:0;padding:50px 14px 22px}.transcend-sigil{width:min(68vw,250px)}.transcend-overlay.revealed .transcend-sigil{width:min(50vw,190px)}}
+@media(prefers-reduced-motion:reduce){.transcend-overlay.open .transcend-sigil img,.transcend-overlay.ritual-starting .transcend-sigil img,.transcend-overlay.ritual-starting .transcend-intro,.transcend-overlay.revealed .transcend-choice-panel,.transcend-choice-card,.transcend-option,.transcend-sequence.active{animation:none!important;transition:none!important}}
+
 </style></head><body>
 <div class="app"><aside class="side"><div class="brand"><span class="sig">✣</span> O OUTRO LADO<span>ARQUIVO DE OPERAÇÕES</span></div><nav class="nav"><button class="active" data-view="home">⌂ &nbsp;Painel</button><button data-view="agents">♙ &nbsp;Agentes</button><button data-view="occult">◉ &nbsp;Transcender</button><button data-view="grimorio">▤ &nbsp;Grimório</button><button data-view="roll">⚄ &nbsp;Rolagens</button><button data-view="combat">⚔ &nbsp;Combate</button><button data-view="history">◷ &nbsp;Histórico</button></nav><small>PROTOCOLO 0-01<br>Registros salvos neste navegador.<br>Versão 2.6 • Transcender e Grimório</small></aside>
 <main><header class="top"><div><div class="eyebrow">SISTEMA DE APOIO À MESA</div><h1 id="title">Painel de operações</h1></div><button class="btn primary" onclick="openModal()">＋ Novo agente</button></header>
@@ -245,6 +311,25 @@
 <section class="view" id="v-occult">
 <div class="section" style="margin-top:0;align-items:end;flex-wrap:wrap"><div><h2>Transcender</h2><p>Um único caminho. Um preço que não pode ser desfeito.</p></div><div class="field occult-agent-picker"><label>AGENTE ATIVO</label><select id="occultAgentSelect" onchange="setOccultAgent(this.value)"></select></div></div>
 <div class="transcend-hero card"><div class="transcend-hero-symbol"><img src="assets/sigilo-transcender.png" alt="Sigilo vermelho do ritual de Transcender"></div><div class="transcend-hero-copy"><span class="eyebrow">RITUAL DE CONEXÃO • O OUTRO LADO</span><h2>TRANSCENDER</h2><p>O silêncio cresce. Algo percebe que você está olhando.</p><button class="btn primary" id="transcendStartButton" onclick="openTranscendence('class')">✧ Atender ao chamado</button><div class="transcend-hero-actions"><button class="btn small ghost" id="transcendPageSoundButton" onclick="toggleVoidSound()">♫ Som ambiente: ligado</button><small>Uma escolha de poder por marco de NEX. Transcender cobra seu preço em Sanidade.</small></div></div></div>
+<section class="card transcend-guide" aria-label="Critérios para Transcender">
+  <div class="section transcend-guide-head" style="margin-top:0;align-items:center">
+    <div><span class="eyebrow">PROGRESSÃO DE EXPOSIÇÃO</span><h2>O caminho do chamado</h2><p>Veja em quais marcos o Outro Lado pode oferecer uma nova conexão.</p></div>
+    <span class="mini-badge" id="transcendProgressBadge">AGUARDANDO AGENTE</span>
+  </div>
+  <div id="transcendProgression" class="transcend-progress"></div>
+  <div class="transcend-affinity-card">
+    <div><span class="eyebrow">MARCO ESPECIAL • NEX 50%</span><b>A afinidade elemental</b><p>Ao alcançar 50% de NEX, escolha Conhecimento, Energia, Morte ou Sangue. A afinidade desperta na primeira Transcendência realizada depois desse marco.</p></div>
+    <div id="transcendAffinityControl" class="transcend-affinity-control"></div>
+  </div>
+  <div class="transcend-rules-grid">
+    <article><span>01</span><b>Alcance um marco</b><p>Os chamados regulares surgem nos marcos de poder de classe: NEX 15%, 30%, 45%, 60%, 75% e 90%.</p></article>
+    <article><span>02</span><b>Escolha Transcender</b><p>No marco disponível, escolha Transcender no lugar de um poder de classe. Depois, escolha um poder paranormal.</p></article>
+    <article><span>03</span><b>Cumpra os pré-requisitos</b><p>O poder paranormal escolhido precisa atender aos seus requisitos. Em regra, cada poder só pode ser escolhido uma vez, salvo exceções indicadas no próprio poder ou pela afinidade.</p></article>
+    <article><span>04</span><b>O preço em Sanidade</b><p>Ao Transcender, você não recebe a Sanidade daquele aumento de NEX. O valor não é recuperado automaticamente depois.</p></article>
+    <article><span>05</span><b>O chamado tem prazo</b><p>Se escolher outro poder de classe ou deixar o chamado terminar sem Transcender, perde aquela oportunidade. Será preciso alcançar um novo marco de NEX.</p></article>
+    <article><span>06</span><b>Versatilidade em NEX 50%</b><p>Se a Versatilidade conceder um poder adicional de classe, essa escolha extra também pode ser Transcender. Se escolher outra trilha, não há esse marco adicional de poder de classe.</p></article>
+  </div>
+</section>
 </section>
 <section class="view" id="v-grimorio">
 <div class="section" style="margin-top:0;align-items:end;flex-wrap:wrap"><div><h2>Grimório</h2><p>Arquivo de campo • registros do Outro Lado e suas manifestações.</p></div><span class="mini-badge" id="grimoireAgentInfo">Nenhum agente selecionado</span></div>
@@ -672,16 +757,65 @@ function classFeatureSummary(c){let n=+c.nex||5;if(c.class==='combatente'){let c
 
 let transcendSource='class',transcendAudio=null,transcendSoundEnabled=true;
 function setOccultAgent(id){if(!agents.some(x=>x.id===id))return;selected=id;render()}
-function nextClassPowerSlot(c){if(!c||c.class==='sobrevivente')return null;let milestones=classPowerMilestones(+c.nex||5,c.versatility||''),powers=c.powers?.class||[];for(let i=0;i<milestones.length;i++)if(!powers[i])return{index:i,nex:milestones[i]};return null}
+function nextClassPowerSlot(c){if(!c||c.class==='sobrevivente')return null;let nex=+c.nex||5,milestones=classPowerMilestones(nex,c.versatility||''),powers=c.powers?.class||[],index=milestones.findIndex(x=>x===nex);if(index<0||powers[index])return null;return{index,nex:milestones[index]}}
 function agentPowerRequirementMet(p,c){let req=p[2]||'',a=c.attrs||{},skills=c.skills||{},powers=c.powers?.class||[],trained=n=>(+skills[n]||0)>0;switch(req){case'for2':return(+a.for||0)>=2;case'agi2':return(+a.agi||0)>=2;case'int2':return(+a.int||0)>=2;case'nex30':return(+c.nex||0)>=30;case'nex60':return(+c.nex||0)>=60;case'agi3attack':return(+a.agi||0)>=3&&(trained('Luta')||trained('Pontaria'));case'for2luta':return(+a.for||0)>=2&&trained('Luta');case'iniciativa':return trained('Iniciativa');case'sentidotatico':return(+a.int||0)>=2&&trained('Percepção')&&trained('Tática');case'tanque':return powers.includes('Proteção Pesada');case'pontaria':return trained('Pontaria');case'tecnologia':return trained('Tecnologia');case'agi3crime':return(+a.agi||0)>=3&&trained('Crime');case'atletismo':return trained('Atletismo');case'mestreElemento':return(+c.nex||0)>=45&&powers.includes('Especialista em Elemento');default:return true}}
 function agentParanormalElement(name,c,index){let saved=c.powers?.paranormalElements?.[index];if(saved)return saved;let p=PARA_POWERS.find(x=>x[0]===name);return p?.[1]||'Geral'}
 function agentParanormalCounts(c){let counts={Conhecimento:0,Energia:0,Morte:0,Sangue:0},powers=c.powers?.paranormal||[];powers.forEach((name,i)=>{let element=agentParanormalElement(name,c,i);if(counts[element]!==undefined)counts[element]++});return counts}
 function agentParanormalAllowed(p,c){let selected=c.powers?.paranormal||[],counts=agentParanormalCounts(c),req=p[3]||'';if(req==='conhecimento1'&&counts.Conhecimento<1)return false;if(req==='energia1'&&counts.Energia<1)return false;if(req==='morte1'&&counts.Morte<1)return false;if(req==='morte2'&&counts.Morte<2)return false;if(req==='sangue1'&&counts.Sangue<1)return false;if(req==='sangue2'&&counts.Sangue<2)return false;let same=selected.filter(x=>x===p[0]).length;if(p[0]!=='Aprender Ritual'&&same>0){let affinity=c.affinityElement||'',firstTranscend=transcendSource==='class'&&+c.nex>=50&&!!affinity,allowed=(!!c.affinityAwakened||firstTranscend)&&p[1]===affinity&&same<2;if(!allowed)return false}return true}
 function availableRitualsFor(c){return RITUALS.filter(r=>ritualAllowed(r,c))}
 function originParanormalPending(c){if(!c||c.origin!=='Cultista Arrependido')return false;if(typeof c.originParanormalChosen==='boolean')return !c.originParanormalChosen;let trans=(c.powers?.class||[]).filter(x=>x==='Transcender').length;return(c.powers?.paranormal||[]).length<=trans}
-function openTranscendence(source){let c=current();if(!c){say('Selecione um agente primeiro.');return}transcendSource=source||'class';if(transcendSource==='class'&&!nextClassPowerSlot(c)){say('Não há escolha de poder de classe pendente neste NEX.');return}if(transcendSource==='origin'&&!originParanormalPending(c)){say('Não há poder paranormal de origem pendente.');return}let layer=$('transcendOverlay');if(!layer)return;layer.classList.remove('revealed');$('transcendChoicePanel').innerHTML='';$('transcendIntro').innerHTML='<span class="eyebrow">RITUAL DE TRANSCENDER</span><h2 id="transcendTitle">O SILÊNCIO RESPONDE.</h2><p>'+(transcendSource==='origin'?'O traço deixado pelo Outro Lado desperta. Escolha o poder paranormal concedido por sua origem.':'Você desenha o símbolo. A realidade parece se afastar. Algo do outro lado percebe sua presença.')+'</p><button class="btn primary transcend-start" id="transcendRevealButton" onclick="revealTranscendChoices()">'+(transcendSource==='origin'?'Despertar o traço':'Atravessar a Membrana')+'</button>';layer.classList.add('open');startVoidAudio()}
-function revealTranscendChoices(){let layer=$('transcendOverlay');if(!layer)return;layer.classList.add('revealed');let panel=$('transcendChoicePanel');if(transcendSource==='origin'){panel.innerHTML='<div class="transcend-choice-heading">O TRAÇO DO OUTRO LADO</div><div class="transcend-choice-grid"><button class="transcend-choice-card" onclick="showParanormalChoices()"><strong>PODER PARANORMAL</strong><small>Escolha o poder concedido pela origem Cultista Arrependido. Não usa um marco de poder de classe nem aplica a perda de SAN de Transcender.</small></button></div>'}else{panel.innerHTML='<div class="transcend-choice-heading">O QUE VOCÊ BUSCA NO OUTRO LADO?</div><div class="transcend-choice-grid"><button class="transcend-choice-card" onclick="chooseTranscendPath(\'class\')"><strong>◇ PODER DE CLASSE</strong><small>Escolha um poder da sua classe, cumprindo os pré-requisitos. É o avanço normal: não realiza Transcender e não sacrifica a SAN deste NEX.</small></button><button class="transcend-choice-card" onclick="chooseTranscendPath(\'paranormal\')"><strong>◉ PODER PARANORMAL</strong><small>Escolha Transcender como poder de classe e receba um poder paranormal. Você não recebe a SAN deste aumento de NEX.</small></button></div>'}}
-function closeTranscendence(){let layer=$('transcendOverlay');if(layer)layer.classList.remove('open','revealed');transcendSource='class'}
+function openTranscendence(source){
+  let c=current();
+  if(!c){say('Selecione um agente primeiro.');return}
+  transcendSource=source||'class';
+  if(transcendSource==='class'){
+    let slot=nextClassPowerSlot(c);
+    if(!slot){say('O chamado só fica disponível ao alcançar um marco de poder de classe. Confira a progressão de NEX.');return}
+  }
+  if(transcendSource==='origin'&&!originParanormalPending(c)){say('Não há poder paranormal de origem pendente.');return}
+  let layer=$('transcendOverlay');
+  if(!layer)return;
+  layer.classList.remove('revealed','ritual-starting');
+  $('transcendChoicePanel').innerHTML='';
+  $('transcendIntro').innerHTML='<span class="eyebrow">RITUAL DE TRANSCENDER</span><h2 id="transcendTitle">O CHAMADO ECOA.</h2><p>'+(transcendSource==='origin'?'Uma marca esquecida desperta sob sua pele. O Outro Lado exige que você escolha o que permanecerá.':'O símbolo está completo. Sua respiração desacelera. Do outro lado da Membrana, algo percebe sua presença.')+'</p><div class="transcend-sequence" id="transcendSequenceText" aria-live="polite">O símbolo aguarda sua decisão.</div><button class="btn primary transcend-start" id="transcendRevealButton" onclick="revealTranscendChoices()">'+(transcendSource==='origin'?'Despertar o traço':'Atravessar a Membrana')+'</button>';
+  layer.classList.add('open');
+  startVoidAudio();
+}
+function revealTranscendChoices(){
+  let layer=$('transcendOverlay');
+  if(!layer||!layer.classList.contains('open')||layer.classList.contains('ritual-starting')||layer.classList.contains('revealed'))return;
+  let button=$('transcendRevealButton'),sequence=$('transcendSequenceText');
+  if(button){button.disabled=true;button.textContent='A MEMBRANA ESTÁ CEDENDO...'}
+  layer.classList.add('ritual-starting');
+  playTranscendCue();
+  let messages=['O símbolo encontra o seu pulso.','A realidade perde os contornos.','Uma presença responde do outro lado.','O chamado exige uma escolha.'];
+  let index=0;
+  function advance(){
+    if(!layer.classList.contains('open'))return;
+    if(sequence){
+      sequence.textContent=messages[index];
+      sequence.classList.remove('active');
+      void sequence.offsetWidth;
+      sequence.classList.add('active');
+    }
+    index++;
+    if(index<messages.length)setTimeout(advance,850);
+    else setTimeout(function(){showTranscendChoiceGateway(layer)},650);
+  }
+  advance();
+}
+function showTranscendChoiceGateway(layer){
+  if(!layer||!layer.classList.contains('open'))return;
+  let panel=$('transcendChoicePanel');
+  layer.classList.remove('ritual-starting');
+  layer.classList.add('revealed');
+  if(transcendSource==='origin'){
+    panel.innerHTML='<div class="transcend-choice-heading">O TRAÇO DO OUTRO LADO</div><div class="transcend-choice-grid"><button class="transcend-choice-card" onclick="showParanormalChoices()"><strong>PODER PARANORMAL</strong><small>Escolha o poder concedido pela origem Cultista Arrependido. Não usa um marco de poder de classe nem aplica a perda de SAN de Transcender.</small></button></div>';
+  }else{
+    panel.innerHTML='<div class="transcend-choice-heading">O QUE VOCÊ BUSCA NO OUTRO LADO?</div><div class="transcend-choice-grid"><button class="transcend-choice-card" onclick="chooseTranscendPath(\'class\')"><strong>◇ PODER DE CLASSE</strong><small>Escolha um poder da sua classe, cumprindo os pré-requisitos. Esta opção não realiza Transcender nem sacrifica a Sanidade deste aumento de NEX.</small></button><button class="transcend-choice-card" onclick="chooseTranscendPath(\'paranormal\')"><strong>◉ PODER PARANORMAL</strong><small>Escolha Transcender como poder de classe e receba um poder paranormal. Você não recebe a Sanidade deste aumento de NEX.</small></button></div>';
+  }
+}
+function closeTranscendence(){let layer=$('transcendOverlay');if(layer)layer.classList.remove('open','revealed','ritual-starting');transcendSource='class'}
 function chooseTranscendPath(path){let c=current();if(!c)return;if(path==='class'){showClassPowerChoices();return}if(path==='paranormal'){if(+c.nex>=50&&!c.affinityElement){$('transcendChoicePanel').innerHTML='<div class="transcend-warning">Em NEX 50%, escolha primeiro um elemento para sua afinidade. Ela desperta na primeira Transcendência depois desse NEX.</div><div class="transcend-option-list">'+['Conhecimento','Energia','Morte','Sangue'].map(x=>'<button class="transcend-option" onclick="setAffinityDuringTranscend(\''+x+'\')"><b>'+x+'</b><small>Escolher como elemento de afinidade.</small></button>').join('')+'</div>';return}showParanormalChoices()}}
 function setAffinityDuringTranscend(element){let c=current();if(!c||!['Conhecimento','Energia','Morte','Sangue'].includes(element))return;if(c.affinityElement&&c.affinityElement!==element)return;c.affinityElement=element;db();showParanormalChoices()}
 function showClassPowerChoices(){let c=current(),slot=nextClassPowerSlot(c),panel=$('transcendChoicePanel');if(!c||!slot){panel.innerHTML='<div class="transcend-warning">Não há um marco de poder de classe disponível.</div>';return}let powers=(CLASS_POWERS[c.class]||[]).filter(p=>p[0]!=='Transcender'&&agentPowerRequirementMet(p,c)&&(p[2]==='repeat'||!(c.powers?.class||[]).includes(p[0])));panel.innerHTML='<div class="transcend-choice-heading">PODER DE '+(c.class==='combatente'?'COMBATENTE':c.class==='especialista'?'ESPECIALISTA':'OCULTISTA')+' • NEX '+slot.nex+'%</div><div class="transcend-option-list">'+(powers.map(p=>'<button class="transcend-option" onclick="completeClassPower(\''+esc(p[0])+'\')"><b>'+esc(p[0])+'</b><small>'+esc(p[1])+'</small></button>').join('')||'<div class="transcend-warning">Nenhum poder está disponível com os atributos, perícias e pré-requisitos atuais.</div>')+'</div><button class="btn small ghost transcend-back" onclick="revealTranscendChoices()">Voltar</button>'}
@@ -713,10 +847,112 @@ function renderGrimoirePage(){let c=current(),info=$('grimoireAgentInfo');if(inf
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeTranscendence()});
 function updateVoidSoundButtons(){let label=transcendSoundEnabled?'♫ Som ambiente: ligado':'♫ Som ambiente: desligado';['transcendSoundButton','transcendPageSoundButton'].forEach(id=>{let b=$(id);if(b)b.textContent=label})}
-function startVoidAudio(){if(!transcendSoundEnabled)return;try{let AC=window.AudioContext||window.webkitAudioContext;if(!AC){let b=$('transcendPageSoundButton');if(b)b.textContent='Áudio não suportado';return}if(transcendAudio){if(transcendAudio.ctx.state==='suspended')transcendAudio.ctx.resume().catch(()=>{});transcendAudio.master.gain.setTargetAtTime(.16,transcendAudio.ctx.currentTime,.25);updateVoidSoundButtons();return}let ctx=new AC(),master=ctx.createGain();master.gain.value=0;master.connect(ctx.destination);let nodes=[];[[46.25,'sine',.58],[55.1,'sine',.34],[73.4,'triangle',.14],[110,'sine',.06]].forEach(v=>{let o=ctx.createOscillator(),g=ctx.createGain();o.type=v[1];o.frequency.value=v[0];g.gain.value=v[2];o.connect(g);g.connect(master);o.start();nodes.push(o,g)});let buffer=ctx.createBuffer(1,ctx.sampleRate*4,ctx.sampleRate),data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*.25;let noise=ctx.createBufferSource(),filter=ctx.createBiquadFilter(),ng=ctx.createGain();noise.buffer=buffer;noise.loop=true;filter.type='lowpass';filter.frequency.value=180;filter.Q.value=.7;ng.gain.value=.16;noise.connect(filter);filter.connect(ng);ng.connect(master);noise.start();nodes.push(noise,filter,ng);let lfo=ctx.createOscillator(),lfoGain=ctx.createGain();lfo.frequency.value=.065;lfoGain.gain.value=38;lfo.connect(lfoGain);lfoGain.connect(filter.frequency);lfo.start();nodes.push(lfo,lfoGain);transcendAudio={ctx,master,nodes};ctx.resume().then(()=>{if(transcendAudio&&transcendAudio.ctx===ctx)master.gain.setTargetAtTime(.16,ctx.currentTime,.25)}).catch(()=>{});updateVoidSoundButtons()}catch(e){let b=$('transcendPageSoundButton');if(b)b.textContent='Falha ao ativar som';transcendAudio=null}}
+function startVoidAudio(){
+  if(!transcendSoundEnabled)return;
+  try{
+    let AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC){let b=$('transcendPageSoundButton');if(b)b.textContent='Áudio não suportado';return}
+    if(!transcendAudio){
+      let ctx=new AC(),master=ctx.createGain();
+      master.gain.value=0;master.connect(ctx.destination);
+      let nodes=[];
+      [[55,'sine',.24],[73.42,'triangle',.13],[110,'sine',.09],[146.83,'sine',.045]].forEach(function(v){
+        let o=ctx.createOscillator(),g=ctx.createGain();
+        o.type=v[1];o.frequency.value=v[0];g.gain.value=v[2];
+        o.connect(g);g.connect(master);o.start();nodes.push(o,g);
+      });
+      let buffer=ctx.createBuffer(1,ctx.sampleRate*3,ctx.sampleRate),data=buffer.getChannelData(0);
+      for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*.18;
+      let noise=ctx.createBufferSource(),filter=ctx.createBiquadFilter(),ng=ctx.createGain();
+      noise.buffer=buffer;noise.loop=true;filter.type='lowpass';filter.frequency.value=190;filter.Q.value=.7;ng.gain.value=.075;
+      noise.connect(filter);filter.connect(ng);ng.connect(master);noise.start();nodes.push(noise,filter,ng);
+      let lfo=ctx.createOscillator(),lfoGain=ctx.createGain();
+      lfo.frequency.value=.07;lfoGain.gain.value=28;lfo.connect(lfoGain);lfoGain.connect(filter.frequency);lfo.start();nodes.push(lfo,lfoGain);
+      transcendAudio={ctx:ctx,master:master,nodes:nodes};
+    }
+    let audio=transcendAudio;
+    let resumed=audio.ctx.state==='suspended'?audio.ctx.resume():Promise.resolve();
+    Promise.resolve(resumed).then(function(){
+      if(transcendAudio===audio)audio.master.gain.setTargetAtTime(.24,audio.ctx.currentTime,.35);
+    }).catch(function(){});
+    updateVoidSoundButtons();
+  }catch(e){
+    let b=$('transcendPageSoundButton');if(b)b.textContent='Falha ao ativar som';transcendAudio=null;
+  }
+}
+function playTranscendCue(){
+  if(!transcendSoundEnabled)return;
+  startVoidAudio();
+  let audio=transcendAudio;
+  if(!audio)return;
+  let ctx=audio.ctx,now=ctx.currentTime;
+  [[196,.12],[293.66,.085],[440,.055]].forEach(function(v){
+    let osc=ctx.createOscillator(),gain=ctx.createGain();
+    osc.type='sine';osc.frequency.setValueAtTime(v[0],now);
+    osc.frequency.exponentialRampToValueAtTime(v[0]*.68,now+1.8);
+    gain.gain.setValueAtTime(.0001,now);
+    gain.gain.exponentialRampToValueAtTime(v[1],now+.12);
+    gain.gain.exponentialRampToValueAtTime(.0001,now+2.1);
+    osc.connect(gain);gain.connect(audio.master);osc.start(now);osc.stop(now+2.15);
+  });
+}
 function toggleVoidSound(){transcendSoundEnabled=!transcendSoundEnabled;if(transcendSoundEnabled){startVoidAudio()}else if(transcendAudio){transcendAudio.master.gain.setTargetAtTime(0,transcendAudio.ctx.currentTime,.12);updateVoidSoundButtons()}else updateVoidSoundButtons()}
 function stopVoidAudio(){if(!transcendAudio)return;let a=transcendAudio;transcendAudio=null;try{a.master.gain.setTargetAtTime(0,a.ctx.currentTime,.1);setTimeout(()=>{a.nodes.forEach(n=>{try{n.stop?.()}catch(e){}});a.ctx.close().catch(()=>{})},350)}catch(e){}}
 
 
-function render(){$('nAgents').textContent=agents.length;renderAgents();fillSelect();renderHistory();renderInventory();renderSkillPage();renderOccultPage();renderGrimoirePage()};setupInventoryPresets();populateOrigins();renderTrailOptions('');['class','nex','aAgi','aFor','aInt','aPre','aVig'].forEach(id=>$(id).addEventListener('input',()=>{if(id==='class')classHint();else{if(id==='nex')renderTrailOptions($('trail').value);refreshBuildEditors()}$('classSkillSummary').textContent=classSkillText($('class').value,+$('aInt').value)}));$('origin').addEventListener('change',onOriginChange);$('trail').addEventListener('change',refreshBuildEditors);render();
+function renderTranscendProgression(){
+  let box=$('transcendProgression'),badge=$('transcendProgressBadge'),button=$('transcendStartButton'),affinityControl=$('transcendAffinityControl');
+  if(!box)return;
+  let c=current();
+  if(!c){
+    if(badge)badge.textContent='AGUARDANDO AGENTE';
+    if(button){button.disabled=true;button.textContent='Cadastre um agente';button.title='Selecione um agente para consultar os chamados.'}
+    box.innerHTML='<div class="transcend-progress-summary"><div><b>O chamado ainda não pode ser identificado.</b><small>Cadastre ou selecione um agente para acompanhar os marcos de NEX.</small></div></div>';
+    if(affinityControl)affinityControl.innerHTML='<span class="build-muted">A escolha de afinidade aparece ao alcançar NEX 50%.</span>';
+    return;
+  }
+  let nex=+c.nex||5;
+  if(c.class==='sobrevivente'){
+    if(badge)badge.textContent='PROGRESSÃO ESPECIAL';
+    if(button){button.disabled=true;button.textContent='Sem marco padrão de classe';button.title='A classe Sobrevivente possui progressão própria.'}
+    box.innerHTML='<div class="transcend-progress-summary"><div><b>Progressão especial de Sobrevivente.</b><small>Esta classe não utiliza os marcos padrão de poder de classe. Verifique as habilidades específicas da ficha e da origem.</small></div><strong>NEX '+nex+'%</strong></div>';
+  }else{
+    let milestones=classPowerMilestones(99,c.versatility||''),powers=c.powers?.class||[],next=nextClassPowerSlot(c),future=milestones.find(x=>x>nex);
+    let cards=milestones.map(function(m,i){
+      let chosen=powers[i]||'',status='',statusClass='',detail='';
+      if(chosen==='Transcender'){
+        status='TRANSCENDIDO';statusClass='is-done';detail='Você recebeu um poder paranormal neste marco.';
+      }else if(chosen){
+        status='MARCO UTILIZADO';statusClass='is-used';detail='Poder escolhido: '+esc(chosen)+'. O chamado deste marco foi encerrado.';
+      }else if(nex===m&&next&&next.index===i){
+        status='CHAMADO DISPONÍVEL';statusClass='is-current';detail='Este é o marco atual. Você pode escolher Transcender no lugar de um poder de classe.';
+      }else if(nex>m){
+        status='CHAMADO ENCERRADO';statusClass='is-expired';detail='O chamado de NEX '+m+'% terminou sem uma Transcendência registrada.';
+      }else if(nex<m){
+        status='AGUARDANDO NEX';statusClass='is-locked';detail='O chamado surge quando o agente alcança NEX '+m+'%.';
+      }else{
+        status='AGUARDANDO';statusClass='is-locked';detail='Conclua o registro do marco atual para continuar.';
+      }
+      return '<article class="transcend-step '+statusClass+'"><div class="transcend-step-top"><span class="transcend-step-index">'+String(i+1).padStart(2,'0')+'</span><span class="transcend-step-status">'+status+'</span></div><strong>NEX '+m+'%</strong><p>'+detail+'</p></article>';
+    }).join('');
+    let summary='',sub='';
+    if(next){summary='O chamado está aberto.';sub='Você pode realizar a escolha de Transcender agora, no marco NEX '+next.nex+'%.'}
+    else if(future){summary='O próximo chamado ainda não chegou.';sub='O próximo marco de poder de classe será NEX '+future+'%. Um chamado anterior não pode ser recuperado.'}
+    else{summary='Todos os marcos de poder de classe foram alcançados.';sub='Não há um novo chamado padrão disponível nesta progressão.'}
+    if(badge)badge.textContent=next?'CHAMADO ABERTO':future?'AGUARDANDO NEX':'MARCOS CONCLUÍDOS';
+    if(button){button.disabled=!next;button.textContent=next?'✧ Atender ao chamado • NEX '+next.nex+'%':future?'Próximo chamado em NEX '+future+'%':'Nenhum chamado disponível';button.title=next?'Transcender está disponível neste marco de NEX.':'A Transcendência só pode ser iniciada durante um marco de poder de classe.'}
+    box.innerHTML='<div class="transcend-progress-summary"><div><b>'+summary+'</b><small>'+sub+'</small></div><strong>NEX '+nex+'%</strong></div><div class="transcend-progress-grid">'+cards+'</div>';
+  }
+  if(affinityControl){
+    if(nex<50){
+      affinityControl.innerHTML='<span class="transcend-affinity-state">Disponível ao alcançar NEX 50%.</span>';
+    }else if(!c.affinityElement){
+      affinityControl.innerHTML='<div class="field"><label>ESCOLHA O ELEMENTO</label><select id="transcendAffinitySelect"><option value="">Selecione</option>'+['Conhecimento','Energia','Morte','Sangue'].map(function(x){return '<option>'+x+'</option>'}).join('')+'</select><button class="btn small primary" style="margin-top:7px" onclick="setAgentAffinityElement($(\'transcendAffinitySelect\').value)">Registrar afinidade</button></div>';
+    }else{
+      affinityControl.innerHTML='<span class="transcend-affinity-state"><b>'+esc(c.affinityElement.toUpperCase())+'</b><small>'+(c.affinityAwakened?'Afinidade desperta.':'Elemento escolhido; a afinidade desperta na primeira Transcendência após NEX 50%.')+'</small></span>';
+    }
+  }
+}
+
+function render(){$('nAgents').textContent=agents.length;renderAgents();fillSelect();renderHistory();renderInventory();renderSkillPage();renderOccultPage();renderTranscendProgression();renderGrimoirePage()};setupInventoryPresets();populateOrigins();renderTrailOptions('');['class','nex','aAgi','aFor','aInt','aPre','aVig'].forEach(id=>$(id).addEventListener('input',()=>{if(id==='class')classHint();else{if(id==='nex')renderTrailOptions($('trail').value);refreshBuildEditors()}$('classSkillSummary').textContent=classSkillText($('class').value,+$('aInt').value)}));$('origin').addEventListener('change',onOriginChange);$('trail').addEventListener('change',refreshBuildEditors);render();
 </script></body></html>
