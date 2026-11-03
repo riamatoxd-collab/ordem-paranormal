@@ -412,3 +412,214 @@
  .paper-v2 .paper-resource{min-height:150px}
 }
 @media(prefers-reduced-motion:reduce){.paper-v2 .sheet-resource-meter>span{transition:none}}
+
+/* ============================================================
+   HUD DE PERÍCIAS — A MALDIÇÃO DOS SETE ANJOS
+   Painel enxuto, com filtros e rolagens no próprio agente
+   ============================================================ */
+.paper-v2 .skill-hud{
+ --hud-ink:#f1dfcb;
+ --hud-gold:#d6aa6d;
+ --hud-red:#b64a51;
+ --hud-border:#805342;
+ display:flex;
+ flex-direction:column;
+ min-width:0;
+ overflow:hidden;
+ border:1px solid #ab7956;
+ border-radius:12px;
+ background:linear-gradient(155deg,#231418 0%,#100c10 56%,#181013 100%);
+ box-shadow:inset 0 0 0 2px #0b080a,0 14px 36px #0008;
+ color:var(--hud-ink);
+}
+.paper-v2 .skill-hud-header{
+ position:relative;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:9px;
+ padding:13px 14px;
+ border-bottom:1px solid #a46c4c;
+ background:radial-gradient(circle at 85% -20%,#d77a6142,transparent 60%),linear-gradient(100deg,#64212b,#31171e 75%,#201216);
+}
+.paper-v2 .skill-hud-header::after{
+ content:"";
+ position:absolute;left:0;right:0;bottom:0;height:2px;
+ background:linear-gradient(90deg,transparent,#dd8e67 42%,#ad4549,transparent);
+ pointer-events:none;
+}
+.paper-v2 .skill-hud-heading{display:flex;gap:10px;align-items:center;min-width:0}
+.paper-v2 .skill-hud-sigil{
+ flex:0 0 38px;
+ width:38px;height:38px;
+ display:grid;place-items:center;
+ border:1px solid #cd9472;
+ border-radius:10px;
+ background:#170c1180;
+ color:#efbd8e;
+ box-shadow:0 0 17px #ce564032;
+ font-size:25px;
+}
+.paper-v2 .skill-hud-kicker{
+ display:block;
+ color:#eac29d;
+ font-size:8px;
+ font-weight:700;
+ letter-spacing:.17em;
+ white-space:nowrap;
+}
+.paper-v2 .skill-hud-heading h3{
+ font:700 clamp(19px,1.7vw,24px)/1.1 Georgia,serif;
+ margin:3px 0 0;
+ color:#ffe4bc;
+ letter-spacing:.095em;
+ text-shadow:0 2px 6px #0009;
+}
+.paper-v2 .skill-hud-score{
+ display:flex;gap:4px;align-items:center;
+ padding:6px 10px;
+ border:1px solid #bf8c60;
+ background:#1e1115c9;
+ border-radius:8px;
+ white-space:nowrap;
+ color:#dbc1a1;
+}
+.paper-v2 .skill-hud-score strong{font-size:25px;line-height:1;font-variant-numeric:tabular-nums;color:#f2cc92}
+.paper-v2 .skill-hud-score>span{font-size:12px}
+.paper-v2 .skill-hud-score small{display:block;letter-spacing:.09em;color:#bd9981;font-size:8px}
+.paper-v2 .skill-hud-toolbar{padding:11px 12px 9px;display:grid;gap:10px;border-bottom:1px solid #664238}
+.paper-v2 .skill-hud-search{display:flex;align-items:center;gap:7px;padding:0 10px;background:#d8c5a8;border:1px solid #b9875d;border-radius:7px;color:#5b3540;min-height:36px}
+.paper-v2 .skill-hud-search span{font-size:25px;line-height:1;opacity:.8}
+.paper-v2 .skill-hud-search input{
+ background:transparent;
+ border:0;outline:0;
+ color:#2d1a21;
+ padding:8px 0;
+ width:100%;min-width:0;
+ font-size:12px;
+ box-shadow:none;
+}
+.paper-v2 .skill-hud-search input::placeholder{color:#806e67}
+.paper-v2 .skill-hud-search:focus-within{outline:2px solid #e2a873;outline-offset:2px}
+.paper-v2 .skill-hud-filters{display:flex;gap:5px}
+.paper-v2 .skill-hud-filters button{
+ flex:1 1 0;
+ min-width:0;
+ min-height:31px;
+ padding:7px 6px;
+ font-size:11px;
+ font-weight:650;
+ color:#cbb6a5;
+ background:#ffffff08;
+ border:1px solid #66463e;
+ border-radius:6px;
+ cursor:pointer;
+ transition:background .18s,border-color .18s;
+}
+.paper-v2 .skill-hud-filters button.active,.paper-v2 .skill-hud-filters button[aria-pressed=true]{
+ color:#ffead2;
+ background:linear-gradient(100deg,#81303a,#5b222e);
+ border-color:#c7896e;
+ box-shadow:inset 0 0 0 1px #ecae6720;
+}
+.paper-v2 .skill-hud-filters button:hover{border-color:#e1ad80}
+.paper-v2 .skill-hud-filters button:focus-visible{outline:2px solid #f4d6ac;outline-offset:2px}
+.paper-v2 .skill-hud-legend{
+ display:flex;justify-content:space-between;gap:10px;
+ align-items:center;
+ padding:9px 13px 6px;
+ font-size:9px;
+ letter-spacing:.085em;
+ color:#bda48f;
+}
+.paper-v2 .skill-hud-legend span:first-child{display:flex;align-items:center;gap:5px}
+.paper-v2 .skill-hud-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#d4ad79;box-shadow:0 0 7px #dbab63a3}
+.paper-v2 .skill-hud-entries{
+ display:grid;align-content:start;gap:5px;
+ padding:4px 10px 10px;
+ max-height:590px;
+ overflow-y:auto;
+ overscroll-behavior:contain;
+ scrollbar-width:thin;
+ scrollbar-color:#8d544c #140d10;
+}
+.paper-v2 .skill-hud-item{
+ --attr-color:#b5a27e;
+ display:grid;
+ grid-template-columns:30px minmax(0,1fr) 36px 42px 19px;
+ align-items:center;
+ gap:6px;
+ text-align:left;
+ width:100%;
+ min-height:49px;
+ padding:6px 8px 6px 7px;
+ border:1px solid #63473d;
+ border-left:3px solid var(--attr-color);
+ border-radius:7px;
+ background:linear-gradient(110deg,#28191e,#171115);
+ color:#f0e3d4;
+ cursor:pointer;
+ box-shadow:inset 0 1px 0 #ffffff0c;
+ transition:border-color .16s,background .16s,transform .16s;
+}
+.paper-v2 .skill-hud-item:hover{border-color:#c9906e;background:linear-gradient(110deg,#4c232c,#24161b);transform:translateX(2px)}
+.paper-v2 .skill-hud-item:focus-visible{outline:2px solid #efd3a2;outline-offset:1px}
+.paper-v2 .skill-hud-item[data-attr=agi]{--attr-color:#bc757b}
+.paper-v2 .skill-hud-item[data-attr=for]{--attr-color:#d78771}
+.paper-v2 .skill-hud-item[data-attr=int]{--attr-color:#c4a2da}
+.paper-v2 .skill-hud-item[data-attr=pre]{--attr-color:#d6b276}
+.paper-v2 .skill-hud-item[data-attr=vig]{--attr-color:#90bea9}
+.paper-v2 .skill-hud-icon{
+ width:28px;height:28px;
+ display:grid;place-items:center;
+ background:color-mix(in srgb,var(--attr-color) 15%,#1b1116);
+ border:1px solid color-mix(in srgb,var(--attr-color) 50%,#3b242a);
+ border-radius:7px;
+ color:var(--attr-color);
+ font-size:18px;
+}
+.paper-v2 .skill-hud-info{display:grid;gap:2px;min-width:0}
+.paper-v2 .skill-hud-info strong{font-size:11.5px;line-height:1.15;overflow-wrap:anywhere;font-weight:750;color:#f4e3ce}
+.paper-v2 .skill-hud-info small{font-size:9px;line-height:1.1;color:#b7a397}
+.paper-v2 .skill-hud-item.is-trained .skill-hud-info small{color:#e2bc84}
+.paper-v2 .skill-hud-item.is-required .skill-hud-info small{color:#d49e9d}
+.paper-v2 .skill-hud-attribute{
+ font-size:10px;font-weight:700;text-align:center;
+ color:var(--attr-color);
+}
+.paper-v2 .skill-hud-bonus{
+ display:grid;place-items:center;
+ width:41px;height:30px;
+ border:1px solid #907052;
+ border-radius:5px;
+ background:linear-gradient(160deg,#ebd8b6,#c4a682);
+ font-size:13px;
+ font-weight:850;
+ font-variant-numeric:tabular-nums;
+ color:#351c20;
+}
+.paper-v2 .skill-hud-item.is-trained .skill-hud-bonus{border-color:#f2c88c;background:linear-gradient(160deg,#f5e4c4,#d8ad79)}
+.paper-v2 .skill-hud-roll{font-size:17px;line-height:1;color:#c1a28d;text-align:center}
+.paper-v2 .skill-hud-item:hover .skill-hud-roll{color:#ffcc91}
+.paper-v2 .skill-hud-empty{padding:25px 12px;text-align:center;color:#bca894;font-size:12px}
+.paper-v2 .skill-hud-footer{
+ display:flex;justify-content:space-between;gap:9px;
+ padding:9px 12px;
+ border-top:1px solid #6e483e;
+ background:#140e12;
+ font-size:10px;
+ color:#baa391;
+}
+@media(max-width:1100px){
+ .paper-v2 .skill-hud-entries{max-height:430px}
+}
+@media(max-width:420px){
+ .paper-v2 .skill-hud-item{grid-template-columns:26px minmax(0,1fr) 29px 38px 16px;gap:4px;padding:5px}
+ .paper-v2 .skill-hud-icon{width:25px;height:25px;font-size:16px}
+ .paper-v2 .skill-hud-bonus{width:36px;height:28px;font-size:12px}
+ .paper-v2 .skill-hud-heading h3{font-size:19px}
+ .paper-v2 .skill-hud-header{padding:10px}
+}
+@media(prefers-reduced-motion:reduce){
+ .paper-v2 .skill-hud-item,.paper-v2 .skill-hud-filters button{transition:none}
+}
