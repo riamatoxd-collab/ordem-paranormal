@@ -52,3 +52,9 @@
  .grimoire-ritual-entry{min-height:0}
 }
 @media(prefers-reduced-motion:reduce){.grimoire-tech>summary{transition:none}}
+
+/* Rituais ainda bloqueados continuam legíveis para consulta e planejamento. */
+.ritual-catalog-item.locked{opacity:.89}
+.ritual-catalog-item.locked .grimoire-tech-content{opacity:1}
+.ritual-catalog-item.locked .grimoire-ritual-description{color:#d8bfae}
+.ritual-catalog-item.locked .grimoire-ritual-status{color:#d0aba0}
