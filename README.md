@@ -210,3 +210,17 @@ A abertura de conta toca uma sequência curta de harmônicos suaves e um eco gra
 
 ### Segurança e privacidade
 O PIN antigo do Painel do Mestre continua sendo somente um bloqueio visual. No **modo local**, dados e credenciais de demonstração estão no navegador. No **modo conectado**, a senha da conta é processada pelo Supabase Auth, e as políticas RLS no banco limitam o acesso às fichas. Os dados do site não devem conter segredos reais de jogadores. Usuários não podem tornar a própria conta `mestre` pelo cliente.
+
+## Status da conexão Supabase (novembro de 2026)
+
+**Supabase conectado e schema implantado** no projeto **eita** (`dmmczcdkparacicpnkfz`).
+
+- URL de conexão pública: `https://dmmczcdkparacicpnkfz.supabase.co`.
+- `auth-config.js` contém apenas a chave **publishable** destinada ao navegador.
+- Tabelas criadas: `public.profiles` e `public.character_vaults`, com RLS habilitado. Cada usuário pode ler e alterar o seu próprio cofre. Usuários com função `mestre` podem ler os demais cofres, mas não alterá-los.
+- O esquema SQL usa funções de segurança em `app_private`, não em `public`. Um novo usuário recebe inicialmente a função `jogador`.
+- O Painel do Mestre mantém o PIN local como etapa visual separada; o banco exige também uma conta Supabase efetivamente autorizada como `mestre`.
+
+**Passo pendente para o proprietário:** cadastrar-se pelo login do próprio RPG e confirmar o e-mail, se solicitado. Depois, atribuir explicitamente a função `mestre` somente à conta correta pelo painel administrativo do Supabase (sem compartilhar senha). Até isso ocorrer, a conta tem permissões de jogador e não verá os dados das outras contas no Painel do Mestre.
+
+**Limitação da verificação:** estrutura, RLS e conexão do projeto foram verificadas, mas o fluxo ponta a ponta de login e salvamento depende da criação de contas reais de teste, que ainda não existem. As instruções anteriores de criação manual do projeto e configuração da chave já foram executadas neste projeto.
