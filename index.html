@@ -253,6 +253,7 @@
 </style><link rel="stylesheet" href="./tema-japao.css">
 <link rel="stylesheet" href="./ficha-mestre.css?v=mestre-pe-vazio-8">
 <link rel="stylesheet" href="./contas.css?v=contas-conhecimento-1">
+<link rel="stylesheet" href="./samurais.css?v=cinco-samurais-1">
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><span class="sig">✣</span> O OUTRO LADO<span>ARQUIVO DE OPERAÇÕES</span></div><nav class="nav"><button class="active" data-view="home">⌂ &nbsp;Painel</button><button data-view="agents">♙ &nbsp;Agentes</button><button data-view="occult">◉ &nbsp;Transcender</button><button data-view="grimorio">▤ &nbsp;Grimório</button><button data-view="roll">⚄ &nbsp;Rolagens</button><button data-view="combat">⚔ &nbsp;Combate</button><button data-view="history">◷ &nbsp;Histórico</button></nav><small>PROTOCOLO 0-01<br>Registros salvos neste navegador.<br>Versão 2.6 • Transcender e Grimório</small></aside>
 <main><header class="top"><div><div class="eyebrow">SISTEMA DE APOIO À MESA</div><h1 id="title">Painel de operações</h1></div><button class="btn primary" onclick="openModal()">＋ Novo agente</button></header>
@@ -984,4 +985,4 @@ function renderTranscendProgression(){
 }
 
 function render(){$('nAgents').textContent=agents.length;renderAgents();fillSelect();renderHistory();renderInventory();renderSkillPage();renderOccultPage();renderTranscendProgression();renderGrimoirePage()};setupInventoryPresets();populateOrigins();renderTrailOptions('');['class','nex','aAgi','aFor','aInt','aPre','aVig'].forEach(id=>$(id).addEventListener('input',()=>{if(id==='class')classHint();else{if(id==='nex')renderTrailOptions($('trail').value);refreshBuildEditors()}$('classSkillSummary').textContent=classSkillText($('class').value,+$('aInt').value)}));$('origin').addEventListener('change',onOriginChange);$('trail').addEventListener('change',refreshBuildEditors);render();
-</script><script src="./auth-config.js?v=supabase-online-2"></script><script src="./contas.js?v=contas-conhecimento-1"></script><script src="./ficha-mestre.js?v=contas-conhecimento-1"></script></body></html>
+</script><script src="./auth-config.js?v=supabase-online-2"></script><script src="./contas.js?v=cinco-samurais-1"></script><script src="./ficha-mestre.js?v=cinco-samurais-1"></script></body></html>
