@@ -10,6 +10,35 @@ for(const group of raw.templates){
   registry[name]={name,kind:group.kind,modes:raw.modes[name]||[],formulas:raw.formulas[name]||[null,null,null],modifiers:raw.effects[name]||{}};
  }
 }
+
+/* Valores confirmados nas fichas dos rituais, organizados por forma.
+   Fórmulas não especificadas permanecem manuais. */
+const verified={
+ 'Eletrocussão':{formulas:['3d6','6d6','8d6'],modifiers:{condition:'vulnerável'}},
+ 'Hemofagia':{formulas:['6d6','6d6','4d6']},
+ 'Miasma Entrópico':{formulas:['4d8','6d8',null],modifiers:{condition:'enjoado'}},
+ 'Poeira da Podridão':{formulas:['4d8','4d8','4d8+16']},
+ 'Consumir Manancial':{formulas:['3d6','6d6',null]},
+ 'Embaralhar':{modifiers:{defense:6}},
+ 'Desfazer Sinapses':{formulas:['2d6+2','3d6+3','8d6+8'],modifiers:{condition:'frustrado'}},
+ 'Inexistir':{formulas:['10d12+10','15d12+15','20d12+20']},
+ 'Invadir Mente':{formulas:['6d6',null,null]},
+ 'Proteção contra Rituais':{modifiers:{ritualResistanceBonus:5,paranormalDR:5}},
+ 'Tela de Ruído':{modifiers:{physicalTempPV:30}},
+ 'Cicatrização':{formulas:['3d8+3','5d8+5','7d8+7']},
+ 'Esfolar':{formulas:['3d4+3','5d4+5','10d4+10'],modifiers:{condition:'sangrando'}},
+ 'Descarnar':{formulas:['6d8','10d8','10d8'],modifiers:{condition:'hemorragia'}},
+ 'Decadência':{formulas:['2d8+2','3d8+3','8d8+8']},
+ 'Paradoxo':{formulas:['6d6','4d6','13d6']},
+ 'Ferver Sangue':{formulas:['4d8','4d8','4d8'],modifiers:{condition:'fraco'}},
+ 'Transfigurar Água':{formulas:['5d8',null,'10d8']},
+ 'Fortalecimento Sensorial':{modifiers:{bonusD20Skills:['Investigação','Luta','Percepção','Pontaria']}}
+};
+for(const [name,value] of Object.entries(verified)){
+ if(!registry[name])throw Error('Ritual não catalogado: '+name);
+ if(value.formulas)registry[name].formulas=value.formulas;
+ if(value.modifiers)registry[name].modifiers={...registry[name].modifiers,...value.modifiers};
+}
 window.OP_RITUAL_EFFECT_REGISTRY=registry;
 window.OP_RITUAL_EFFECT_COUNT=Object.keys(registry).length;
 })();
