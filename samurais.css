@@ -133,3 +133,10 @@
  #samuraiEditorForm{padding:12px}
  .samurai-editor-head{padding:12px}
 }
+
+#v-mestre .samurai-master-dossier{border:1px solid #71554b;border-radius:7px;background:#130f13;overflow:hidden}
+#v-mestre .samurai-master-dossier>summary{cursor:pointer;color:#e3c29e;padding:10px 11px;font-size:11px;font-weight:800}
+#v-mestre .samurai-master-dossier[open]>summary{border-bottom:1px solid #71554b;background:#302029}
+#v-mestre .samurai-master-dossier>div{padding:7px 12px;display:grid;gap:6px}
+#v-mestre .samurai-master-dossier p{color:#d6bdab;font-size:10px;line-height:1.6;overflow-wrap:anywhere;margin:0}
+#v-mestre .samurai-master-dossier strong{color:#f0d7b5}
