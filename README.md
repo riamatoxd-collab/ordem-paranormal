@@ -261,3 +261,27 @@ Os dados vivem em `public.samurai_slots` no Supabase, e **não** são inseridos 
 **Verificação:** as cinco linhas e os controles RLS foram confirmados no Supabase. Um teste de atribuição e salvamento feito dentro de uma transação desfeita comprovou que o mestre pode atribuir e um jogador pode salvar somente seu personagem, sem criar uma atribuição permanente de teste.
 
 **Segurança:** os RPCs administrativos são `SECURITY DEFINER` com verificações explícitas de `auth.uid()` e da função de mestre. O Security Advisor apresenta alertas sobre funções desse tipo executáveis por usuários autenticados; no projeto, isso é proposital para os endpoints protegidos e requer revisão sempre que forem alterados. Também é recomendável habilitar proteção contra senhas vazadas em Supabase Authentication.
+
+## Recuperação de senha por e-mail (Supabase)
+
+A tela de entrada agora tem o botão **Esqueci minha senha**. O jogador informa seu e-mail e o sistema chama o endpoint de recuperação do Supabase Auth, que envia uma mensagem com link de redefinição **se o e-mail estiver cadastrado**. A tela não revela a existência de uma conta para evitar enumeração. Depois de abrir o link, o site valida a credencial temporária no próprio Supabase antes de oferecer **Nova senha** e **Confirmar nova senha**. A alteração da senha usa o endpoint autenticado do Supabase. O jogador então entra novamente; suas fichas e seu samurai atribuído permanecem na conta original.
+
+### Configuração obrigatória para links de retorno
+
+O endereço do site precisa estar autorizado **antes de testar o link**. Como o RPG é servido como página estática, o código utiliza exatamente o endereço HTTPS da página de login aberta pelo jogador, sem `?` ou `#`, no parâmetro `redirect_to`. No [Supabase — Authentication → URL Configuration](https://supabase.com/dashboard/project/dmmczcdkparacicpnkfz/auth/url-configuration):
+
+1. Defina **Site URL** como o endereço HTTPS real e público do site do RPG.
+2. Adicione o **mesmo endereço completo** à lista **Redirect URLs**, incluindo o caminho da página. Se houver endereços adicionais confiáveis (domínio próprio, por exemplo), cadastre-os também individualmente.
+3. Confirme que o modelo de e-mail de recuperação usa o link de confirmação fornecido pelo Supabase (`{{ .ConfirmationURL }}`) e respeita `redirect_to`.
+4. Verifique se o projeto consegue enviar mensagens de recuperação. Conforme as limitações do serviço de e-mail padrão do Supabase, pode ser necessário configurar um servidor SMTP para enviar a usuários externos.
+
+**Atenção:** alterar somente o código do site **não** adiciona automaticamente endereços à lista de redirecionamentos do Supabase. Se o retorno não estiver autorizado, o link poderá abrir o Site URL padrão em vez do RPG. Essa etapa deve ser verificada no painel de autenticação.
+
+### Segurança e compatibilidade
+
+- A senha **não** é enviada nem armazenada no GitHub ou no cofre de personagens; a atualização é feita diretamente pelo Supabase Auth.
+- O navegador remove tokens da URL imediatamente ao receber um link de recuperação e só aceita trocar a senha após consultar o endpoint autenticado de usuário.
+- A recuperação é disponibilizada no **modo online**. Contas locais de demonstração anteriores não usam o Supabase Auth.
+- O link deve ser usado pelo próprio dono da caixa de e-mail. Se expirou, o jogador pode solicitar outro.
+- O código também aceita links que retornam com `token_hash` em vez do token de sessão padrão.
+- Não se deve testar o fluxo em uma conta de jogador real sem que a própria pessoa solicite a recuperação.

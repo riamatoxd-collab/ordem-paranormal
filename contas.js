@@ -25,6 +25,8 @@
  let knowledgeSoundEnabled=true;
  let knowledgeAudio=null;
  let authReady=false;
+ let recoveryMode=null;
+ let recoveryAccessToken=null;
  const originalDB=db;
  const originalRender=render;
  function readJson(key,fallback){try{const value=JSON.parse(localStorage.getItem(key));return value??fallback}catch(e){return fallback}}
@@ -247,6 +249,140 @@
  authGate.className='op-auth-gate';authGate.id='opAuthGate';
  authGate.innerHTML='<section class="op-auth-window"><div class="op-auth-crest" aria-hidden="true">✧</div><small class="op-auth-kicker">ARQUIVO DE CONHECIMENTO</small><h1>O Outro Lado</h1><p>Os nomes são lembrados. Os segredos, não.</p><div class="op-auth-tabs" role="tablist" aria-label="Acesso ao sistema"><button type="button" data-auth-tab="login" class="active" aria-selected="true">Entrar</button><button type="button" data-auth-tab="register" aria-selected="false">Cadastrar conta</button></div><form id="opAuthForm"><div id="opAuthNameRow" hidden><label>NOME DO JOGADOR<input id="opAuthName" maxlength="35" autocomplete="nickname" placeholder="Nome ou apelido"></label></div><label id="opAuthIdentifierLabel">USUÁRIO<input id="opAuthIdentifier" type="text" required autocomplete="username" placeholder="Nome cadastrado"></label><label>SENHA<input id="opAuthPassword" type="password" required minlength="8" autocomplete="current-password" placeholder="Mínimo 8 caracteres"></label><button type="submit" class="op-auth-submit" id="opAuthSubmit">Abrir arquivo</button></form><p class="op-auth-status" id="opAuthStatus" role="status"></p><div class="op-auth-bottom"><button type="button" id="opKnowledgeToggle">♫ Ouvir Conhecimento</button><span id="opAuthMode"></span></div></section>';
  document.body.appendChild(authGate);
+ const recoveryTrigger=document.createElement('button');
+ recoveryTrigger.type='button';
+ recoveryTrigger.id='opAuthForgotPassword';
+ recoveryTrigger.className='op-auth-forgot-trigger';
+ recoveryTrigger.textContent='Esqueci minha senha';
+ authGate.querySelector('#opAuthForm').after(recoveryTrigger);
+ const recoveryPanel=document.createElement('section');
+ recoveryPanel.id='opRecoveryPanel';
+ recoveryPanel.className='op-recovery-panel';
+ recoveryPanel.hidden=true;
+ recoveryPanel.innerHTML='<form id="opRecoveryRequestForm">'
+  +'<div class="op-recovery-sigil" aria-hidden="true">✧</div>'
+  +'<h2>Recuperar acesso</h2><p>Informe o e-mail usado no cadastro. Enviaremos um link de recuperação, se houver uma conta associada a ele.</p>'
+  +'<label>E-MAIL DA CONTA<input type="email" name="email" id="opRecoveryEmail" required autocomplete="email" placeholder="seu@email.com" maxlength="254"></label>'
+  +'<button class="op-auth-submit" type="submit">Enviar link de recuperação</button>'
+  +'</form>'
+  +'<form id="opRecoveryNewForm" hidden>'
+  +'<div class="op-recovery-sigil" aria-hidden="true">✦</div>'
+  +'<h2>Definir nova senha</h2><p>O sigilo foi validado. Crie uma nova senha para a sua conta; as fichas continuarão salvas no Supabase.</p>'
+  +'<label>NOVA SENHA<input type="password" id="opRecoveryNewPassword" required minlength="8" maxlength="128" autocomplete="new-password" placeholder="Pelo menos 8 caracteres"></label>'
+  +'<label>CONFIRMAR NOVA SENHA<input type="password" id="opRecoveryConfirmPassword" required minlength="8" maxlength="128" autocomplete="new-password" placeholder="Repita a nova senha"></label>'
+  +'<button class="op-auth-submit" type="submit">Salvar nova senha</button>'
+  +'</form>'
+  +'<button type="button" class="op-recovery-back" id="opRecoveryBackToLogin">← Voltar ao login</button>';
+ recoveryTrigger.after(recoveryPanel);
+ function showRecoveryMode(mode){
+  recoveryMode=mode;
+  const recovering=!!mode;
+  const loginTabs=authGate.querySelector('.op-auth-tabs');
+  loginTabs.hidden=recovering;
+  document.getElementById('opAuthForm').hidden=recovering;
+  recoveryTrigger.hidden=recovering||!online||authTab!=='login';
+  recoveryPanel.hidden=!recovering;
+  document.getElementById('opRecoveryRequestForm').hidden=mode!=='request';
+  document.getElementById('opRecoveryNewForm').hidden=mode!=='new';
+  if(mode==='request'){
+   document.getElementById('opRecoveryEmail').value=document.getElementById('opAuthIdentifier').value.trim();
+   document.getElementById('opRecoveryEmail').focus();
+  }else if(mode==='new'){
+   document.getElementById('opRecoveryNewPassword').focus();
+  }else{
+   document.getElementById('opAuthPassword').value='';
+   document.getElementById('opAuthIdentifier').focus();
+  }
+ }
+ function backToLogin(){
+  recoveryAccessToken=null;
+  document.getElementById('opRecoveryNewPassword').value='';
+  document.getElementById('opRecoveryConfirmPassword').value='';
+  showRecoveryMode(null);
+  setMessage('');
+ }
+ recoveryTrigger.addEventListener('click',()=>{setMessage('');showRecoveryMode('request')});
+ document.getElementById('opRecoveryBackToLogin').addEventListener('click',backToLogin);
+ document.getElementById('opRecoveryRequestForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!online){setMessage('A recuperação por e-mail precisa do modo conectado ao Supabase.',true);return}
+  const form=e.currentTarget;
+  const button=form.querySelector('button[type=submit]');
+  const email=document.getElementById('opRecoveryEmail').value.trim().toLowerCase();
+  if(!email)return;
+  button.disabled=true;setMessage('Solicitando link de recuperação...');
+  try{
+   // O endereço de retorno deve ser autorizado em Authentication → URL Configuration.
+   const redirect=window.location.origin+window.location.pathname;
+   if(window.location.protocol!=='https:'&&!['localhost','127.0.0.1'].includes(window.location.hostname))
+    throw new Error('Abra o site com HTTPS para receber o link de recuperação.');
+   await api('/auth/v1/recover?redirect_to='+encodeURIComponent(redirect),'POST',{email},'');
+   setMessage('Se esse e-mail estiver cadastrado, você receberá um link para criar outra senha. Confira também a pasta de spam.');
+  }catch(error){
+   const message=String(error?.message||'');
+   setMessage(/rate.limit|too.many|429/i.test(message)?'Muitas solicitações. Aguarde um pouco antes de tentar novamente.':
+    'Não foi possível solicitar o link. Verifique a conexão e tente novamente.',true);
+  }finally{button.disabled=false}
+ });
+ document.getElementById('opRecoveryNewForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!online||!recoveryAccessToken){setMessage('Link expirado ou inválido. Solicite outro.',true);return}
+  const password=document.getElementById('opRecoveryNewPassword').value;
+  const confirmation=document.getElementById('opRecoveryConfirmPassword').value;
+  if(password.length<8||password.length>128){setMessage('Escolha uma senha entre 8 e 128 caracteres.',true);return}
+  if(password!==confirmation){setMessage('As senhas informadas não coincidem.',true);return}
+  const button=e.currentTarget.querySelector('button[type=submit]');
+  button.disabled=true;setMessage('Atualizando senha de acesso...');
+  try{
+   await api('/auth/v1/user','PUT',{password},recoveryAccessToken,false);
+   try{await api('/auth/v1/logout','POST',{},recoveryAccessToken,false)}catch(e){}
+   recoveryAccessToken=null;
+   document.getElementById('opRecoveryNewPassword').value='';
+   document.getElementById('opRecoveryConfirmPassword').value='';
+   showRecoveryMode(null);
+   setMessage('Senha atualizada! Agora entre com o seu e-mail e a nova senha.');
+  }catch(error){
+   setMessage('Não foi possível alterar a senha. O link pode ter expirado; solicite outro.',true);
+  }finally{button.disabled=false}
+ });
+ async function handleRecoveryRedirect(){
+  if(!online)return false;
+  const hash=new URLSearchParams(window.location.hash.replace(/^#/,''));
+  const query=new URLSearchParams(window.location.search);
+  const recovery=hash.get('type')==='recovery'||query.get('type')==='recovery'||
+   (hash.has('error')&&hash.has('error_code'));
+  if(!recovery)return false;
+  // Apaga tokens e códigos da barra de endereço antes de processá-los.
+  window.history.replaceState(window.history.state,'',window.location.pathname);
+  sessionStorage.removeItem(currentSessionKey);
+  account=null;token='';refreshToken='';authReady=false;
+  setVault({characters:[],history:[]});
+  authGate.hidden=false;
+  document.querySelector('.app').inert=true;
+  updateAccountBadge();
+  showRecoveryMode('new');
+  setMessage('Validando o link de recuperação...');
+  try{
+   if(hash.has('error')||query.has('error'))throw Error('Link inválido');
+   const directToken=hash.get('access_token')||query.get('access_token');
+   const tokenHash=query.get('token_hash')||hash.get('token_hash');
+   if(directToken){
+    recoveryAccessToken=directToken;
+   }else if(tokenHash){
+    const response=await api('/auth/v1/verify','POST',{type:'recovery',token_hash:tokenHash},'',false);
+    recoveryAccessToken=response?.access_token||null;
+   }
+   if(!recoveryAccessToken)throw Error('Link inválido');
+   await api('/auth/v1/user','GET',null,recoveryAccessToken,false);
+   setMessage('Link confirmado. Informe sua nova senha abaixo.');
+  }catch(error){
+   recoveryAccessToken=null;
+   showRecoveryMode('request');
+   document.getElementById('opRecoveryEmail').value='';
+   setMessage('Link inválido ou expirado. Informe o e-mail e solicite uma nova recuperação.',true);
+  }
+  return true;
+ }
  document.querySelector('.app').inert=true;
  function updateAuthTab(){
   const registering=authTab==='register';
@@ -260,6 +396,7 @@
   identifier.placeholder=online?'seu@email.com':'Nome cadastrado';
   identifier.type=online?'email':'text';
   document.getElementById('opAuthSubmit').textContent=registering?'Criar conta':'Abrir arquivo';
+  recoveryTrigger.hidden=registering||!online||!!recoveryMode;
   document.getElementById('opAuthPassword').autocomplete=registering?'new-password':'current-password';
   document.getElementById('opAuthMode').textContent=online?'Contas sincronizadas (Supabase)':'Modo local • somente este navegador';
  }
@@ -629,6 +766,7 @@
   if(account)saveJson(vaultKey(account.id),vaultSnapshot());
  });
  async function bootstrap(){
+  if(await handleRecoveryRedirect())return;
   let session=null;
   try{session=JSON.parse(sessionStorage.getItem(currentSessionKey)||'null')}catch(e){}
   if(!session){setVault({characters:[],history:[]});render();updateAccountBadge();return}
