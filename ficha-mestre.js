@@ -162,6 +162,10 @@
   if(value.trim()===''||!Number.isInteger(cost)||cost<0||cost>99){say('Custo de PE deve ser um número inteiro de 0 a 99.');return}
   const activation=$('sheetKnownPowerActivation')?.value==='active';
   if(!activation&&cost>0){say('Para usar custo de PE, selecione o tipo Ativável.');return}
+  const trial={...c,sheetPowers:[...sheetPowerStore(c),{source:'catalog',category:power.category,name:power.name}]};
+  if(activation&&cost>0&&peActionList(trial).some(a=>a.name===power.name)){
+   say('Esse poder já possui custo automático no sistema. Use custo 0 ou crie uma versão personalizada.');return;
+  }
   c.sheetPowers=[...sheetPowerStore(c),{id:'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),name:power.name,description:power.description||'',source:'catalog',category:power.category,group:power.group,cost,activation,limit:'none'}];
   db();render();say('Poder adicionado: '+power.name+'.');
  };
