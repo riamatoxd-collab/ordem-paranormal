@@ -805,3 +805,94 @@
  .paper-v2 #sheetCustomPowerPanel .sheet-power-inline{grid-template-columns:1fr}
  .paper-v2 #sheetCustomPowerPanel .sheet-power-inline label:last-child{grid-column:auto}
 }
+
+/* Grimório 3.0 — resumos autorais e referências por ritual */
+.occult-archive .grimoire-catalog-heading{
+ display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+ gap:7px;margin:10px 0 12px;
+ font-size:11px;color:#d8bd9f;
+}
+.occult-archive .grimoire-catalog-heading>span{
+ border:1px solid #9a5e47;background:#371c24;border-radius:6px;
+ padding:6px 10px;color:#edd0a9;font-weight:750;
+}
+.occult-archive .grimoire-catalog-heading small{font-size:10px;color:#b1a195}
+.occult-archive .ritual-catalog-list{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;align-items:stretch;
+}
+.occult-archive .ritual-catalog-item.grimoire-ritual-entry{
+ --element-tone:#c9a570;
+ position:relative;
+ display:flex;flex-direction:column;
+ min-width:0;min-height:160px;
+ padding:12px;
+ gap:10px;
+ border:1px solid color-mix(in srgb,var(--element-tone) 65%,#403037);
+ border-left:3px solid var(--element-tone);
+ border-radius:10px;
+ background:radial-gradient(circle at 100% -20%,color-mix(in srgb,var(--element-tone) 12%,transparent),transparent 52%),linear-gradient(145deg,#24151c,#0f0e13);
+ box-shadow:0 6px 18px #0005;
+ color:#eaded0;
+ opacity:1;
+}
+.occult-archive .ritual-catalog-item.grimoire-ritual-entry.locked{opacity:.76}
+.occult-archive .grimoire-ritual-entry.element-conhecimento{--element-tone:#e6d499}
+.occult-archive .grimoire-ritual-entry.element-energia{--element-tone:#ae87f0}
+.occult-archive .grimoire-ritual-entry.element-morte{--element-tone:#a7b7a1}
+.occult-archive .grimoire-ritual-entry.element-sangue{--element-tone:#e46d74}
+.occult-archive .grimoire-ritual-entry.element-medo{--element-tone:#ddd8cd}
+.occult-archive .grimoire-ritual-entry-top{display:flex;align-items:center;gap:10px;min-width:0}
+.occult-archive .grimoire-ritual-sigil{
+ flex:0 0 38px;width:38px;height:38px;display:grid;place-items:center;
+ border:1px solid color-mix(in srgb,var(--element-tone) 57%,transparent);
+ border-radius:9px;
+ background:color-mix(in srgb,var(--element-tone) 10%,#1c1219);
+ color:var(--element-tone);
+ font-size:24px;
+ text-shadow:0 0 7px color-mix(in srgb,var(--element-tone) 25%,transparent);
+}
+.occult-archive .grimoire-ritual-entry-title{display:grid;gap:3px;min-width:0}
+.occult-archive .grimoire-ritual-entry-title b{font-size:13px;color:#fff0d9;overflow-wrap:anywhere;line-height:1.3}
+.occult-archive .grimoire-ritual-entry-title small{margin:0;font-size:10px;color:var(--element-tone);line-height:1.4}
+.occult-archive .grimoire-ritual-description{
+ margin:0;flex:1;
+ font-size:11.5px;line-height:1.65;
+ color:#dac9bf;
+}
+.occult-archive .grimoire-ritual-entry-foot{
+ display:flex;align-items:end;flex-wrap:wrap;justify-content:space-between;gap:7px;
+ border-top:1px solid #86604a5a;
+ padding-top:8px;
+ color:#c4ab98;
+ font-size:9.5px;line-height:1.4;
+}
+.occult-archive .grimoire-ritual-status{
+ font-size:9px;font-weight:700;color:#c9b4a5;
+ text-align:right;
+}
+.occult-archive .grimoire-ritual-status.is-known{color:#a6d9a5}
+.grimoire-known-description{
+ margin:9px 0 0;
+ border-top:1px solid #765647;
+ padding-top:8px;
+}
+.grimoire-known-description summary{
+ cursor:pointer;
+ color:#e9bc8e;
+ font-size:11px;font-weight:700;
+ list-style-position:inside;
+}
+.grimoire-known-description summary:focus-visible{outline:2px solid #e0ab76;outline-offset:3px}
+.grimoire-known-description p{
+ color:#e4d4c5;
+ font-size:11px;line-height:1.6;
+ margin:9px 0 4px;
+}
+.grimoire-known-description small{color:#bb9e89;font-size:10px}
+@media(max-width:850px){
+ .occult-archive .ritual-catalog-list{grid-template-columns:1fr}
+}
+@media(max-width:530px){
+ .occult-archive .ritual-catalog-item.grimoire-ritual-entry{padding:10px;min-height:140px}
+ .occult-archive .grimoire-ritual-sigil{width:32px;height:32px;flex-basis:32px;font-size:20px}
+}
