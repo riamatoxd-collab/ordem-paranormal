@@ -126,6 +126,19 @@
 
  function isPower(h){return ['Ritual','Habilidade','Poder'].includes(h.kind)||/CONJURADO|SELO CRIADO|HABILIDADE/i.test(h.status||'')}
  function renderMaster(){
+  if(!masterUnlocked)return;
+  const peSelect=$('masterPEAgent');
+  if(peSelect){
+   const previous=peSelect.value;
+   peSelect.innerHTML=agents.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join('')||'<option value="">Nenhum agente cadastrado</option>';
+   peSelect.value=agents.some(c=>c.id===previous)?previous:(current()?.id||'');
+   const selectedAgent=agents.find(c=>c.id===peSelect.value);
+   const status=$('masterPEStatus');
+   if(status)status.innerHTML=selectedAgent?
+    '<span><strong>'+esc(selectedAgent.peNow??0)+'</strong> / '+stats(selectedAgent).pe+' PE atuais</span><span><strong>'+(+selectedAgent.peSpentTurn||0)+'</strong> / '+peLimitFor(selectedAgent)+' gasto no turno</span><span><strong>'+(+selectedAgent.peTemp||0)+'</strong> PE temporários</span>':
+    '<span>Cadastre um agente para controlar seus PE.</span>';
+   document.querySelectorAll('.master-pe-buttons button').forEach(button=>button.disabled=!selectedAgent);
+  }
   const sel=$('masterAgent'),old=sel.value;sel.innerHTML='<option value="todos">Todos os agentes</option>'+agents.map(c=>'<option value="'+esc(c.name)+'">'+esc(c.name)+'</option>').join('');
   if([...sel.options].some(o=>o.value===old))sel.value=old;
   const all=hist.filter(h=>sel.value==='todos'||h.agent===sel.value);
@@ -356,7 +369,7 @@
   const invHtml=inventory.length?inventory.map(it=>'<div class="sheet-entry"><span class="sheet-symbol">'+(it.weapon?'⚔':'▣')+'</span><strong>'+esc(it.name||'Item')+'</strong><button class="sheet-qty" title="Diminuir quantidade" onclick="adjustInventoryQty(\''+esc(it.id)+'\',-1)">−</button><small>×'+esc(it.qty||1)+'</small><button class="sheet-qty" title="Aumentar quantidade" onclick="adjustInventoryQty(\''+esc(it.id)+'\',1)">+</button><button class="sheet-remove" title="Remover item" onclick="sheetRemoveItem(\''+esc(it.id)+'\')">✕</button></div>').join(''):'<p class="sheet-empty">Inventário vazio.</p>';
   const weapons=inventory.filter(it=>it.weapon);
   const combatHtml=weapons.length?weapons.map(it=>{const profile=weaponProfileFor(it);return '<button class="sheet-weapon" onclick="sheetRollWeapon(\''+esc(it.id)+'\')"><span>⚔</span><span><strong>'+esc(it.name)+'</strong><small>'+(profile?esc(profile.damage)+' • '+esc(profile.skill):it.sheetDamage?esc(it.sheetDamage)+' • '+esc(it.sheetSkill||'Luta'):'Clique para configurar dano')+'</small></span><b>ROLAR DADOS ⚄</b></button>'}).join(''):'<p class="sheet-empty">Adicione uma arma ao inventário para habilitar os ataques.</p>';
-  el.innerHTML='<div class="paper-sheet paper-v2"><div class="sheet-ornament" aria-hidden="true">✿　✦　鳥居　✦　✿</div><div class="paper-head"><div><small>ORDEM PARANORMAL • FICHA DE AGENTE</small><h2>'+esc(c.name)+'</h2><p>'+esc(c.origin||'Origem não definida')+' • '+esc(className(c.class))+'</p></div><div class="paper-nex">NEX <strong>'+esc(c.nex||0)+'%</strong></div></div><div class="paper-columns"><div><div class="paper-caption paper-attributes-heading"><span>ATRIBUTOS</span><small>CLIQUE PARA ROLAR</small><button type="button" class="paper-attribute-edit" title="Editar atributos e adicionar pontos" aria-label="Editar atributos e adicionar pontos" onclick="sheetOpenAttributeEditor()"><span aria-hidden="true">✎</span><i aria-hidden="true">+</i></button></div><div class="paper-attributes"><div class="paper-core">✣<span>ATRIBUTOS</span></div>'+attrHtml+'</div><div class="paper-resources">'+resource('pv','PONTOS DE VIDA',c.pvNow,st.pv)+resource('pe','PONTOS DE ESFORÇO',(+c.peNow||0)+(+c.peTemp||0),st.pe)+resource('san','SANIDADE',c.sanNow,st.san)+resource('def','DEFESA BASE',10+(+c.attrs.agi||0),null)+'</div><div class="paper-shortcuts"><button class="btn small" onclick="openModal(\''+esc(c.id)+'\')">Editar ficha</button></div></div><div>'+skillHudHtml+'</div></div><div class="sheet-pe-overview"><span>PE DISPONÍVEL <b>'+((+c.peNow||0)+(+c.peTemp||0))+'</b></span><span>GASTO NO TURNO <b>'+(+c.peSpentTurn||0)+'</b> / '+peLimitFor(c)+'</span></div><section class="sheet-block sheet-pe-block" id="sheetPEBlock"><h3>✧ HABILIDADES COM CUSTO DE PE <small>'+peActions.length+'</small></h3><div class="sheet-pe-list">'+peHtml+'</div></section><div class="sheet-lower"><section class="sheet-block sheet-powers-block"><h3>✦ PODERES & HABILIDADES <small>'+(powers.length+grantedPowers.length)+'</small></h3><div class="sheet-scroll sheet-powers-list">'+powerHtml+'</div>'+powerEditorHtml+'</section><section class="sheet-block"><h3>◈ RITUAIS <small>'+rituals.length+'</small></h3><div class="sheet-scroll">'+ritualHtml+'</div><div class="sheet-add"><select id="sheetRitualChoice" aria-label="Ritual para aprender"></select><button class="btn small primary" onclick="sheetLearnRitual()">+ Aprender</button></div></section><section class="sheet-block"><h3>▣ EQUIPAMENTO & INVENTÁRIO <small>'+inventory.length+'</small></h3><div class="sheet-scroll">'+invHtml+'</div><div class="sheet-add"><select id="sheetItemPreset" aria-label="Modelo de equipamento" onchange="sheetSelectPreset(this.value)"><option value="">Item personalizado</option></select><input id="sheetItemName" placeholder="Nome do equipamento" maxlength="100" aria-label="Nome do equipamento"><input id="sheetItemQty" type="number" min="1" max="999" value="1" aria-label="Quantidade"><label class="sheet-weapon-check"><input id="sheetItemWeapon" type="checkbox"> Arma</label><button class="btn small primary" onclick="sheetAddItem()">+ Adicionar</button></div></section><section class="sheet-block"><h3>⚔ ATAQUES & COMBATE <small>'+weapons.length+'</small></h3><div class="sheet-scroll">'+combatHtml+'</div><div class="sheet-add"><label class="sheet-defense">Defesa do alvo <input id="sheetTargetDefense" type="number" min="0" max="999" value="15"></label><label class="sheet-defense">Distância <select id="sheetTargetRange"><option value="curto">Curto</option><option value="medio">Médio</option><option value="longo">Longo</option><option value="extremo">Extremo</option></select></label></div><div id="sheetCombatResult" class="sheet-combat-result" aria-live="polite"></div></section></div><div class="paper-bottom">A MALDIÇÃO DOS SETE ANJOS <span>REGISTRO PARANORMAL</span></div></div><details class="paper-technical"><summary>Ficha técnica, controles e informações adicionais</summary><div class="paper-original">'+original+'</div></details>';
+  el.innerHTML='<div class="paper-sheet paper-v2"><div class="sheet-ornament" aria-hidden="true">✿　✦　鳥居　✦　✿</div><div class="paper-head"><div><small>ORDEM PARANORMAL • FICHA DE AGENTE</small><h2>'+esc(c.name)+'</h2><p>'+esc(c.origin||'Origem não definida')+' • '+esc(className(c.class))+'</p></div><div class="paper-nex">NEX <strong>'+esc(c.nex||0)+'%</strong></div></div><div class="paper-columns"><div><div class="paper-caption paper-attributes-heading"><span>ATRIBUTOS</span><small>CLIQUE PARA ROLAR</small><button type="button" class="paper-attribute-edit" title="Editar atributos e adicionar pontos" aria-label="Editar atributos e adicionar pontos" onclick="sheetOpenAttributeEditor()"><span aria-hidden="true">✎</span><i aria-hidden="true">+</i></button></div><div class="paper-attributes"><div class="paper-core">✣<span>ATRIBUTOS</span></div>'+attrHtml+'</div><div class="paper-resources">'+resource('pv','PONTOS DE VIDA',c.pvNow,st.pv)+resource('pe','PONTOS DE ESFORÇO',(+c.peNow||0)+(+c.peTemp||0),st.pe)+resource('san','SANIDADE',c.sanNow,st.san)+resource('def','DEFESA BASE',10+(+c.attrs.agi||0),null)+'</div><div class="paper-shortcuts"><button class="btn small" onclick="openModal(\''+esc(c.id)+'\')">Editar ficha</button></div></div><div>'+skillHudHtml+'</div></div><div class="sheet-pe-overview"><span>PE DISPONÍVEL <b>'+((+c.peNow||0)+(+c.peTemp||0))+'</b></span><span>GASTO NO TURNO <b>'+(+c.peSpentTurn||0)+'</b> / '+peLimitFor(c)+'</span></div><div class="sheet-pe-rest-controls" aria-label="Reiniciar e recuperar PE"><span class="sheet-pe-rest-title">◈ CONTROLE DE PE <small>Novo turno libera o limite; Recuperar PE restaura a reserva atual.</small></span><div><button type="button" class="btn small" data-agent="'+esc(c.id)+'" onclick="sheetNewPETurn(this.dataset.agent)">↻ Novo turno</button><button type="button" class="btn small" data-agent="'+esc(c.id)+'" onclick="sheetFinishPEScene(this.dataset.agent)">◌ Encerrar cena</button><button type="button" class="btn small primary" data-agent="'+esc(c.id)+'" onclick="sheetRefillPE(this.dataset.agent)">✚ Recuperar PE</button></div></div><section class="sheet-block sheet-pe-block" id="sheetPEBlock"><h3>✧ HABILIDADES COM CUSTO DE PE <small>'+peActions.length+'</small></h3><div class="sheet-pe-list">'+peHtml+'</div></section><div class="sheet-lower"><section class="sheet-block sheet-powers-block"><h3>✦ PODERES & HABILIDADES <small>'+(powers.length+grantedPowers.length)+'</small></h3><div class="sheet-scroll sheet-powers-list">'+powerHtml+'</div>'+powerEditorHtml+'</section><section class="sheet-block"><h3>◈ RITUAIS <small>'+rituals.length+'</small></h3><div class="sheet-scroll">'+ritualHtml+'</div><div class="sheet-add"><select id="sheetRitualChoice" aria-label="Ritual para aprender"></select><button class="btn small primary" onclick="sheetLearnRitual()">+ Aprender</button></div></section><section class="sheet-block"><h3>▣ EQUIPAMENTO & INVENTÁRIO <small>'+inventory.length+'</small></h3><div class="sheet-scroll">'+invHtml+'</div><div class="sheet-add"><select id="sheetItemPreset" aria-label="Modelo de equipamento" onchange="sheetSelectPreset(this.value)"><option value="">Item personalizado</option></select><input id="sheetItemName" placeholder="Nome do equipamento" maxlength="100" aria-label="Nome do equipamento"><input id="sheetItemQty" type="number" min="1" max="999" value="1" aria-label="Quantidade"><label class="sheet-weapon-check"><input id="sheetItemWeapon" type="checkbox"> Arma</label><button class="btn small primary" onclick="sheetAddItem()">+ Adicionar</button></div></section><section class="sheet-block"><h3>⚔ ATAQUES & COMBATE <small>'+weapons.length+'</small></h3><div class="sheet-scroll">'+combatHtml+'</div><div class="sheet-add"><label class="sheet-defense">Defesa do alvo <input id="sheetTargetDefense" type="number" min="0" max="999" value="15"></label><label class="sheet-defense">Distância <select id="sheetTargetRange"><option value="curto">Curto</option><option value="medio">Médio</option><option value="longo">Longo</option><option value="extremo">Extremo</option></select></label></div><div id="sheetCombatResult" class="sheet-combat-result" aria-live="polite"></div></section></div><div class="paper-bottom">A MALDIÇÃO DOS SETE ANJOS <span>REGISTRO PARANORMAL</span></div></div><details class="paper-technical"><summary>Ficha técnica, controles e informações adicionais</summary><div class="paper-original">'+original+'</div></details>';
   const powerSelect=$('sheetKnownPowerSelect');
   if(powerSelect)powerSelect.innerHTML=sheetPowerCatalogOptions(c);
   const presetSelect=$('sheetItemPreset');if(presetSelect)presetSelect.innerHTML='<option value="">Item personalizado</option>'+INVENTORY_PRESETS.map((p,i)=>'<option value="'+i+'">'+esc(p.name)+'</option>').join('');
@@ -448,6 +461,42 @@
  };
  window.sheetLearnRitual=function(){const value=$('sheetRitualChoice')?.value,select=$('grimoireNewRitual');if(!value||!select){say('Nenhum ritual disponível.');return}select.value=value;addKnownRitualFromPage()};
  window.sheetRemoveRitual=function(index){const c=current();if(!c?.powers?.rituals?.[index])return;if(!confirm('Remover este ritual da ficha?'))return;c.powers.rituals.splice(index,1);db();render()};
+
+ window.sheetNewPETurn=function(agentId){
+  const c=agents.find(x=>x.id===agentId);if(!c)return;
+  const spent=+c.peSpentTurn||0;
+  newPETurn(agentId);
+  addHist({agent:c.name,label:'Novo turno',detail:'Limite de PE do turno reiniciado (gasto anterior: '+spent+' PE). PE atuais não foram recuperados.',total:spent,dt:null,passed:null,status:'TURNO REINICIADO',kind:'Recursos'});
+  if(masterUnlocked)renderMaster();
+ };
+ window.sheetFinishPEScene=function(agentId){
+  const c=agents.find(x=>x.id===agentId);if(!c)return;
+  if(!confirm('Encerrar a cena? Os usos por cena e por turno serão reiniciados, e os PE temporários serão removidos. Os PE normais não serão recuperados.'))return;
+  const removed=+c.peTemp||0;
+  endPEScene(agentId);
+  addHist({agent:c.name,label:'Cena encerrada',detail:'Usos e limite reiniciados • PE temporários removidos: '+removed,total:removed,dt:null,passed:null,status:'CENA ENCERRADA',kind:'Recursos'});
+  if(masterUnlocked)renderMaster();
+ };
+ window.sheetRefillPE=function(agentId){
+  const c=agents.find(x=>x.id===agentId);if(!c)return;
+  const maximum=Math.max(0,stats(c).pe),previous=Math.max(0,+c.peNow||0);
+  if(previous>=maximum){say('Os PE normais desse agente já estão no máximo.');return}
+  if(!confirm('Recuperar os PE normais de '+c.name+' até o máximo ('+maximum+')? O limite de gasto do turno continuará como está.'))return;
+  c.peNow=maximum;
+  db();
+  addHist({agent:c.name,label:'PE recuperados',detail:'PE normais recuperados: '+previous+' → '+maximum+'. Limite do turno preservado.',total:maximum-previous,dt:null,passed:null,status:'PE RECUPERADO',kind:'Recursos'});
+  render();
+  say(c.name+': PE recuperados para '+maximum+'.');
+ };
+ window.masterPEAction=function(action){
+  if(!masterUnlocked)return;
+  const id=$('masterPEAgent')?.value;
+  const c=agents.find(x=>x.id===id);
+  if(!c){say('Selecione um agente para controlar PE.');return}
+  if(action==='turn')window.sheetNewPETurn(id);
+  else if(action==='scene')window.sheetFinishPEScene(id);
+  else if(action==='restore')window.sheetRefillPE(id);
+ };
  window.sheetUsePE=function(actionId){
   const c=current(),a=c&&peActionList(c).find(x=>x.id===actionId);if(!c||!a)return;
   const sheet=$('sheet-pe-'+a.id),target=$((a.mode==='cost'?'pe-cost-':'pe-param-')+a.id);
