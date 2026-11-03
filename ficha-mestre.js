@@ -5,10 +5,125 @@
  masterBtn.dataset.view='mestre';masterBtn.textContent='♜  Painel do Mestre';nav.appendChild(masterBtn);
  const main=document.querySelector('main');
  const master=document.createElement('section');master.className='view';master.id='v-mestre';
- master.innerHTML='<div class="section" style="margin-top:0"><div><div class="eyebrow">REGISTRO DA MESA</div><h2>Painel do Mestre</h2><p>Atividades registradas neste navegador. Outros dispositivos não são sincronizados.</p></div></div><div class="master-summary" id="masterSummary"></div><div class="master-filters"><label>Agente <select id="masterAgent"></select></label><label>Tipo <select id="masterKind"><option value="todos">Todos</option><option value="poderes">Poderes e rituais</option><option value="testes">Testes e combate</option></select></label></div><div class="list" id="masterLog"></div>';
+ master.innerHTML='<div class="master-console">'
+  +'<div class="master-console-head"><div class="master-brand"><small>TRANSMISSÃO RESTRITA • CAMADA DO VAZIO</small><h2>♜ Painel do Mestre</h2><p>Registros ficam neste navegador e não são sincronizados com outros dispositivos.</p></div><div class="master-access-tools"><span class="master-lock-label">ACESSO AUTORIZADO</span><button type="button" class="btn small master-sound-toggle" id="masterSoundToggle" onclick="toggleMasterAmbient()" aria-pressed="true">◉ Som do Vazio: ligado</button><button type="button" class="btn small master-lock-button" onclick="lockMasterPanel()">Bloquear painel</button></div></div>'
+  +'<div class="master-summary" id="masterSummary"></div>'
+  +'<section class="master-pe-console" aria-label="Controles de esforço dos agentes"><div class="master-pe-head"><span>◈ CONTROLE DE ESFORÇO</span><small>Reinicie o turno, encerre a cena ou recupere PE, conforme a situação da mesa.</small></div><div class="master-pe-controls"><label>AGENTE<select id="masterPEAgent"></select></label><div class="master-pe-buttons"><button type="button" class="btn small" onclick="masterPEAction(&quot;turn&quot;)">↻ Novo turno</button><button type="button" class="btn small" onclick="masterPEAction(&quot;scene&quot;)">◌ Encerrar cena</button><button type="button" class="btn small primary" onclick="masterPEAction(&quot;restore&quot;)">✚ Recuperar PE</button></div></div><div class="master-pe-status" id="masterPEStatus" aria-live="polite"></div></section>'
+  +'<div class="master-filters"><label>Agente <select id="masterAgent"></select></label><label>Tipo <select id="masterKind"><option value="todos">Todos</option><option value="poderes">Poderes e rituais</option><option value="testes">Testes e combate</option></select></label></div><div class="list" id="masterLog"></div></div>';
  const footer=main.querySelector('.foot');main.insertBefore(master,footer);
- masterBtn.addEventListener('click',()=>{document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));master.classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x===masterBtn));$('title').textContent='Painel do Mestre';if(typeof stopVoidAudio==='function')stopVoidAudio();renderMaster()});
- $('masterAgent').addEventListener('change',renderMaster);$('masterKind').addEventListener('change',renderMaster);
+
+ const MASTER_PASSWORD='342005'; // Bloqueio de interface local; não substitui autenticação de servidor.
+ let masterUnlocked=false;
+ let masterSoundEnabled=true;
+ let masterAmbient=null;
+ const masterGate=document.createElement('div');
+ masterGate.id='masterGate';masterGate.className='master-gate';masterGate.hidden=true;
+ masterGate.innerHTML='<section class="master-gate-dialog" role="dialog" aria-modal="true" aria-labelledby="masterGateTitle" aria-describedby="masterGateDescription"><div class="master-gate-sigil" aria-hidden="true">◈</div><span class="master-gate-kicker">ENTRADA RESTRITA</span><h2 id="masterGateTitle">O Vazio observa.</h2><p id="masterGateDescription">Somente o mestre pode abrir este arquivo. Insira o código de acesso para continuar.</p><form id="masterGateForm"><label for="masterGatePassword">SENHA DO MESTRE</label><input id="masterGatePassword" type="password" inputmode="numeric" maxlength="6" autocomplete="off" required placeholder="••••••"><p id="masterGateError" class="master-gate-error" role="alert" aria-live="polite"></p><div class="master-gate-actions"><button type="button" class="btn small" id="masterGateCancel">Voltar</button><button type="submit" class="btn small primary">Entrar no painel</button></div></form><small class="master-gate-hint">Este bloqueio protege apenas a interface local. A senha pode ser encontrada por alguém que inspecione o código do site.</small></section>';
+ document.body.appendChild(masterGate);
+ const audioButton=$('masterSoundToggle');
+ function updateMasterAudioButton(){
+  if(!audioButton)return;
+  audioButton.textContent=masterSoundEnabled?'◉ Som do Vazio: ligado':'◯ Som do Vazio: desligado';
+  audioButton.setAttribute('aria-pressed',String(masterSoundEnabled));
+ }
+ function startMasterAmbient(){
+  if(!masterUnlocked||!masterSoundEnabled||masterAmbient)return;
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC){masterSoundEnabled=false;updateMasterAudioButton();say('Áudio não suportado neste navegador.');return}
+  try{
+   const ctx=new AC(),output=ctx.createGain(),nodes=[];
+   output.gain.setValueAtTime(0,ctx.currentTime);
+   output.connect(ctx.destination);
+   // Drone grave + oscilação lenta + ruído filtrado, sintetizados localmente.
+   [[52,'sine',.24],[74,'triangle',.09],[104.3,'sine',.045]].forEach(([frequency,type,volume])=>{
+    const osc=ctx.createOscillator(),gain=ctx.createGain();
+    osc.type=type;osc.frequency.value=frequency;gain.gain.value=volume;
+    osc.connect(gain);gain.connect(output);osc.start();nodes.push(osc);
+   });
+   const noiseBuffer=ctx.createBuffer(1,Math.round(ctx.sampleRate*2),ctx.sampleRate);
+   const noiseData=noiseBuffer.getChannelData(0);
+   for(let i=0;i<noiseData.length;i++)noiseData[i]=(Math.random()*2-1)*.28;
+   const noise=ctx.createBufferSource(),filter=ctx.createBiquadFilter(),noiseGain=ctx.createGain();
+   noise.buffer=noiseBuffer;noise.loop=true;
+   filter.type='lowpass';filter.frequency.value=150;filter.Q.value=.75;noiseGain.gain.value=.055;
+   noise.connect(filter);filter.connect(noiseGain);noiseGain.connect(output);noise.start();
+   nodes.push(noise);
+   const lfo=ctx.createOscillator(),lfoGain=ctx.createGain();
+   lfo.type='sine';lfo.frequency.value=.11;lfoGain.gain.value=45;
+   lfo.connect(lfoGain);lfoGain.connect(filter.frequency);lfo.start();nodes.push(lfo);
+   masterAmbient={ctx,output,nodes};
+   output.gain.setTargetAtTime(.19,ctx.currentTime,.25);
+   Promise.resolve(ctx.resume()).catch(()=>{stopMasterAmbient();say('Não foi possível iniciar o som. Use o botão para tentar novamente.')});
+  }catch(e){stopMasterAmbient();masterSoundEnabled=false;updateMasterAudioButton();say('Falha ao iniciar o som do Vazio.')}
+ }
+ function stopMasterAmbient(){
+  if(!masterAmbient)return;
+  const audio=masterAmbient;masterAmbient=null;
+  try{
+   audio.output.gain.setTargetAtTime(0,audio.ctx.currentTime,.045);
+   setTimeout(()=>{audio.nodes.forEach(node=>{try{node.stop()}catch(e){}});audio.ctx.close().catch(()=>{})},280);
+  }catch(e){try{audio.ctx.close().catch(()=>{})}catch(err){}}
+ }
+ window.toggleMasterAmbient=function(){
+  if(!masterUnlocked)return;
+  masterSoundEnabled=!masterSoundEnabled;updateMasterAudioButton();
+  if(masterSoundEnabled)startMasterAmbient();else stopMasterAmbient();
+ };
+ function closeMasterGate(){
+  masterGate.hidden=true;
+  $('masterGatePassword').value='';
+  $('masterGateError').textContent='';
+  masterBtn.focus();
+ }
+ function showMasterGate(){
+  if(!masterGate.hidden)return;
+  masterGate.hidden=false;
+  $('masterGatePassword').value='';
+  $('masterGateError').textContent='';
+  $('masterGatePassword').focus();
+ }
+ $('masterGateCancel').addEventListener('click',closeMasterGate);
+ masterGate.addEventListener('click',e=>{if(e.target===masterGate)closeMasterGate()});
+ masterGate.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();closeMasterGate();return}
+  if(e.key==='Tab'){
+   const els=[...masterGate.querySelectorAll('input,button')].filter(el=>!el.disabled);
+   if(!els.length)return;
+   if(e.shiftKey&&document.activeElement===els[0]){e.preventDefault();els[els.length-1].focus()}
+   else if(!e.shiftKey&&document.activeElement===els[els.length-1]){e.preventDefault();els[0].focus()}
+  }
+ });
+ const originalView=view;
+ function openMasterView(){
+  masterUnlocked=true;
+  originalView('mestre');
+  $('title').textContent='Painel do Mestre';
+  renderMaster();
+  startMasterAmbient();
+  updateMasterAudioButton();
+ }
+ view=function(page){
+  if(page==='mestre'){if(masterUnlocked)openMasterView();else showMasterGate();return}
+  masterUnlocked=false;stopMasterAmbient();
+  originalView(page);
+ };
+ $('masterGateForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const input=$('masterGatePassword'),error=$('masterGateError');
+  if(input.value!==MASTER_PASSWORD){error.textContent='Código incorreto. O Vazio permanece fechado.';input.value='';input.focus();return}
+  masterGate.hidden=true;input.value='';error.textContent='';
+  openMasterView();
+ });
+ masterBtn.addEventListener('click',()=>view('mestre'));
+ window.lockMasterPanel=function(){
+  masterUnlocked=false;stopMasterAmbient();
+  view('home');
+  say('Painel do Mestre bloqueado.');
+ };
+ $('masterAgent').addEventListener('change',renderMaster);
+ $('masterKind').addEventListener('change',renderMaster);
+ $('masterPEAgent').addEventListener('change',renderMaster);
+
  function isPower(h){return ['Ritual','Habilidade','Poder'].includes(h.kind)||/CONJURADO|SELO CRIADO|HABILIDADE/i.test(h.status||'')}
  function renderMaster(){
   const sel=$('masterAgent'),old=sel.value;sel.innerHTML='<option value="todos">Todos os agentes</option>'+agents.map(c=>'<option value="'+esc(c.name)+'">'+esc(c.name)+'</option>').join('');
