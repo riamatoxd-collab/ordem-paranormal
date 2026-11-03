@@ -156,3 +156,21 @@ Um **botão circular com ícone de edição e sinal +** aparece no canto direito
 - Os pontos manuais ficam armazenados em `manualAttributeBonuses`, separados dos aumentos de atributo por NEX. Dessa forma, os ajustes não desaparecem quando a ficha é editada ou o NEX muda.
 - Ao salvar, os novos atributos passam a valer para rolagens e cálculos de PV/PE/Defesa. A quantidade atual de PV/PE não aumenta automaticamente; ela é limitada ao novo máximo se necessário.
 - As alterações são registradas no histórico local.
+
+## Painel do Mestre — bloqueio e Som do Vazio
+
+A entrada no **Painel do Mestre** solicita um PIN configurado pelo mestre. A senha é verificada no navegador; o painel não abre pela navegação normal antes de informar o PIN correto. O botão **Bloquear painel** fecha o acesso, e ao sair do painel o acesso é bloqueado novamente.
+
+**Importante:** por ser um site estático, esta é apenas uma proteção de interface, **não uma autenticação segura**. O PIN está no JavaScript e pode ser visto por quem inspecionar os arquivos; os registros locais permanecem acessíveis pelo navegador. Para dados confidenciais ou acesso de jogadores em dispositivos distintos, seria necessário um servidor com autenticação real.
+
+O **Som do Vazio** é criado por Web Audio API (tons graves e ruído filtrado), começa após o acesso autorizado e pode ser ligado ou desligado no topo do painel. O áudio para ao sair ou bloquear. A inicialização exige interação do usuário e pode ser impedida pelas configurações do navegador; não são usados arquivos de música externos.
+
+## Reiniciar e recuperar PE
+
+Na ficha do agente e na área **Controle de Esforço** do Painel do Mestre estão disponíveis três controles distintos:
+
+- **Novo turno:** zera o gasto de PE contabilizado no turno e libera novamente habilidades de uso por turno. Não recupera PE normais.
+- **Encerrar cena:** reinicia limites/usos por turno e cena e remove PE temporários. Não recupera PE normais.
+- **Recuperar PE:** restaura os PE normais ao máximo calculado pela ficha. **Não** reinicia por si só o limite de gasto do turno nem remove PE temporários.
+
+As alterações são persistidas no navegador e registradas no histórico; encerrar cena e recuperar PE pedem confirmação.
