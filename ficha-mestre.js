@@ -9,6 +9,7 @@
   +'<div class="master-console-head"><div class="master-brand"><small>TRANSMISSÃO RESTRITA • CAMADA DO VAZIO</small><h2>♜ Painel do Mestre</h2><p>Registros ficam neste navegador e não são sincronizados com outros dispositivos.</p></div><div class="master-access-tools"><span class="master-lock-label">ACESSO AUTORIZADO</span><button type="button" class="btn small master-sound-toggle" id="masterSoundToggle" onclick="toggleMasterAmbient()" aria-pressed="true">◉ Som do Vazio: ligado</button><button type="button" class="btn small master-lock-button" onclick="lockMasterPanel()">Bloquear painel</button></div></div>'
   +'<div class="master-summary" id="masterSummary"></div>'
   +'<section class="master-pe-console" aria-label="Controles de esforço dos agentes"><div class="master-pe-head"><span>◈ CONTROLE DE ESFORÇO</span><small>Reinicie o turno, encerre a cena ou recupere PE, conforme a situação da mesa.</small></div><div class="master-pe-controls"><label>AGENTE<select id="masterPEAgent"></select></label><div class="master-pe-buttons"><button type="button" class="btn small" onclick="masterPEAction(&quot;turn&quot;)">↻ Novo turno</button><button type="button" class="btn small" onclick="masterPEAction(&quot;scene&quot;)">◌ Encerrar cena</button><button type="button" class="btn small primary" onclick="masterPEAction(&quot;restore&quot;)">✚ Recuperar PE</button></div></div><div class="master-pe-status" id="masterPEStatus" aria-live="polite"></div></section>'
+  +'<section class="op-master-roster"><div class="op-master-roster-head"><div><h3>✧ Personagens registrados</h3><p>Consulte personagens criados pelos jogadores, seus recursos e atributos.</p></div><button type="button" onclick="OPAccounts.refreshMasterRoster()">↻ Atualizar registros</button></div><div id="masterAccountRoster" aria-live="polite"></div></section>'
   +'<div class="master-filters"><label>Agente <select id="masterAgent"></select></label><label>Tipo <select id="masterKind"><option value="todos">Todos</option><option value="poderes">Poderes e rituais</option><option value="testes">Testes e combate</option></select></label></div><div class="list" id="masterLog"></div></div>';
  const footer=main.querySelector('.foot');main.insertBefore(master,footer);
 
@@ -147,6 +148,7 @@
   const rows=all.filter(h=>mode==='poderes'?isPower(h):mode==='testes'?!isPower(h):true);
   $('masterSummary').innerHTML='<div class="master-stat"><small>AGENTES</small><b>'+agents.length+'</b></div><div class="master-stat"><small>REGISTROS</small><b>'+all.length+'</b></div><div class="master-stat"><small>PODERES / RITUAIS</small><b>'+power.length+'</b></div>';
   $('masterLog').innerHTML=rows.map(h=>'<article class="master-entry"><div><strong>'+esc(h.agent||'Agente')+'</strong><span class="master-kind">'+esc(h.kind||'Ação')+'</span><div class="master-label">'+esc(h.label||'Ação')+'</div><small>'+esc(h.detail||'')+'</small></div><time>'+esc(h.time||'')+'</time></article>').join('')||'<div class="empty">Nenhuma atividade neste filtro.</div>';
+  if(window.OPAccounts?.authenticated)window.OPAccounts.renderMasterRoster();
  }
 
  let skillHudFilter='trained';
