@@ -5,12 +5,140 @@
  masterBtn.dataset.view='mestre';masterBtn.textContent='♜  Painel do Mestre';nav.appendChild(masterBtn);
  const main=document.querySelector('main');
  const master=document.createElement('section');master.className='view';master.id='v-mestre';
- master.innerHTML='<div class="section" style="margin-top:0"><div><div class="eyebrow">REGISTRO DA MESA</div><h2>Painel do Mestre</h2><p>Atividades registradas neste navegador. Outros dispositivos não são sincronizados.</p></div></div><div class="master-summary" id="masterSummary"></div><div class="master-filters"><label>Agente <select id="masterAgent"></select></label><label>Tipo <select id="masterKind"><option value="todos">Todos</option><option value="poderes">Poderes e rituais</option><option value="testes">Testes e combate</option></select></label></div><div class="list" id="masterLog"></div>';
+ master.innerHTML='<div class="master-console">'
+  +'<div class="master-console-head"><div class="master-brand"><small>TRANSMISSÃO RESTRITA • CAMADA DO VAZIO</small><h2>♜ Painel do Mestre</h2><p>Registros ficam neste navegador e não são sincronizados com outros dispositivos.</p></div><div class="master-access-tools"><span class="master-lock-label">ACESSO AUTORIZADO</span><button type="button" class="btn small master-sound-toggle" id="masterSoundToggle" onclick="toggleMasterAmbient()" aria-pressed="true">◉ Som do Vazio: ligado</button><button type="button" class="btn small master-lock-button" onclick="lockMasterPanel()">Bloquear painel</button></div></div>'
+  +'<div class="master-summary" id="masterSummary"></div>'
+  +'<section class="master-pe-console" aria-label="Controles de esforço dos agentes"><div class="master-pe-head"><span>◈ CONTROLE DE ESFORÇO</span><small>Reinicie o turno, encerre a cena ou recupere PE, conforme a situação da mesa.</small></div><div class="master-pe-controls"><label>AGENTE<select id="masterPEAgent"></select></label><div class="master-pe-buttons"><button type="button" class="btn small" onclick="masterPEAction(&quot;turn&quot;)">↻ Novo turno</button><button type="button" class="btn small" onclick="masterPEAction(&quot;scene&quot;)">◌ Encerrar cena</button><button type="button" class="btn small primary" onclick="masterPEAction(&quot;restore&quot;)">✚ Recuperar PE</button></div></div><div class="master-pe-status" id="masterPEStatus" aria-live="polite"></div></section>'
+  +'<div class="master-filters"><label>Agente <select id="masterAgent"></select></label><label>Tipo <select id="masterKind"><option value="todos">Todos</option><option value="poderes">Poderes e rituais</option><option value="testes">Testes e combate</option></select></label></div><div class="list" id="masterLog"></div></div>';
  const footer=main.querySelector('.foot');main.insertBefore(master,footer);
- masterBtn.addEventListener('click',()=>{document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));master.classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x===masterBtn));$('title').textContent='Painel do Mestre';if(typeof stopVoidAudio==='function')stopVoidAudio();renderMaster()});
- $('masterAgent').addEventListener('change',renderMaster);$('masterKind').addEventListener('change',renderMaster);
+
+ const MASTER_PASSWORD='342005'; // Bloqueio de interface local; não substitui autenticação de servidor.
+ let masterUnlocked=false;
+ let masterSoundEnabled=true;
+ let masterAmbient=null;
+ const masterGate=document.createElement('div');
+ masterGate.id='masterGate';masterGate.className='master-gate';masterGate.hidden=true;
+ masterGate.innerHTML='<section class="master-gate-dialog" role="dialog" aria-modal="true" aria-labelledby="masterGateTitle" aria-describedby="masterGateDescription"><div class="master-gate-sigil" aria-hidden="true">◈</div><span class="master-gate-kicker">ENTRADA RESTRITA</span><h2 id="masterGateTitle">O Vazio observa.</h2><p id="masterGateDescription">Somente o mestre pode abrir este arquivo. Insira o código de acesso para continuar.</p><form id="masterGateForm"><label for="masterGatePassword">SENHA DO MESTRE</label><input id="masterGatePassword" type="password" inputmode="numeric" maxlength="6" autocomplete="off" required placeholder="••••••"><p id="masterGateError" class="master-gate-error" role="alert" aria-live="polite"></p><div class="master-gate-actions"><button type="button" class="btn small" id="masterGateCancel">Voltar</button><button type="submit" class="btn small primary">Entrar no painel</button></div></form><small class="master-gate-hint">Este bloqueio protege apenas a interface local. A senha pode ser encontrada por alguém que inspecione o código do site.</small></section>';
+ document.body.appendChild(masterGate);
+ const audioButton=$('masterSoundToggle');
+ function updateMasterAudioButton(){
+  if(!audioButton)return;
+  audioButton.textContent=masterSoundEnabled?'◉ Som do Vazio: ligado':'◯ Som do Vazio: desligado';
+  audioButton.setAttribute('aria-pressed',String(masterSoundEnabled));
+ }
+ function startMasterAmbient(){
+  if(!masterUnlocked||!masterSoundEnabled||masterAmbient)return;
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC){masterSoundEnabled=false;updateMasterAudioButton();say('Áudio não suportado neste navegador.');return}
+  try{
+   const ctx=new AC(),output=ctx.createGain(),nodes=[];
+   output.gain.setValueAtTime(0,ctx.currentTime);
+   output.connect(ctx.destination);
+   // Drone grave + oscilação lenta + ruído filtrado, sintetizados localmente.
+   [[52,'sine',.24],[74,'triangle',.09],[104.3,'sine',.045]].forEach(([frequency,type,volume])=>{
+    const osc=ctx.createOscillator(),gain=ctx.createGain();
+    osc.type=type;osc.frequency.value=frequency;gain.gain.value=volume;
+    osc.connect(gain);gain.connect(output);osc.start();nodes.push(osc);
+   });
+   const noiseBuffer=ctx.createBuffer(1,Math.round(ctx.sampleRate*2),ctx.sampleRate);
+   const noiseData=noiseBuffer.getChannelData(0);
+   for(let i=0;i<noiseData.length;i++)noiseData[i]=(Math.random()*2-1)*.28;
+   const noise=ctx.createBufferSource(),filter=ctx.createBiquadFilter(),noiseGain=ctx.createGain();
+   noise.buffer=noiseBuffer;noise.loop=true;
+   filter.type='lowpass';filter.frequency.value=150;filter.Q.value=.75;noiseGain.gain.value=.055;
+   noise.connect(filter);filter.connect(noiseGain);noiseGain.connect(output);noise.start();
+   nodes.push(noise);
+   const lfo=ctx.createOscillator(),lfoGain=ctx.createGain();
+   lfo.type='sine';lfo.frequency.value=.11;lfoGain.gain.value=45;
+   lfo.connect(lfoGain);lfoGain.connect(filter.frequency);lfo.start();nodes.push(lfo);
+   masterAmbient={ctx,output,nodes};
+   output.gain.setTargetAtTime(.19,ctx.currentTime,.25);
+   Promise.resolve(ctx.resume()).catch(()=>{stopMasterAmbient();say('Não foi possível iniciar o som. Use o botão para tentar novamente.')});
+  }catch(e){stopMasterAmbient();masterSoundEnabled=false;updateMasterAudioButton();say('Falha ao iniciar o som do Vazio.')}
+ }
+ function stopMasterAmbient(){
+  if(!masterAmbient)return;
+  const audio=masterAmbient;masterAmbient=null;
+  try{
+   audio.output.gain.setTargetAtTime(0,audio.ctx.currentTime,.045);
+   setTimeout(()=>{audio.nodes.forEach(node=>{try{node.stop()}catch(e){}});audio.ctx.close().catch(()=>{})},280);
+  }catch(e){try{audio.ctx.close().catch(()=>{})}catch(err){}}
+ }
+ window.toggleMasterAmbient=function(){
+  if(!masterUnlocked)return;
+  masterSoundEnabled=!masterSoundEnabled;updateMasterAudioButton();
+  if(masterSoundEnabled)startMasterAmbient();else stopMasterAmbient();
+ };
+ function closeMasterGate(){
+  masterGate.hidden=true;
+  $('masterGatePassword').value='';
+  $('masterGateError').textContent='';
+  masterBtn.focus();
+ }
+ function showMasterGate(){
+  if(!masterGate.hidden)return;
+  masterGate.hidden=false;
+  $('masterGatePassword').value='';
+  $('masterGateError').textContent='';
+  $('masterGatePassword').focus();
+ }
+ $('masterGateCancel').addEventListener('click',closeMasterGate);
+ masterGate.addEventListener('click',e=>{if(e.target===masterGate)closeMasterGate()});
+ masterGate.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();closeMasterGate();return}
+  if(e.key==='Tab'){
+   const els=[...masterGate.querySelectorAll('input,button')].filter(el=>!el.disabled);
+   if(!els.length)return;
+   if(e.shiftKey&&document.activeElement===els[0]){e.preventDefault();els[els.length-1].focus()}
+   else if(!e.shiftKey&&document.activeElement===els[els.length-1]){e.preventDefault();els[0].focus()}
+  }
+ });
+ const originalView=view;
+ function openMasterView(){
+  masterUnlocked=true;
+  originalView('mestre');
+  $('title').textContent='Painel do Mestre';
+  renderMaster();
+  startMasterAmbient();
+  updateMasterAudioButton();
+ }
+ view=function(page){
+  if(page==='mestre'){if(masterUnlocked)openMasterView();else showMasterGate();return}
+  masterUnlocked=false;stopMasterAmbient();
+  originalView(page);
+ };
+ $('masterGateForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const input=$('masterGatePassword'),error=$('masterGateError');
+  if(input.value!==MASTER_PASSWORD){error.textContent='Código incorreto. O Vazio permanece fechado.';input.value='';input.focus();return}
+  masterGate.hidden=true;input.value='';error.textContent='';
+  openMasterView();
+ });
+ masterBtn.addEventListener('click',()=>view('mestre'));
+ window.lockMasterPanel=function(){
+  masterUnlocked=false;stopMasterAmbient();
+  view('home');
+  say('Painel do Mestre bloqueado.');
+ };
+ $('masterAgent').addEventListener('change',renderMaster);
+ $('masterKind').addEventListener('change',renderMaster);
+ $('masterPEAgent').addEventListener('change',renderMaster);
+
  function isPower(h){return ['Ritual','Habilidade','Poder'].includes(h.kind)||/CONJURADO|SELO CRIADO|HABILIDADE/i.test(h.status||'')}
  function renderMaster(){
+  if(!masterUnlocked)return;
+  const peSelect=$('masterPEAgent');
+  if(peSelect){
+   const previous=peSelect.value;
+   peSelect.innerHTML=agents.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join('')||'<option value="">Nenhum agente cadastrado</option>';
+   peSelect.value=agents.some(c=>c.id===previous)?previous:(current()?.id||'');
+   const selectedAgent=agents.find(c=>c.id===peSelect.value);
+   const status=$('masterPEStatus');
+   if(status)status.innerHTML=selectedAgent?
+    '<span><strong>'+esc(selectedAgent.peNow??0)+'</strong> / '+stats(selectedAgent).pe+' PE atuais</span><span><strong>'+(+selectedAgent.peSpentTurn||0)+'</strong> / '+peLimitFor(selectedAgent)+' gasto no turno</span><span><strong>'+(+selectedAgent.peTemp||0)+'</strong> PE temporários</span>':
+    '<span>Cadastre um agente para controlar seus PE.</span>';
+   document.querySelectorAll('.master-pe-buttons button').forEach(button=>button.disabled=!selectedAgent);
+  }
   const sel=$('masterAgent'),old=sel.value;sel.innerHTML='<option value="todos">Todos os agentes</option>'+agents.map(c=>'<option value="'+esc(c.name)+'">'+esc(c.name)+'</option>').join('');
   if([...sel.options].some(o=>o.value===old))sel.value=old;
   const all=hist.filter(h=>sel.value==='todos'||h.agent===sel.value);
@@ -241,7 +369,7 @@
   const invHtml=inventory.length?inventory.map(it=>'<div class="sheet-entry"><span class="sheet-symbol">'+(it.weapon?'⚔':'▣')+'</span><strong>'+esc(it.name||'Item')+'</strong><button class="sheet-qty" title="Diminuir quantidade" onclick="adjustInventoryQty(\''+esc(it.id)+'\',-1)">−</button><small>×'+esc(it.qty||1)+'</small><button class="sheet-qty" title="Aumentar quantidade" onclick="adjustInventoryQty(\''+esc(it.id)+'\',1)">+</button><button class="sheet-remove" title="Remover item" onclick="sheetRemoveItem(\''+esc(it.id)+'\')">✕</button></div>').join(''):'<p class="sheet-empty">Inventário vazio.</p>';
   const weapons=inventory.filter(it=>it.weapon);
   const combatHtml=weapons.length?weapons.map(it=>{const profile=weaponProfileFor(it);return '<button class="sheet-weapon" onclick="sheetRollWeapon(\''+esc(it.id)+'\')"><span>⚔</span><span><strong>'+esc(it.name)+'</strong><small>'+(profile?esc(profile.damage)+' • '+esc(profile.skill):it.sheetDamage?esc(it.sheetDamage)+' • '+esc(it.sheetSkill||'Luta'):'Clique para configurar dano')+'</small></span><b>ROLAR DADOS ⚄</b></button>'}).join(''):'<p class="sheet-empty">Adicione uma arma ao inventário para habilitar os ataques.</p>';
-  el.innerHTML='<div class="paper-sheet paper-v2"><div class="sheet-ornament" aria-hidden="true">✿　✦　鳥居　✦　✿</div><div class="paper-head"><div><small>ORDEM PARANORMAL • FICHA DE AGENTE</small><h2>'+esc(c.name)+'</h2><p>'+esc(c.origin||'Origem não definida')+' • '+esc(className(c.class))+'</p></div><div class="paper-nex">NEX <strong>'+esc(c.nex||0)+'%</strong></div></div><div class="paper-columns"><div><div class="paper-caption paper-attributes-heading"><span>ATRIBUTOS</span><small>CLIQUE PARA ROLAR</small><button type="button" class="paper-attribute-edit" title="Editar atributos e adicionar pontos" aria-label="Editar atributos e adicionar pontos" onclick="sheetOpenAttributeEditor()"><span aria-hidden="true">✎</span><i aria-hidden="true">+</i></button></div><div class="paper-attributes"><div class="paper-core">✣<span>ATRIBUTOS</span></div>'+attrHtml+'</div><div class="paper-resources">'+resource('pv','PONTOS DE VIDA',c.pvNow,st.pv)+resource('pe','PONTOS DE ESFORÇO',(+c.peNow||0)+(+c.peTemp||0),st.pe)+resource('san','SANIDADE',c.sanNow,st.san)+resource('def','DEFESA BASE',10+(+c.attrs.agi||0),null)+'</div><div class="paper-shortcuts"><button class="btn small" onclick="openModal(\''+esc(c.id)+'\')">Editar ficha</button></div></div><div>'+skillHudHtml+'</div></div><div class="sheet-pe-overview"><span>PE DISPONÍVEL <b>'+((+c.peNow||0)+(+c.peTemp||0))+'</b></span><span>GASTO NO TURNO <b>'+(+c.peSpentTurn||0)+'</b> / '+peLimitFor(c)+'</span></div><section class="sheet-block sheet-pe-block" id="sheetPEBlock"><h3>✧ HABILIDADES COM CUSTO DE PE <small>'+peActions.length+'</small></h3><div class="sheet-pe-list">'+peHtml+'</div></section><div class="sheet-lower"><section class="sheet-block sheet-powers-block"><h3>✦ PODERES & HABILIDADES <small>'+(powers.length+grantedPowers.length)+'</small></h3><div class="sheet-scroll sheet-powers-list">'+powerHtml+'</div>'+powerEditorHtml+'</section><section class="sheet-block"><h3>◈ RITUAIS <small>'+rituals.length+'</small></h3><div class="sheet-scroll">'+ritualHtml+'</div><div class="sheet-add"><select id="sheetRitualChoice" aria-label="Ritual para aprender"></select><button class="btn small primary" onclick="sheetLearnRitual()">+ Aprender</button></div></section><section class="sheet-block"><h3>▣ EQUIPAMENTO & INVENTÁRIO <small>'+inventory.length+'</small></h3><div class="sheet-scroll">'+invHtml+'</div><div class="sheet-add"><select id="sheetItemPreset" aria-label="Modelo de equipamento" onchange="sheetSelectPreset(this.value)"><option value="">Item personalizado</option></select><input id="sheetItemName" placeholder="Nome do equipamento" maxlength="100" aria-label="Nome do equipamento"><input id="sheetItemQty" type="number" min="1" max="999" value="1" aria-label="Quantidade"><label class="sheet-weapon-check"><input id="sheetItemWeapon" type="checkbox"> Arma</label><button class="btn small primary" onclick="sheetAddItem()">+ Adicionar</button></div></section><section class="sheet-block"><h3>⚔ ATAQUES & COMBATE <small>'+weapons.length+'</small></h3><div class="sheet-scroll">'+combatHtml+'</div><div class="sheet-add"><label class="sheet-defense">Defesa do alvo <input id="sheetTargetDefense" type="number" min="0" max="999" value="15"></label><label class="sheet-defense">Distância <select id="sheetTargetRange"><option value="curto">Curto</option><option value="medio">Médio</option><option value="longo">Longo</option><option value="extremo">Extremo</option></select></label></div><div id="sheetCombatResult" class="sheet-combat-result" aria-live="polite"></div></section></div><div class="paper-bottom">A MALDIÇÃO DOS SETE ANJOS <span>REGISTRO PARANORMAL</span></div></div><details class="paper-technical"><summary>Ficha técnica, controles e informações adicionais</summary><div class="paper-original">'+original+'</div></details>';
+  el.innerHTML='<div class="paper-sheet paper-v2"><div class="sheet-ornament" aria-hidden="true">✿　✦　鳥居　✦　✿</div><div class="paper-head"><div><small>ORDEM PARANORMAL • FICHA DE AGENTE</small><h2>'+esc(c.name)+'</h2><p>'+esc(c.origin||'Origem não definida')+' • '+esc(className(c.class))+'</p></div><div class="paper-nex">NEX <strong>'+esc(c.nex||0)+'%</strong></div></div><div class="paper-columns"><div><div class="paper-caption paper-attributes-heading"><span>ATRIBUTOS</span><small>CLIQUE PARA ROLAR</small><button type="button" class="paper-attribute-edit" title="Editar atributos e adicionar pontos" aria-label="Editar atributos e adicionar pontos" onclick="sheetOpenAttributeEditor()"><span aria-hidden="true">✎</span><i aria-hidden="true">+</i></button></div><div class="paper-attributes"><div class="paper-core">✣<span>ATRIBUTOS</span></div>'+attrHtml+'</div><div class="paper-resources">'+resource('pv','PONTOS DE VIDA',c.pvNow,st.pv)+resource('pe','PONTOS DE ESFORÇO',(+c.peNow||0)+(+c.peTemp||0),st.pe)+resource('san','SANIDADE',c.sanNow,st.san)+resource('def','DEFESA BASE',10+(+c.attrs.agi||0),null)+'</div><div class="paper-shortcuts"><button class="btn small" onclick="openModal(\''+esc(c.id)+'\')">Editar ficha</button></div></div><div>'+skillHudHtml+'</div></div><div class="sheet-pe-overview"><span>PE DISPONÍVEL <b>'+((+c.peNow||0)+(+c.peTemp||0))+'</b></span><span>GASTO NO TURNO <b>'+(+c.peSpentTurn||0)+'</b> / '+peLimitFor(c)+'</span></div><div class="sheet-pe-rest-controls" aria-label="Reiniciar e recuperar PE"><span class="sheet-pe-rest-title">◈ CONTROLE DE PE <small>Novo turno libera o limite; Recuperar PE restaura a reserva atual.</small></span><div><button type="button" class="btn small" data-agent="'+esc(c.id)+'" onclick="sheetNewPETurn(this.dataset.agent)">↻ Novo turno</button><button type="button" class="btn small" data-agent="'+esc(c.id)+'" onclick="sheetFinishPEScene(this.dataset.agent)">◌ Encerrar cena</button><button type="button" class="btn small primary" data-agent="'+esc(c.id)+'" onclick="sheetRefillPE(this.dataset.agent)">✚ Recuperar PE</button></div></div><section class="sheet-block sheet-pe-block" id="sheetPEBlock"><h3>✧ HABILIDADES COM CUSTO DE PE <small>'+peActions.length+'</small></h3><div class="sheet-pe-list">'+peHtml+'</div></section><div class="sheet-lower"><section class="sheet-block sheet-powers-block"><h3>✦ PODERES & HABILIDADES <small>'+(powers.length+grantedPowers.length)+'</small></h3><div class="sheet-scroll sheet-powers-list">'+powerHtml+'</div>'+powerEditorHtml+'</section><section class="sheet-block"><h3>◈ RITUAIS <small>'+rituals.length+'</small></h3><div class="sheet-scroll">'+ritualHtml+'</div><div class="sheet-add"><select id="sheetRitualChoice" aria-label="Ritual para aprender"></select><button class="btn small primary" onclick="sheetLearnRitual()">+ Aprender</button></div></section><section class="sheet-block"><h3>▣ EQUIPAMENTO & INVENTÁRIO <small>'+inventory.length+'</small></h3><div class="sheet-scroll">'+invHtml+'</div><div class="sheet-add"><select id="sheetItemPreset" aria-label="Modelo de equipamento" onchange="sheetSelectPreset(this.value)"><option value="">Item personalizado</option></select><input id="sheetItemName" placeholder="Nome do equipamento" maxlength="100" aria-label="Nome do equipamento"><input id="sheetItemQty" type="number" min="1" max="999" value="1" aria-label="Quantidade"><label class="sheet-weapon-check"><input id="sheetItemWeapon" type="checkbox"> Arma</label><button class="btn small primary" onclick="sheetAddItem()">+ Adicionar</button></div></section><section class="sheet-block"><h3>⚔ ATAQUES & COMBATE <small>'+weapons.length+'</small></h3><div class="sheet-scroll">'+combatHtml+'</div><div class="sheet-add"><label class="sheet-defense">Defesa do alvo <input id="sheetTargetDefense" type="number" min="0" max="999" value="15"></label><label class="sheet-defense">Distância <select id="sheetTargetRange"><option value="curto">Curto</option><option value="medio">Médio</option><option value="longo">Longo</option><option value="extremo">Extremo</option></select></label></div><div id="sheetCombatResult" class="sheet-combat-result" aria-live="polite"></div></section></div><div class="paper-bottom">A MALDIÇÃO DOS SETE ANJOS <span>REGISTRO PARANORMAL</span></div></div><details class="paper-technical"><summary>Ficha técnica, controles e informações adicionais</summary><div class="paper-original">'+original+'</div></details>';
   const powerSelect=$('sheetKnownPowerSelect');
   if(powerSelect)powerSelect.innerHTML=sheetPowerCatalogOptions(c);
   const presetSelect=$('sheetItemPreset');if(presetSelect)presetSelect.innerHTML='<option value="">Item personalizado</option>'+INVENTORY_PRESETS.map((p,i)=>'<option value="'+i+'">'+esc(p.name)+'</option>').join('');
@@ -333,6 +461,42 @@
  };
  window.sheetLearnRitual=function(){const value=$('sheetRitualChoice')?.value,select=$('grimoireNewRitual');if(!value||!select){say('Nenhum ritual disponível.');return}select.value=value;addKnownRitualFromPage()};
  window.sheetRemoveRitual=function(index){const c=current();if(!c?.powers?.rituals?.[index])return;if(!confirm('Remover este ritual da ficha?'))return;c.powers.rituals.splice(index,1);db();render()};
+
+ window.sheetNewPETurn=function(agentId){
+  const c=agents.find(x=>x.id===agentId);if(!c)return;
+  const spent=+c.peSpentTurn||0;
+  newPETurn(agentId);
+  addHist({agent:c.name,label:'Novo turno',detail:'Limite de PE do turno reiniciado (gasto anterior: '+spent+' PE). PE atuais não foram recuperados.',total:spent,dt:null,passed:null,status:'TURNO REINICIADO',kind:'Recursos'});
+  if(masterUnlocked)renderMaster();
+ };
+ window.sheetFinishPEScene=function(agentId){
+  const c=agents.find(x=>x.id===agentId);if(!c)return;
+  if(!confirm('Encerrar a cena? Os usos por cena e por turno serão reiniciados, e os PE temporários serão removidos. Os PE normais não serão recuperados.'))return;
+  const removed=+c.peTemp||0;
+  endPEScene(agentId);
+  addHist({agent:c.name,label:'Cena encerrada',detail:'Usos e limite reiniciados • PE temporários removidos: '+removed,total:removed,dt:null,passed:null,status:'CENA ENCERRADA',kind:'Recursos'});
+  if(masterUnlocked)renderMaster();
+ };
+ window.sheetRefillPE=function(agentId){
+  const c=agents.find(x=>x.id===agentId);if(!c)return;
+  const maximum=Math.max(0,stats(c).pe),previous=Math.max(0,+c.peNow||0);
+  if(previous>=maximum){say('Os PE normais desse agente já estão no máximo.');return}
+  if(!confirm('Recuperar os PE normais de '+c.name+' até o máximo ('+maximum+')? O limite de gasto do turno continuará como está.'))return;
+  c.peNow=maximum;
+  db();
+  addHist({agent:c.name,label:'PE recuperados',detail:'PE normais recuperados: '+previous+' → '+maximum+'. Limite do turno preservado.',total:maximum-previous,dt:null,passed:null,status:'PE RECUPERADO',kind:'Recursos'});
+  render();
+  say(c.name+': PE recuperados para '+maximum+'.');
+ };
+ window.masterPEAction=function(action){
+  if(!masterUnlocked)return;
+  const id=$('masterPEAgent')?.value;
+  const c=agents.find(x=>x.id===id);
+  if(!c){say('Selecione um agente para controlar PE.');return}
+  if(action==='turn')window.sheetNewPETurn(id);
+  else if(action==='scene')window.sheetFinishPEScene(id);
+  else if(action==='restore')window.sheetRefillPE(id);
+ };
  window.sheetUsePE=function(actionId){
   const c=current(),a=c&&peActionList(c).find(x=>x.id===actionId);if(!c||!a)return;
   const sheet=$('sheet-pe-'+a.id),target=$((a.mode==='cost'?'pe-cost-':'pe-param-')+a.id);
