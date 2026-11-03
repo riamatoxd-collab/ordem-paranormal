@@ -634,7 +634,7 @@
   const slot=samuraiRows?.find(s=>s.slug===slug);if(!slot)return;
   if(slot.assigned_to){say('Desatribua o samurai antes de editar o modelo.');return}
   editSamuraiSlug=slug;
-  const c=slot.character||{},attrs=c.attrs||{},st=stats(c),modal=samuraiEditorModal();
+  const c=slot.character||{},attrs=c.attrs||{},st=stats(c),sh=c.samuraiSheet||{},weapon=sh.weapon||{},ability=sh.ability||{},modal=samuraiEditorModal();
   modal.style.setProperty('--samurai-color',slot.color);
   modal.querySelector('#samuraiEditorTitle').textContent=slot.name;
   const inp=(id,label,value,type='text',extra='')=>'<label>'+safe(label)+'<input id="samuraiEdit_'+id+'" type="'+type+'" value="'+safe(value)+'" '+extra+'></label>';
@@ -653,10 +653,30 @@
    +'<div class="samurai-editor-group"><h3>✧ Atributos</h3><div class="samurai-editor-fields samurai-editor-attributes">'+attributes+'</div></div>'
    +'<div class="samurai-editor-group"><h3>♥ Recursos</h3><div class="samurai-editor-fields">'
    +inp('pv','PV atuais',c.pvNow??st.pv,'number','min="0" max="9999" required')
-   +inp('pe','PE atuais',c.peNow??st.pe,'number','min="0" max="9999" required')
-   +inp('san','SAN atual',c.sanNow??st.san,'number','min="0" max="9999" required')
+   +inp('pvMax','PV máximos',sh.pv??st.pv,'number','min="1" max="9999" required')
+   +inp('pdNow','PD atuais',c.pdNow??sh.pd??0,'number','min="0" max="9999" required')
+   +inp('pdMax','PD máximos',sh.pd??0,'number','min="1" max="9999" required')
+   +inp('defense','Defesa',sh.defense??10,'number','min="0" max="999" required')
+   +inp('speed','Deslocamento (m)',sh.speed??9,'number','min="0" max="999" required')
    +'</div></div>'
-   +'<div class="samurai-editor-group"><h3>⚄ Perícias</h3><div class="samurai-editor-fields samurai-editor-skills">'+skills+'</div></div>'
+   +'<div class="samurai-editor-group"><h3>✦ Selo, arma e habilidade única</h3><div class="samurai-editor-fields">'
+   +inp('element','Elemento',sh.element||'')
+   +inp('mark','Marca na rocha',sh.mark||'')
+   +inp('order','Ordem no ritual',sh.order??1,'number','min="1" max="5" required')
+   +inp('phrase','Frase do ritual',sh.phrase||'')
+   +inp('armor','Armadura',sh.armor||'')
+   +inp('weaponName','Arma especial',weapon.name||'')
+   +inp('weaponDice','Dados d20 para atacar',weapon.dice??1,'number','min="1" max="20" required')
+   +inp('weaponBonus','Bônus no ataque',weapon.bonus??0,'number','min="-100" max="100" required')
+   +inp('weaponCritical','Crítico (ex. 19/x2)',weapon.critical||'')
+   +textarea('damageParts','Dano: uma linha por componente (ex.: 1d10 | 3 | corte)',(weapon.damageParts||[]).map(p=>p.dice+'d'+p.faces+' | '+p.bonus+' | '+p.type).join('\n'),4)
+   +textarea('specialSkills','Perícias: uma linha por teste (ex.: Luta | 3 | 10)',(sh.skills||[]).map(p=>p.name+' | '+p.dice+' | '+p.bonus).join('\n'),5)
+   +inp('abilityName','Nome da habilidade única',ability.name||'')
+   +inp('abilityCost','Custo da habilidade em PD',ability.cost??2,'number','min="0" max="99" required')
+   +options('abilityTrigger','Tipo',[['Ativação','Ativação'],['Reação','Reação']],ability.trigger||'Ativação')
+   +textarea('abilityDescription','Descrição da habilidade única',ability.description||'',5)
+   +'</div></div>'
+   +'<div class="samurai-editor-group"><h3>⚄ Perícias convencionais</h3><div class="samurai-editor-fields samurai-editor-skills">'+skills+'</div></div>'
    +'<div class="samurai-editor-group"><h3>▤ História e equipamento</h3><div class="samurai-editor-fields">'
    +textarea('backstory','História',c.backstory||'')
    +textarea('objective','Objetivo',c.objective||'')
@@ -694,8 +714,41 @@
    concept:get('concept').trim().slice(0,200),backstory:get('backstory').trim().slice(0,2000),
    objective:get('objective').trim().slice(0,2000),personality:get('personality').trim().slice(0,2000),
    appearance:get('appearance').trim().slice(0,2000)};
+  const number=(id,min,max)=>{const n=Number(get(id));return Number.isInteger(n)&&n>=min&&n<=max?n:null};
+  const maxima={pv:number('pvMax',1,9999),pd:number('pdMax',1,9999),defense:number('defense',0,999),speed:number('speed',0,999)};
+  if(Object.values(maxima).some(x=>x===null)){say('PV, PD, defesa ou deslocamento inválidos.');return}
+  const order=number('order',1,5),abilityCost=number('abilityCost',0,99),weaponDice=number('weaponDice',1,20),weaponBonus=number('weaponBonus',-100,100);
+  if([order,abilityCost,weaponDice,weaponBonus].some(x=>x===null)){say('Confira os valores da arma, habilidade e ordem no ritual.');return}
+  const specialSkills=[];
+  for(const line of get('specialSkills').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,30)){
+   const parts=line.split('|').map(x=>x.trim()),dice=Number(parts[1]),bonus=Number(parts[2]);
+   if(parts.length!==3||!parts[0]||!Number.isInteger(dice)||dice<1||dice>20||!Number.isInteger(bonus)||bonus<-100||bonus>100){say('Perícia especial inválida: '+line+'. Use Nome | dados d20 | bônus.');return}
+   specialSkills.push({name:parts[0].slice(0,75),dice,bonus});
+  }
+  const damageParts=[];
+  for(const line of get('damageParts').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,8)){
+   const parts=line.split('|').map(x=>x.trim()),match=/^(\d+)d(\d+)$/i.exec(parts[0]),bonus=Number(parts[1]);
+   if(parts.length!==3||!match||!parts[2]||Number(match[1])>25||Number(match[1])<1||Number(match[2])<2||Number(match[2])>100||!Number.isInteger(bonus)||bonus<-100||bonus>100){
+    say('Dano inválido: '+line+'. Use 1d10 | 3 | corte.');return;
+   }
+   damageParts.push({dice:Number(match[1]),faces:Number(match[2]),bonus,type:parts[2].slice(0,50)});
+  }
+  if(!specialSkills.length||!damageParts.length){say('A ficha especial precisa de pelo menos uma perícia e um componente de dano.');return}
+  const specialSheet={...c.samuraiSheet,attrs:{...attrs},pv:maxima.pv,pd:maxima.pd,defense:maxima.defense,speed:maxima.speed,
+   element:get('element').trim().slice(0,60),mark:get('mark').trim().slice(0,100),order,phrase:get('phrase').trim().slice(0,250),
+   armor:get('armor').trim().slice(0,150),skills:specialSkills,personality:c.personality,
+   weapon:{...c.samuraiSheet?.weapon,name:get('weaponName').trim().slice(0,100),dice:weaponDice,bonus:weaponBonus,
+    critical:get('weaponCritical').trim().slice(0,20),damageParts,
+    damage:damageParts.map(p=>p.dice+'d'+p.faces+(p.bonus?' + '+p.bonus:'')+' '+p.type).join(' + ')},
+   ability:{name:get('abilityName').trim().slice(0,100),cost:abilityCost,trigger:get('abilityTrigger'),
+    description:get('abilityDescription').trim().slice(0,1500)}};
+  if(!specialSheet.ability.name||!specialSheet.ability.description||!specialSheet.weapon.name||!specialSheet.element){say('Preencha elemento, arma e habilidade única.');return}
+  const currentPv=number('pv',0,maxima.pv),currentPd=number('pdNow',0,maxima.pd);
+  if(currentPv===null||currentPd===null){say('Os PV e PD atuais devem estar entre zero e o máximo.');return}
+  c.samuraiSheet=specialSheet;c.samuraiHomebrew=true;c.pdNow=currentPd;c.pvNow=currentPv;
+  c.peNow=0;c.sanNow=0;
   const maximal=stats(c);
-  for(const [key,prop,max] of [['pv','pvNow',maximal.pv],['pe','peNow',maximal.pe],['san','sanNow',maximal.san]]){
+  for(const [key,prop,max] of [['pv','pvNow',maximal.pv]]){
    const value=Number(get(key));
    if(!Number.isInteger(value)||value<0||value>max){say('O valor de '+key.toUpperCase()+' deve estar entre 0 e '+max+'.');return}
    c[prop]=value;
