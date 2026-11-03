@@ -623,3 +623,185 @@
 @media(prefers-reduced-motion:reduce){
  .paper-v2 .skill-hud-item,.paper-v2 .skill-hud-filters button{transition:none}
 }
+
+/* ==========================================================
+   PODERES DA FICHA — catálogo de poderes + criação autoral
+   ========================================================== */
+.paper-v2 .sheet-powers-block{
+ --pw-red:#a9454d;
+ --pw-gold:#d7ac7b;
+ gap:11px;
+}
+.paper-v2 .sheet-powers-list{
+ max-height:345px;
+ scrollbar-width:thin;
+ scrollbar-color:#945b4c #1a1014;
+ padding-right:3px;
+ gap:8px;
+}
+.paper-v2 .sheet-power-card{
+ border:1px solid #977052;
+ border-radius:7px;
+ background:linear-gradient(108deg,#e9d7b9,#c4ae8b);
+ color:#2c1820;
+ padding:10px 11px;
+ box-shadow:0 2px 5px #0005;
+}
+.paper-v2 .sheet-power-card.is-added{
+ border-color:#bd7b5d;
+ background:linear-gradient(110deg,#e8d3b4,#cbb093);
+}
+.paper-v2 .sheet-power-card-top{
+ display:flex;align-items:center;gap:9px;
+ min-width:0;
+}
+.paper-v2 .sheet-power-glyph{
+ display:grid;place-items:center;
+ flex:0 0 26px;width:26px;height:26px;
+ border:1px solid #ae5d4c;
+ color:#b63547;
+ background:#f5e6cd;
+ border-radius:6px;
+ font-size:18px;
+}
+.paper-v2 .sheet-power-card-heading{
+ display:grid;gap:3px;
+ flex:1;min-width:0;
+}
+.paper-v2 .sheet-power-card-heading strong{
+ color:#30171c;
+ font:700 13px/1.2 Georgia,serif;
+ overflow-wrap:anywhere;
+}
+.paper-v2 .sheet-power-card-heading small{
+ font-size:9px;
+ color:#7e4e49;
+ font-weight:700;
+ text-transform:uppercase;
+ letter-spacing:.04em;
+}
+.paper-v2 .sheet-power-card p{
+ margin:8px 0 0;
+ padding-top:6px;
+ border-top:1px solid #865e4e40;
+ font-size:11px;
+ line-height:1.5;
+ color:#513a32;
+}
+.paper-v2 .sheet-power-actions{
+ display:flex;flex-wrap:wrap;justify-content:end;align-items:center;gap:4px;
+}
+.paper-v2 .sheet-power-actions .btn{
+ padding:6px 8px;
+ min-height:29px;
+ border-radius:5px;
+ font-size:10px;
+}
+.paper-v2 .sheet-power-actions .sheet-remove{min-width:28px;min-height:28px}
+.paper-v2 .sheet-power-actions button:disabled{opacity:.55;cursor:not-allowed}
+.paper-v2 .sheet-power-editors{
+ display:grid;
+ gap:8px;
+ margin-top:3px;
+}
+.paper-v2 .sheet-power-form{
+ border:1px solid #92634a;
+ border-radius:7px;
+ background:linear-gradient(145deg,#2a171d,#170e13);
+ overflow:hidden;
+}
+.paper-v2 .sheet-power-form summary{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ list-style:none;
+ cursor:pointer;
+ padding:11px 12px;
+ font-size:12px;
+ font-weight:700;
+ letter-spacing:.02em;
+ color:#f0cca4;
+}
+.paper-v2 .sheet-power-form summary::-webkit-details-marker{display:none}
+.paper-v2 .sheet-power-form summary::after{
+ content:"+";
+ width:23px;height:23px;
+ display:grid;place-items:center;
+ background:#60242e;
+ border:1px solid #ae7053;
+ border-radius:5px;
+ font-size:17px;
+ color:#f9d9ae;
+}
+.paper-v2 .sheet-power-form[open] summary::after{content:"−"}
+.paper-v2 .sheet-power-form summary:hover,.paper-v2 .sheet-power-form summary:focus-visible{
+ background:#59303b;
+}
+.paper-v2 .sheet-power-form-body{
+ display:grid;
+ gap:11px;
+ padding:13px;
+ border-top:1px solid #875541;
+ background:radial-gradient(circle at 100% 0,#a43d3f12,transparent 60%),#160e12;
+}
+.paper-v2 .sheet-power-form label{
+ display:grid;gap:5px;min-width:0;
+ font-size:11px;font-weight:700;
+ color:#e8c8a1;
+}
+.paper-v2 .sheet-power-form input,
+.paper-v2 .sheet-power-form select,
+.paper-v2 .sheet-power-form textarea{
+ width:100%;
+ max-width:100%;
+ min-width:0;
+ border:1px solid #ae7956;
+ background:#e7d5b9;
+ color:#2f1a21;
+ border-radius:5px;
+ font-size:12px;
+ padding:9px 8px;
+ font-family:inherit;
+ box-shadow:none;
+}
+.paper-v2 .sheet-power-form textarea{resize:vertical;min-height:70px;line-height:1.45}
+.paper-v2 .sheet-power-form input:focus-visible,
+.paper-v2 .sheet-power-form select:focus-visible,
+.paper-v2 .sheet-power-form textarea:focus-visible{
+ outline:2px solid #e0a674;
+ outline-offset:1px;
+}
+.paper-v2 .sheet-power-inline{
+ display:grid;
+ grid-template-columns:minmax(0,1.1fr) minmax(82px,.65fr);
+ gap:9px;
+}
+.paper-v2 #sheetCustomPowerPanel .sheet-power-inline{
+ grid-template-columns:repeat(3,minmax(0,1fr));
+}
+.paper-v2 .sheet-power-inline input[type=number]{min-width:0}
+.paper-v2 .sheet-power-form .btn{
+ justify-self:start;
+ font-size:11px;
+ padding:8px 12px;
+}
+.paper-v2 .sheet-power-form-actions{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+.paper-v2 .sheet-power-note{
+ color:#bca18d;
+ font-size:10px;
+ line-height:1.45;
+}
+@media(max-width:1050px){
+ .paper-v2 .sheet-powers-list{max-height:300px}
+}
+@media(max-width:550px){
+ .paper-v2 #sheetCustomPowerPanel .sheet-power-inline{grid-template-columns:1fr 1fr}
+ .paper-v2 #sheetCustomPowerPanel .sheet-power-inline label:last-child{grid-column:1/-1}
+ .paper-v2 .sheet-power-card-top{flex-wrap:wrap}
+ .paper-v2 .sheet-power-actions{width:100%;justify-content:flex-start;padding-left:33px}
+}
+@media(max-width:370px){
+ .paper-v2 .sheet-power-inline{grid-template-columns:1fr}
+ .paper-v2 #sheetCustomPowerPanel .sheet-power-inline{grid-template-columns:1fr}
+ .paper-v2 #sheetCustomPowerPanel .sheet-power-inline label:last-child{grid-column:auto}
+}
