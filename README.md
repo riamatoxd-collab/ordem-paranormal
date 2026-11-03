@@ -174,3 +174,39 @@ Na ficha do agente e na área **Controle de Esforço** do Painel do Mestre estã
 - **Recuperar PE:** restaura os PE normais ao máximo calculado pela ficha. **Não** reinicia por si só o limite de gasto do turno nem remove PE temporários.
 
 As alterações são persistidas no navegador e registradas no histórico; encerrar cena e recuperar PE pedem confirmação.
+
+## Contas, cadastro e arquivo global de personagens
+
+O site agora oferece uma tela de **Entrar / Cadastrar conta**, ambientada no elemento Conhecimento, com um efeito sonoro original gerado pelo navegador. O menu **Cadastrar personagem** abre uma área própria para criar, visualizar e editar personagens associados à conta ativa. A tela **Painel do Mestre → Personagens registrados** lista as fichas com nome do jogador, classe, NEX, recursos, atributos, perícias, poderes, rituais e equipamentos. A lista pode ser atualizada manualmente; personagens de outras contas são somente para consulta.
+
+### Uso imediato: modo local
+Sem configurar banco, o site funciona em **modo local**: as contas e fichas ficam apenas no navegador e no dispositivo usado. A senha local é armazenada como hash PBKDF2 com salt, mas isso **não cria autenticação segura entre dispositivos**; alguém com acesso ao navegador/dispositivo pode manipular dados locais. Use apelidos e senhas diferentes das suas senhas pessoais. Cada conta local tem um cofre próprio. As fichas antigas em `op_agents` não são apagadas: após cadastrar a conta, é possível clicar em **Importar fichas antigas** (uma única importação por navegador).
+
+### Ativar contas reais e sincronização entre dispositivos
+O projeto vem preparado para usar **Supabase Auth + Postgres com Row Level Security**. A sincronização global **não funciona até realizar estes passos**:
+
+1. Crie um projeto Supabase e execute o arquivo `supabase-schema.sql` no **SQL Editor**. Isso cria as tabelas `profiles` e `character_vaults`, a criação automática do perfil e as políticas RLS.
+2. Configure **Authentication → URL Configuration** com o domínio HTTPS em que o site está publicado. Em **Authentication → Providers → Email**, configure a confirmação de e-mail conforme a política da sua mesa.
+3. Copie a **Project URL** e a chave **publishable / anon** do projeto para `auth-config.js`:
+   ```js
+   window.OP_AUTH_CONFIG = {
+     supabaseUrl: "https://SEU-PROJETO.supabase.co",
+     supabaseAnonKey: "SUA_CHAVE_PUBLICAVEL"
+   };
+   ```
+   **NUNCA** coloque no frontend uma chave `service_role`, `secret` ou credenciais de administrador.
+4. Cadastre o seu usuário pelo formulário do site e confirme o e-mail, se necessário.
+5. No painel **Authentication → Users** do Supabase, copie o UUID da sua conta de mestre e, no SQL Editor, execute:
+   ```sql
+   update public.profiles set role = 'mestre'
+   where id = 'UUID-DA-CONTA-DO-MESTRE'::uuid;
+   ```
+6. Os jogadores poderão criar contas e personagens de seus próprios dispositivos. Abra o Painel do Mestre e clique em **Atualizar registros** para consultar as fichas de todas as contas. Somente um usuário com `role='mestre'` pode ler os cofres de outros usuários. O PIN visual configurado anteriormente **não concede essa permissão no banco**.
+
+As fichas são gravadas na conta e mantêm cópia local por segurança. Alterações podem ficar pendentes de sincronização durante uma falha de conexão, com nova tentativa ao abrir a conta. A lista do mestre é **consultada por demanda**, não é atualização instantânea em tempo real. Evite editar a mesma conta em dois dispositivos ao mesmo tempo: a última gravação pode prevalecer. O servidor Supabase não está incluído no repositório e precisa ser configurado pelo proprietário.
+
+### Som de Conhecimento
+A abertura de conta toca uma sequência curta de harmônicos suaves e um eco grave, sintetizados por **Web Audio API** (composição original, sem música de terceiros). O botão **Ouvir Conhecimento** na entrada permite pré-escutar o som. O navegador pode impedir reprodução automática sem interação; nesses casos, basta usar o botão.
+
+### Segurança e privacidade
+O PIN antigo do Painel do Mestre continua sendo somente um bloqueio visual. No **modo local**, dados e credenciais de demonstração estão no navegador. No **modo conectado**, a senha da conta é processada pelo Supabase Auth, e as políticas RLS no banco limitam o acesso às fichas. Os dados do site não devem conter segredos reais de jogadores. Usuários não podem tornar a própria conta `mestre` pelo cliente.
