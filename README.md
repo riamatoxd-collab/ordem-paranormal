@@ -146,3 +146,13 @@ O catálogo inclui **85 opções de ritual do Livro Básico v1.3**, corresponden
 - Os 16 rituais do suplemento entram no catálogo geral e podem ser aprendidos quando atenderem aos filtros de círculo/NEX já implementados na aplicação.
 
 **Fontes:** *Ordem Paranormal RPG v1.3*, seção Descrição dos Rituais, pp. 124–143; *Sobrevivendo ao Horror v1.3.1*, seção Novos Rituais, pp. 48–56.
+
+## Editor rápido de atributos na ficha
+
+Um **botão circular com ícone de edição e sinal +** aparece no canto direito do cabeçalho **ATRIBUTOS**, na ficha de agente. Ao clicar, abre um editor para **AGI, FOR, INT, PRE e VIG** com botões `−` e `+`, `Salvar alterações` e `Cancelar`.
+
+- O editor permite valores de **0 a 10** como ajuste manual da mesa. Valores acima dos limites normais não fazem parte das regras padrão de criação: são uma opção para campanhas personalizadas.
+- A alteração só é aplicada ao selecionar **Salvar alterações**; ao cancelar, os valores originais permanecem.
+- Os pontos manuais ficam armazenados em `manualAttributeBonuses`, separados dos aumentos de atributo por NEX. Dessa forma, os ajustes não desaparecem quando a ficha é editada ou o NEX muda.
+- Ao salvar, os novos atributos passam a valer para rolagens e cálculos de PV/PE/Defesa. A quantidade atual de PV/PE não aumenta automaticamente; ela é limitada ao novo máximo se necessário.
+- As alterações são registradas no histórico local.

@@ -94,6 +94,104 @@
   const actions=fromSheet?'<div class="sheet-power-actions">'+btn+(p.source==='custom'?'<button type="button" class="btn small" data-power="'+esc(p.id)+'" onclick="sheetEditCustomPower(this.dataset.power)">Editar</button>':'')+'<button type="button" class="sheet-remove" title="Remover poder adicionado" aria-label="Remover '+esc(p.name)+'" data-power="'+esc(p.id)+'" onclick="sheetDeletePower(this.dataset.power)">✕</button></div>':'';
   return '<article class="sheet-power-card '+(fromSheet?'is-added':'is-natural')+'"><div class="sheet-power-card-top"><span class="sheet-power-glyph" aria-hidden="true">✦</span><div class="sheet-power-card-heading"><strong>'+esc(p.name)+'</strong><small>'+esc(label)+(cost?' • '+cost:'')+(fromSheet&&p.activation?' • '+(p.limit==='turn'?'1 por turno':p.limit==='scene'?'1 por cena':'uso livre'):'')+'</small></div>'+actions+'</div>'+(p.description?'<p>'+esc(p.description)+'</p>':'')+'</article>';
  }
+
+ const attributeEditorStats=[
+  ['agi','AGI','Agilidade','◈'],
+  ['for','FOR','Força','✦'],
+  ['int','INT','Intelecto','✧'],
+  ['pre','PRE','Presença','✷'],
+  ['vig','VIG','Vigor','❖']
+ ];
+ let attributeDraft=null,attributeStart=null,attributeEditingId=null,attributeReturnFocus=null;
+ function sheetAttributeEditor(){
+  let overlay=$('sheetAttributeModal');
+  if(overlay)return overlay;
+  overlay=document.createElement('div');
+  overlay.className='sheet-attribute-modal';
+  overlay.id='sheetAttributeModal';
+  overlay.hidden=true;
+  overlay.innerHTML='<section class="sheet-attribute-dialog" role="dialog" aria-modal="true" aria-labelledby="sheetAttributeEditorTitle" aria-describedby="sheetAttributeHelp">'
+   +'<header class="sheet-attribute-dialog-head"><div class="sheet-attribute-headline"><span aria-hidden="true" class="sheet-attribute-head-icon">✧</span><div><small>AJUSTES DA CAMPANHA</small><h2 id="sheetAttributeEditorTitle">Editar atributos</h2></div></div><button type="button" class="sheet-attribute-close" aria-label="Fechar editor de atributos" onclick="sheetCloseAttributeEditor()">✕</button></header>'
+   +'<p id="sheetAttributeHelp" class="sheet-attribute-help">Use − e + para alterar os valores dos atributos. O ajuste é adicional à progressão de NEX, salvo na ficha e utilizado em todos os testes.</p>'
+   +'<div class="sheet-attribute-rows">'
+   +attributeEditorStats.map(([key,short,name,icon])=>'<div class="sheet-attribute-row" data-edit-attribute="'+key+'"><span class="sheet-attribute-row-icon" aria-hidden="true">'+icon+'</span><div class="sheet-attribute-label"><strong>'+name+'</strong><small>'+short+'</small></div><div class="sheet-attribute-stepper"><button type="button" data-key="'+key+'" onclick="sheetShiftAttribute(this.dataset.key,-1)" aria-label="Diminuir '+name+'">−</button><output id="sheetDraft-'+key+'" aria-label="Valor de '+name+'">0</output><button type="button" data-key="'+key+'" onclick="sheetShiftAttribute(this.dataset.key,1)" aria-label="Aumentar '+name+'">+</button></div></div>').join('')
+   +'</div>'
+   +'<div class="sheet-attribute-note"><span id="sheetAttributeDelta" aria-live="polite">Nenhuma alteração</span><small>Valores de 0 a 10 • ajustes além do limite normal são opcionais da mesa.</small></div>'
+   +'<footer class="sheet-attribute-actions"><button type="button" class="sheet-attribute-cancel" onclick="sheetCloseAttributeEditor()">Cancelar</button><button type="button" class="sheet-attribute-save" onclick="sheetSaveAttributes()">Salvar alterações</button></footer>'
+   +'</section>';
+  overlay.addEventListener('click',e=>{if(e.target===overlay)window.sheetCloseAttributeEditor()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden){e.preventDefault();window.sheetCloseAttributeEditor()}});
+  document.body.appendChild(overlay);
+  return overlay;
+ }
+ function sheetRefreshAttributeDraft(){
+  if(!attributeDraft||!attributeStart)return;
+  let net=0,changed=0;
+  for(const [key] of attributeEditorStats){
+   const value=attributeDraft[key]??0,element=$('sheetDraft-'+key);
+   if(element)element.textContent=value;
+   const row=document.querySelector('.sheet-attribute-modal [data-edit-attribute="'+key+'"]');
+   const buttons=row?.querySelectorAll('button')||[];
+   if(buttons[0])buttons[0].disabled=value<=0;
+   if(buttons[1])buttons[1].disabled=value>=10;
+   const diff=value-(attributeStart[key]||0);net+=diff;
+   if(diff!==0)changed++;
+   row?.classList.toggle('has-change',diff!==0);
+  }
+  const meter=$('sheetAttributeDelta');
+  if(meter)meter.textContent=changed===0?'Nenhuma alteração':(net>0?'+':'')+net+' pontos no total • '+changed+' atributo(s) alterado(s)';
+ }
+ window.sheetOpenAttributeEditor=function(){
+  const c=current();if(!c){say('Selecione um agente antes de editar atributos.');return}
+  const overlay=sheetAttributeEditor();
+  attributeEditingId=c.id;
+  attributeStart=Object.fromEntries(attributeEditorStats.map(([key])=>[key,Math.max(0,Math.min(10,Math.round(+c.attrs[key]||0)))]));
+  attributeDraft={...attributeStart};
+  attributeReturnFocus=document.activeElement;
+  overlay.hidden=false;
+  document.body.classList.add('sheet-attribute-editor-open');
+  sheetRefreshAttributeDraft();
+  overlay.querySelector('.sheet-attribute-close')?.focus();
+ };
+ window.sheetCloseAttributeEditor=function(){
+  const overlay=$('sheetAttributeModal');if(overlay)overlay.hidden=true;
+  document.body.classList.remove('sheet-attribute-editor-open');
+  attributeDraft=null;attributeStart=null;attributeEditingId=null;
+  if(attributeReturnFocus?.isConnected)attributeReturnFocus.focus();
+  attributeReturnFocus=null;
+ };
+ window.sheetShiftAttribute=function(key,change){
+  if(!attributeDraft||!attributeEditorStats.some(row=>row[0]===key))return;
+  const next=Math.max(0,Math.min(10,(+attributeDraft[key]||0)+Math.sign(change)));
+  attributeDraft[key]=next;
+  sheetRefreshAttributeDraft();
+ };
+ window.sheetSaveAttributes=function(){
+  const c=current();if(!c||!attributeDraft||!attributeStart||c.id!==attributeEditingId){
+   say('Não foi possível salvar: agente não selecionado.');window.sheetCloseAttributeEditor();return
+  }
+  const changes=[];
+  const bonuses={...(c.manualAttributeBonuses||{})};
+  for(const [key,short,name] of attributeEditorStats){
+   const before=+c.attrs[key]||0,after=+attributeDraft[key]||0;
+   if(before===after)continue;
+   bonuses[key]=(+bonuses[key]||0)+(after-before);
+   c.attrs[key]=after;
+   changes.push(name+': '+before+' → '+after);
+  }
+  if(!changes.length){window.sheetCloseAttributeEditor();say('Nenhuma alteração nos atributos.');return}
+  c.manualAttributeBonuses=bonuses;
+  const newMaximum=stats(c);
+  for(const [field,max] of [['pvNow','pv'],['peNow','pe'],['sanNow','san']]){
+   const value=Number(c[field]);
+   c[field]=Number.isFinite(value)?Math.max(0,Math.min(newMaximum[max],value)):newMaximum[max];
+  }
+  addHist({agent:c.name,label:'Atributos ajustados',detail:changes.join(' • '),total:null,dt:null,passed:null,status:'EDITADO',kind:'Atributo'});
+  window.sheetCloseAttributeEditor();
+  render();
+  document.querySelector('.paper-attributes-heading .paper-attribute-edit')?.focus();
+  say('Atributos atualizados e salvos na ficha.');
+ };
  function renderPaper(){
   const el=$('agentDetail'),c=current();if(!el||!c)return;
   const original=el.innerHTML;
@@ -143,7 +241,7 @@
   const invHtml=inventory.length?inventory.map(it=>'<div class="sheet-entry"><span class="sheet-symbol">'+(it.weapon?'⚔':'▣')+'</span><strong>'+esc(it.name||'Item')+'</strong><button class="sheet-qty" title="Diminuir quantidade" onclick="adjustInventoryQty(\''+esc(it.id)+'\',-1)">−</button><small>×'+esc(it.qty||1)+'</small><button class="sheet-qty" title="Aumentar quantidade" onclick="adjustInventoryQty(\''+esc(it.id)+'\',1)">+</button><button class="sheet-remove" title="Remover item" onclick="sheetRemoveItem(\''+esc(it.id)+'\')">✕</button></div>').join(''):'<p class="sheet-empty">Inventário vazio.</p>';
   const weapons=inventory.filter(it=>it.weapon);
   const combatHtml=weapons.length?weapons.map(it=>{const profile=weaponProfileFor(it);return '<button class="sheet-weapon" onclick="sheetRollWeapon(\''+esc(it.id)+'\')"><span>⚔</span><span><strong>'+esc(it.name)+'</strong><small>'+(profile?esc(profile.damage)+' • '+esc(profile.skill):it.sheetDamage?esc(it.sheetDamage)+' • '+esc(it.sheetSkill||'Luta'):'Clique para configurar dano')+'</small></span><b>ROLAR DADOS ⚄</b></button>'}).join(''):'<p class="sheet-empty">Adicione uma arma ao inventário para habilitar os ataques.</p>';
-  el.innerHTML='<div class="paper-sheet paper-v2"><div class="sheet-ornament" aria-hidden="true">✿　✦　鳥居　✦　✿</div><div class="paper-head"><div><small>ORDEM PARANORMAL • FICHA DE AGENTE</small><h2>'+esc(c.name)+'</h2><p>'+esc(c.origin||'Origem não definida')+' • '+esc(className(c.class))+'</p></div><div class="paper-nex">NEX <strong>'+esc(c.nex||0)+'%</strong></div></div><div class="paper-columns"><div><div class="paper-caption">ATRIBUTOS <small>CLIQUE PARA ROLAR</small></div><div class="paper-attributes"><div class="paper-core">✣<span>ATRIBUTOS</span></div>'+attrHtml+'</div><div class="paper-resources">'+resource('pv','PONTOS DE VIDA',c.pvNow,st.pv)+resource('pe','PONTOS DE ESFORÇO',(+c.peNow||0)+(+c.peTemp||0),st.pe)+resource('san','SANIDADE',c.sanNow,st.san)+resource('def','DEFESA BASE',10+(+c.attrs.agi||0),null)+'</div><div class="paper-shortcuts"><button class="btn small" onclick="openModal(\''+esc(c.id)+'\')">Editar ficha</button></div></div><div>'+skillHudHtml+'</div></div><div class="sheet-pe-overview"><span>PE DISPONÍVEL <b>'+((+c.peNow||0)+(+c.peTemp||0))+'</b></span><span>GASTO NO TURNO <b>'+(+c.peSpentTurn||0)+'</b> / '+peLimitFor(c)+'</span></div><section class="sheet-block sheet-pe-block" id="sheetPEBlock"><h3>✧ HABILIDADES COM CUSTO DE PE <small>'+peActions.length+'</small></h3><div class="sheet-pe-list">'+peHtml+'</div></section><div class="sheet-lower"><section class="sheet-block sheet-powers-block"><h3>✦ PODERES & HABILIDADES <small>'+(powers.length+grantedPowers.length)+'</small></h3><div class="sheet-scroll sheet-powers-list">'+powerHtml+'</div>'+powerEditorHtml+'</section><section class="sheet-block"><h3>◈ RITUAIS <small>'+rituals.length+'</small></h3><div class="sheet-scroll">'+ritualHtml+'</div><div class="sheet-add"><select id="sheetRitualChoice" aria-label="Ritual para aprender"></select><button class="btn small primary" onclick="sheetLearnRitual()">+ Aprender</button></div></section><section class="sheet-block"><h3>▣ EQUIPAMENTO & INVENTÁRIO <small>'+inventory.length+'</small></h3><div class="sheet-scroll">'+invHtml+'</div><div class="sheet-add"><select id="sheetItemPreset" aria-label="Modelo de equipamento" onchange="sheetSelectPreset(this.value)"><option value="">Item personalizado</option></select><input id="sheetItemName" placeholder="Nome do equipamento" maxlength="100" aria-label="Nome do equipamento"><input id="sheetItemQty" type="number" min="1" max="999" value="1" aria-label="Quantidade"><label class="sheet-weapon-check"><input id="sheetItemWeapon" type="checkbox"> Arma</label><button class="btn small primary" onclick="sheetAddItem()">+ Adicionar</button></div></section><section class="sheet-block"><h3>⚔ ATAQUES & COMBATE <small>'+weapons.length+'</small></h3><div class="sheet-scroll">'+combatHtml+'</div><div class="sheet-add"><label class="sheet-defense">Defesa do alvo <input id="sheetTargetDefense" type="number" min="0" max="999" value="15"></label><label class="sheet-defense">Distância <select id="sheetTargetRange"><option value="curto">Curto</option><option value="medio">Médio</option><option value="longo">Longo</option><option value="extremo">Extremo</option></select></label></div><div id="sheetCombatResult" class="sheet-combat-result" aria-live="polite"></div></section></div><div class="paper-bottom">A MALDIÇÃO DOS SETE ANJOS <span>REGISTRO PARANORMAL</span></div></div><details class="paper-technical"><summary>Ficha técnica, controles e informações adicionais</summary><div class="paper-original">'+original+'</div></details>';
+  el.innerHTML='<div class="paper-sheet paper-v2"><div class="sheet-ornament" aria-hidden="true">✿　✦　鳥居　✦　✿</div><div class="paper-head"><div><small>ORDEM PARANORMAL • FICHA DE AGENTE</small><h2>'+esc(c.name)+'</h2><p>'+esc(c.origin||'Origem não definida')+' • '+esc(className(c.class))+'</p></div><div class="paper-nex">NEX <strong>'+esc(c.nex||0)+'%</strong></div></div><div class="paper-columns"><div><div class="paper-caption paper-attributes-heading"><span>ATRIBUTOS</span><small>CLIQUE PARA ROLAR</small><button type="button" class="paper-attribute-edit" title="Editar atributos e adicionar pontos" aria-label="Editar atributos e adicionar pontos" onclick="sheetOpenAttributeEditor()"><span aria-hidden="true">✎</span><i aria-hidden="true">+</i></button></div><div class="paper-attributes"><div class="paper-core">✣<span>ATRIBUTOS</span></div>'+attrHtml+'</div><div class="paper-resources">'+resource('pv','PONTOS DE VIDA',c.pvNow,st.pv)+resource('pe','PONTOS DE ESFORÇO',(+c.peNow||0)+(+c.peTemp||0),st.pe)+resource('san','SANIDADE',c.sanNow,st.san)+resource('def','DEFESA BASE',10+(+c.attrs.agi||0),null)+'</div><div class="paper-shortcuts"><button class="btn small" onclick="openModal(\''+esc(c.id)+'\')">Editar ficha</button></div></div><div>'+skillHudHtml+'</div></div><div class="sheet-pe-overview"><span>PE DISPONÍVEL <b>'+((+c.peNow||0)+(+c.peTemp||0))+'</b></span><span>GASTO NO TURNO <b>'+(+c.peSpentTurn||0)+'</b> / '+peLimitFor(c)+'</span></div><section class="sheet-block sheet-pe-block" id="sheetPEBlock"><h3>✧ HABILIDADES COM CUSTO DE PE <small>'+peActions.length+'</small></h3><div class="sheet-pe-list">'+peHtml+'</div></section><div class="sheet-lower"><section class="sheet-block sheet-powers-block"><h3>✦ PODERES & HABILIDADES <small>'+(powers.length+grantedPowers.length)+'</small></h3><div class="sheet-scroll sheet-powers-list">'+powerHtml+'</div>'+powerEditorHtml+'</section><section class="sheet-block"><h3>◈ RITUAIS <small>'+rituals.length+'</small></h3><div class="sheet-scroll">'+ritualHtml+'</div><div class="sheet-add"><select id="sheetRitualChoice" aria-label="Ritual para aprender"></select><button class="btn small primary" onclick="sheetLearnRitual()">+ Aprender</button></div></section><section class="sheet-block"><h3>▣ EQUIPAMENTO & INVENTÁRIO <small>'+inventory.length+'</small></h3><div class="sheet-scroll">'+invHtml+'</div><div class="sheet-add"><select id="sheetItemPreset" aria-label="Modelo de equipamento" onchange="sheetSelectPreset(this.value)"><option value="">Item personalizado</option></select><input id="sheetItemName" placeholder="Nome do equipamento" maxlength="100" aria-label="Nome do equipamento"><input id="sheetItemQty" type="number" min="1" max="999" value="1" aria-label="Quantidade"><label class="sheet-weapon-check"><input id="sheetItemWeapon" type="checkbox"> Arma</label><button class="btn small primary" onclick="sheetAddItem()">+ Adicionar</button></div></section><section class="sheet-block"><h3>⚔ ATAQUES & COMBATE <small>'+weapons.length+'</small></h3><div class="sheet-scroll">'+combatHtml+'</div><div class="sheet-add"><label class="sheet-defense">Defesa do alvo <input id="sheetTargetDefense" type="number" min="0" max="999" value="15"></label><label class="sheet-defense">Distância <select id="sheetTargetRange"><option value="curto">Curto</option><option value="medio">Médio</option><option value="longo">Longo</option><option value="extremo">Extremo</option></select></label></div><div id="sheetCombatResult" class="sheet-combat-result" aria-live="polite"></div></section></div><div class="paper-bottom">A MALDIÇÃO DOS SETE ANJOS <span>REGISTRO PARANORMAL</span></div></div><details class="paper-technical"><summary>Ficha técnica, controles e informações adicionais</summary><div class="paper-original">'+original+'</div></details>';
   const powerSelect=$('sheetKnownPowerSelect');
   if(powerSelect)powerSelect.innerHTML=sheetPowerCatalogOptions(c);
   const presetSelect=$('sheetItemPreset');if(presetSelect)presetSelect.innerHTML='<option value="">Item personalizado</option>'+INVENTORY_PRESETS.map((p,i)=>'<option value="'+i+'">'+esc(p.name)+'</option>').join('');

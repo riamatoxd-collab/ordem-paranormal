@@ -896,3 +896,257 @@
  .occult-archive .ritual-catalog-item.grimoire-ritual-entry{padding:10px;min-height:140px}
  .occult-archive .grimoire-ritual-sigil{width:32px;height:32px;flex-basis:32px;font-size:20px}
 }
+
+/* =============================================
+   BOTÃO DE ATRIBUTOS + EDITOR DA MESA
+   Botão posicionado no canto do cabeçalho indicado na imagem.
+   ============================================= */
+.paper-v2 .paper-attributes-heading{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:9px;
+ min-height:45px;
+ padding-bottom:7px;
+ margin-bottom:8px;
+}
+.paper-v2 .paper-attributes-heading>span{
+ color:#e6bd86;
+ font-size:11px;
+ font-weight:800;
+ letter-spacing:.12em;
+}
+.paper-v2 .paper-attributes-heading>small{
+ margin-left:auto;
+ color:#bba291;
+ font-size:9px;
+ font-weight:750;
+ letter-spacing:.095em;
+ text-align:right;
+}
+.paper-v2 .paper-attribute-edit{
+ position:relative;
+ flex:0 0 38px;
+ display:grid;place-items:center;
+ min-width:38px;
+ width:38px;
+ height:38px;
+ border:1px solid #d9a477;
+ border-radius:50%;
+ background:radial-gradient(circle at 35% 25%,#722e39,#291019 82%);
+ box-shadow:0 0 0 3px #9e373b21,inset 0 1px 0 #fbc6a542,0 3px 12px #0008;
+ color:#f3d4a8;
+ font-size:21px;
+ line-height:1;
+ cursor:pointer;
+ transition:background .17s,box-shadow .17s,transform .17s;
+}
+.paper-v2 .paper-attribute-edit i{
+ position:absolute;right:-4px;bottom:-3px;
+ display:grid;place-items:center;
+ width:17px;height:17px;
+ border-radius:50%;
+ border:1px solid #f1c79a;
+ background:#9b3446;
+ color:#fff2df;
+ font-family:system-ui,sans-serif;
+ font-size:12px;
+ font-style:normal;
+ font-weight:800;
+}
+.paper-v2 .paper-attribute-edit:hover{
+ background:radial-gradient(circle at 35% 25%,#ab4651,#3f1724 84%);
+ box-shadow:0 0 0 4px #d54d5c3c,0 0 15px #ba455478;
+ transform:translateY(-1px);
+}
+.paper-v2 .paper-attribute-edit:focus-visible{outline:3px solid #f1c48b;outline-offset:4px}
+/* Modal adicionado ao body para não ser recortado pela moldura da ficha */
+body.sheet-attribute-editor-open{overflow:hidden}
+.sheet-attribute-modal[hidden]{display:none!important}
+.sheet-attribute-modal{
+ position:fixed;inset:0;z-index:20000;
+ display:flex;align-items:center;justify-content:center;
+ padding:18px;
+ background:#080609dc;
+ backdrop-filter:blur(7px);
+ overflow:auto;
+}
+.sheet-attribute-dialog{
+ position:relative;
+ display:flex;flex-direction:column;
+ width:min(100%,520px);
+ max-height:min(92dvh,760px);
+ overflow:auto;
+ border:1px solid #bb8267;
+ border-radius:13px;
+ background:radial-gradient(circle at 92% 0%,#a43b4444,transparent 38%),linear-gradient(150deg,#2b1720 0%,#160f15 72%,#100c12);
+ color:#f5e7d8;
+ box-shadow:inset 0 0 0 2px #120b0f,0 20px 75px #000d,0 0 30px #d43e503b;
+}
+.sheet-attribute-dialog::before{
+ position:absolute;
+ top:0;left:13px;right:13px;
+ content:"";
+ height:3px;
+ background:linear-gradient(90deg,transparent,#e18b78,#eec493,#b93c53,transparent);
+ pointer-events:none;
+}
+.sheet-attribute-dialog-head{
+ display:flex;align-items:center;justify-content:space-between;gap:12px;
+ padding:18px 18px 14px;
+ border-bottom:1px solid #875241;
+ background:linear-gradient(90deg,#62242e7a,#24121b);
+}
+.sheet-attribute-headline{display:flex;align-items:center;gap:11px;min-width:0}
+.sheet-attribute-head-icon{
+ display:grid;place-items:center;
+ flex:0 0 40px;
+ width:40px;height:40px;
+ border:1px solid #c58e6d;
+ border-radius:9px;
+ background:#1f1218;
+ color:#f3cb9a;
+ font-size:25px;
+}
+.sheet-attribute-headline small{display:block;color:#dda986;font-size:9px;font-weight:800;letter-spacing:.14em}
+.sheet-attribute-headline h2{font:700 24px/1.2 Georgia,serif;color:#ffe7c5;margin:4px 0 0}
+.sheet-attribute-close{
+ flex:0 0 33px;width:33px;height:33px;
+ display:grid;place-items:center;
+ border:1px solid #845452;
+ border-radius:7px;
+ background:#25141d;
+ color:#e6c6b6;font-size:17px;
+ cursor:pointer;
+}
+.sheet-attribute-close:hover{background:#6e2632;color:white}
+.sheet-attribute-help{
+ margin:0;
+ padding:13px 18px;
+ font-size:11.5px;
+ line-height:1.6;
+ color:#cbb5a8;
+}
+.sheet-attribute-rows{display:grid;gap:7px;padding:0 18px 14px}
+.sheet-attribute-row{
+ --attr-hue:#ca9d7b;
+ display:grid;
+ grid-template-columns:35px minmax(0,1fr) auto;
+ gap:10px;
+ align-items:center;
+ min-height:64px;
+ padding:9px 11px;
+ border:1px solid #684638;
+ border-left:3px solid var(--attr-hue);
+ border-radius:8px;
+ background:linear-gradient(100deg,#332027,#1e141b);
+ transition:border-color .15s,background .15s;
+}
+.sheet-attribute-row[data-edit-attribute=agi]{--attr-hue:#d18a8d}
+.sheet-attribute-row[data-edit-attribute=for]{--attr-hue:#da9675}
+.sheet-attribute-row[data-edit-attribute=int]{--attr-hue:#bd9ae3}
+.sheet-attribute-row[data-edit-attribute=pre]{--attr-hue:#e0bf81}
+.sheet-attribute-row[data-edit-attribute=vig]{--attr-hue:#95baa5}
+.sheet-attribute-row.has-change{
+ border-color:#d4a379;
+ border-left-color:var(--attr-hue);
+ background:linear-gradient(105deg,#53282f,#261620);
+}
+.sheet-attribute-row-icon{
+ display:grid;place-items:center;
+ width:32px;height:32px;
+ border:1px solid color-mix(in srgb,var(--attr-hue) 58%,#25141b);
+ border-radius:8px;
+ background:color-mix(in srgb,var(--attr-hue) 10%,#191018);
+ color:var(--attr-hue);
+ font-size:21px;
+}
+.sheet-attribute-label{display:flex;flex-direction:column;gap:3px}
+.sheet-attribute-label strong{font-size:12px;color:#f8e5ce}
+.sheet-attribute-label small{font-size:9px;letter-spacing:.12em;color:var(--attr-hue);font-weight:700}
+.sheet-attribute-stepper{display:flex;align-items:center;gap:5px}
+.sheet-attribute-stepper button{
+ width:34px;height:34px;min-width:34px;
+ border:1px solid #a46f5c;
+ border-radius:7px;
+ background:#351e25;
+ color:#f5decd;
+ font-size:22px;font-weight:800;
+ cursor:pointer;
+}
+.sheet-attribute-stepper button:last-child{
+ background:linear-gradient(145deg,#a94d58,#712c3d);
+ border-color:#d58d79;
+ color:#fff1dc;
+}
+.sheet-attribute-stepper button:hover:not(:disabled){filter:brightness(1.22)}
+.sheet-attribute-stepper button:disabled{opacity:.3;cursor:not-allowed}
+.sheet-attribute-stepper button:focus-visible,
+.sheet-attribute-close:focus-visible,
+.sheet-attribute-actions button:focus-visible{outline:2px solid #f4ca9c;outline-offset:3px}
+.sheet-attribute-stepper output{
+ min-width:46px;
+ display:grid;place-items:center;
+ height:38px;
+ padding:2px 8px;
+ border:1px solid #c49c74;
+ border-radius:6px;
+ background:#ebd8b7;
+ color:#361b23;
+ font-size:22px;
+ font-weight:850;
+ font-variant-numeric:tabular-nums;
+}
+.sheet-attribute-note{
+ margin:0 18px 16px;
+ display:flex;flex-direction:column;gap:4px;
+ border:1px solid #775140;
+ border-radius:7px;
+ padding:10px 12px;
+ background:#120c11;
+}
+.sheet-attribute-note span{font-size:12px;color:#e5bd8e;font-weight:750}
+.sheet-attribute-note small{font-size:10px;color:#b9a39b;line-height:1.5}
+.sheet-attribute-actions{
+ display:flex;align-items:center;justify-content:flex-end;
+ gap:9px;
+ padding:13px 18px 16px;
+ border-top:1px solid #75503f;
+}
+.sheet-attribute-actions button{
+ min-height:39px;
+ padding:10px 15px;
+ border:1px solid #ae7659;
+ border-radius:7px;
+ background:#2d1b21;
+ color:#f0d7c5;
+ cursor:pointer;
+ font-size:12px;
+ font-weight:750;
+}
+.sheet-attribute-actions .sheet-attribute-save{
+ background:linear-gradient(100deg,#9d3949,#6c2538);
+ color:#fff0dd;
+ border-color:#d39579;
+}
+.sheet-attribute-actions button:hover{filter:brightness(1.17)}
+@media(max-width:500px){
+ .paper-v2 .paper-attributes-heading>small{font-size:8px;letter-spacing:0}
+ .paper-v2 .paper-attribute-edit{flex-basis:34px;width:34px;height:34px;min-width:34px}
+ .sheet-attribute-modal{padding:9px}
+ .sheet-attribute-dialog-head{padding:13px 12px}
+ .sheet-attribute-headline h2{font-size:21px}
+ .sheet-attribute-rows{padding:0 10px 12px}
+ .sheet-attribute-row{grid-template-columns:29px minmax(0,1fr) auto;gap:7px;padding:7px}
+ .sheet-attribute-row-icon{width:27px;height:27px;font-size:16px}
+ .sheet-attribute-label strong{font-size:11px}
+ .sheet-attribute-stepper{gap:3px}
+ .sheet-attribute-stepper button{min-width:30px;width:30px;height:32px}
+ .sheet-attribute-stepper output{min-width:39px;height:35px;font-size:20px}
+ .sheet-attribute-help{padding:12px;font-size:11px}
+ .sheet-attribute-note{margin:0 10px 12px}
+ .sheet-attribute-actions{padding:12px}
+}
+@media(prefers-reduced-motion:reduce){
+ .paper-v2 .paper-attribute-edit,.sheet-attribute-row{transition:none}
+}
