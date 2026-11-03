@@ -109,6 +109,7 @@
   }
   storeSession();
   authGate.hidden=true;
+  document.querySelector('.app').inert=false;
   authReady=true;
   render();
   updateAccountBadge();
@@ -140,7 +141,8 @@
    }
   }else{
    const users=accountList();
-   const key=name.trim().toLocaleLowerCase('pt-BR');
+   const key=identifier.trim().toLocaleLowerCase('pt-BR');
+   if(key.length<3||key.length>40)throw Error('Escolha um usuário entre 3 e 40 caracteres.');
    if(users.some(u=>u.key===key))throw Error('Esse nome de usuário já está cadastrado neste navegador.');
    const salt=Array.from(crypto.getRandomValues(new Uint8Array(16))).map(x=>x.toString(16).padStart(2,'0')).join('');
    const passwordHash=await hashLocalPassword(password,salt);
@@ -172,6 +174,7 @@
   if(typeof window.lockMasterPanel==='function'&&document.getElementById('v-mestre')?.classList.contains('active'))window.lockMasterPanel();
   setVault({characters:[],history:[]});authReady=false;
   authGate.hidden=false;
+  document.querySelector('.app').inert=true;
   authTab='login';updateAuthTab();setMessage('');
   render();updateAccountBadge();
   document.getElementById('opAuthIdentifier')?.focus();
@@ -207,6 +210,7 @@
  authGate.className='op-auth-gate';authGate.id='opAuthGate';
  authGate.innerHTML='<section class="op-auth-window"><div class="op-auth-crest" aria-hidden="true">✧</div><small class="op-auth-kicker">ARQUIVO DE CONHECIMENTO</small><h1>O Outro Lado</h1><p>Os nomes são lembrados. Os segredos, não.</p><div class="op-auth-tabs" role="tablist" aria-label="Acesso ao sistema"><button type="button" data-auth-tab="login" class="active" aria-selected="true">Entrar</button><button type="button" data-auth-tab="register" aria-selected="false">Cadastrar conta</button></div><form id="opAuthForm"><div id="opAuthNameRow" hidden><label>NOME DO JOGADOR<input id="opAuthName" maxlength="35" autocomplete="nickname" placeholder="Nome ou apelido"></label></div><label id="opAuthIdentifierLabel">USUÁRIO<input id="opAuthIdentifier" type="text" required autocomplete="username" placeholder="Nome cadastrado"></label><label>SENHA<input id="opAuthPassword" type="password" required minlength="8" autocomplete="current-password" placeholder="Mínimo 8 caracteres"></label><button type="submit" class="op-auth-submit" id="opAuthSubmit">Abrir arquivo</button></form><p class="op-auth-status" id="opAuthStatus" role="status"></p><div class="op-auth-bottom"><button type="button" id="opKnowledgeToggle">♫ Ouvir Conhecimento</button><span id="opAuthMode"></span></div></section>';
  document.body.appendChild(authGate);
+ document.querySelector('.app').inert=true;
  function updateAuthTab(){
   const registering=authTab==='register';
   authGate.querySelectorAll('[data-auth-tab]').forEach(b=>{
@@ -264,11 +268,7 @@
    setTimeout(()=>ctx.close().catch(()=>{}),3500);
   }catch(e){console.warn('Áudio de Conhecimento indisponível:',e.message)}
  }
- document.getElementById('opKnowledgeToggle').addEventListener('click',()=>{
-  knowledgeSoundEnabled=!knowledgeSoundEnabled;
-  document.getElementById('opKnowledgeToggle').textContent=knowledgeSoundEnabled?'♫ Ouvir Conhecimento':'♪ Som desligado';
-  if(knowledgeSoundEnabled)playKnowledge();
- });
+ document.getElementById('opKnowledgeToggle').addEventListener('click',playKnowledge);
  updateAuthTab();
  // Aba própria para cadastrar personagens sem duplicar o formulário do jogo.
  const nav=document.querySelector('.nav');
@@ -351,7 +351,8 @@
   if(account)saveJson(vaultKey(account.id),vaultSnapshot());
  });
  async function bootstrap(){
-  const session=readJson(currentSessionKey,null);
+  let session=null;
+  try{session=JSON.parse(sessionStorage.getItem(currentSessionKey)||'null')}catch(e){}
   if(!session){setVault({characters:[],history:[]});render();updateAccountBadge();return}
   try{
    if(online&&session.token&&session.account){
@@ -363,7 +364,7 @@
     if(user)await loadAccount({id:user.id,displayName:user.displayName,role:'jogador'});
    }
   }catch(e){sessionStorage.removeItem(currentSessionKey);account=null;token='';setVault({characters:[],history:[]});render()}
-  if(!account){authGate.hidden=false;updateAuthTab();updateAccountBadge()}
+  if(!account){authGate.hidden=false;document.querySelector('.app').inert=true;updateAuthTab();updateAccountBadge()}
  }
  bootstrap();
 })();
