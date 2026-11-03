@@ -11,6 +11,7 @@ function skillBonus(c,n){return entries(c).reduce((v,e)=>v+(+e.mods?.skills||0)+
 function attribute(c,key){return Math.max(0,(+c?.attrs?.[key]||0)+entries(c).reduce((n,e)=>n+(e.mods?.attributeKey===key?(+e.mods?.attribute||0):0),0))}
 function defenseBonus(c){return entries(c).reduce((v,e)=>v+(+e.mods?.defense||0),0)}
 function attackBonus(c){return entries(c).reduce((v,e)=>v+(+e.mods?.attack||0),0)}
+function ritualCostDiscount(c,inside){return inside?entries(c).filter(e=>e.name==='Cinerária').reduce((n,e)=>Math.max(n,+e.mods?.costReduction||0),0):0}
 function bonusResistance(c){return entries(c).reduce((v,e)=>v+(+e.mods?.ritualResistanceBonus||0),0)}
 function addEffect(target,e){
  target.activeRitualEffects=Array.isArray(target.activeRitualEffects)?target.activeRitualEffects.filter(x=>x.active!==false):[];
@@ -108,7 +109,7 @@ function rollResistance(){
  if(!skill||!t){el('opFxRollResult').textContent='Resistência resolvida pelo mestre.';return}
  const key=skill==='Vontade'?'pre':skill==='Fortitude'?'vig':'agi',a=attribute(t,key);
  const dice=Array.from({length:a||2},()=>1+Math.floor(Math.random()*20)),die=a?Math.max(...dice):Math.min(...dice);
- const total=die+sb(rank(t,skill))+skillBonus(t,skill)+bonusResistance(t),dc=10+Math.ceil((+c.nex||5)/5)+(+c.attrs.pre||0)+entries(c).reduce((v,e)=>v+(+e.mods?.ritualDT||0),0);
+ const total=die+sb(rank(t,skill))+skillBonus(t,skill)+bonusResistance(t),dc=10+Math.ceil((+c.nex||5)/5)+(+c.attrs.pre||0)+(cast.insideCineraria?5:0);
  const passed=die===20||total>=dc;
  el('opFxRes').value=passed?'passed':'failed';
  el('opFxRollResult').textContent=skill+' '+dice.join(', ')+' → '+total+' vs DT '+dc+' • '+(passed?'Passou':'Falhou');
@@ -223,10 +224,10 @@ function powerUsed(c,action,cost){
 const oldCast=window.useKnownRitual;
 if(typeof oldCast==='function')window.useKnownRitual=function(id,index,seal=false){
  const c=get(id),ritual=c?.powers?.rituals?.[index],prev=hist[0];if(!ritual)return oldCast(id,index,seal);
- const [name,element,rawCircle]=ritual.split('|'),extra=seal?0:(+el('ritual-extra-'+index)?.value||0);
+ const [name,element,rawCircle]=ritual.split('|'),extra=seal?0:(+el('ritual-extra-'+index)?.value||0),insideCineraria=!seal&&!!el('ritual-cineraria-'+index)?.checked;
  oldCast(id,index,seal);
  if(seal||hist[0]===prev||hist[0]?.label!==name||hist[0]?.kind!=='Ritual')return;
- afterCast({id,name,element,circle:+rawCircle||1,extra,cost:+hist[0].total||1});
+ afterCast({id,name,element,circle:+rawCircle||1,extra,cost:+hist[0].total||1,insideCineraria});
 };
 const oldPE=window.renderPEPanel;
 if(typeof oldPE==='function')window.renderPEPanel=function(c){return oldPE(c)+activeHtml(c)};
@@ -246,5 +247,5 @@ if(typeof oldAttack==='function')window.attack=function(){
 };
 const oldScene=window.endPEScene;
 if(typeof oldScene==='function')window.endPEScene=function(id){oldScene(id);endScene(id)};
-window.RitualEngine={registry:reg,afterCast,open,close,skillBonus,attribute,defenseBonus,attackBonus,bonusResistance,rollFormula,newTurn,endScene,rest,sustain,remove,activeHtml,cpTest,applyPowerHealing,loseMirror};
+window.RitualEngine={registry:reg,afterCast,open,close,skillBonus,attribute,defenseBonus,attackBonus,bonusResistance,ritualCostDiscount,rollFormula,newTurn,endScene,rest,sustain,remove,activeHtml,cpTest,applyPowerHealing,loseMirror};
 })();
