@@ -224,3 +224,40 @@ O PIN antigo do Painel do Mestre continua sendo somente um bloqueio visual. No *
 **Passo pendente para o proprietário:** cadastrar-se pelo login do próprio RPG e confirmar o e-mail, se solicitado. Depois, atribuir explicitamente a função `mestre` somente à conta correta pelo painel administrativo do Supabase (sem compartilhar senha). Até isso ocorrer, a conta tem permissões de jogador e não verá os dados das outras contas no Painel do Mestre.
 
 **Limitação da verificação:** estrutura, RLS e conexão do projeto foram verificadas, mas o fluxo ponta a ponta de login e salvamento depende da criação de contas reais de teste, que ainda não existem. As instruções anteriores de criação manual do projeto e configuração da chave já foram executadas neste projeto.
+
+## Os Cinco Samurais — painel do mestre
+
+O Painel do Mestre inclui a área **Os Cinco Samurais**, com cinco fichas iniciais distintas, cada uma com cor e atributos próprios:
+
+| Samurai | Cor | Identidade visual |
+|---|---|---|
+| Akira Kurogane | `#C34954` | Vermelho |
+| Ichiro Yamioka | `#8F70CB` | Violeta |
+| Masamune Hayato | `#D4A14D` | Dourado |
+| Reiji Kuronami | `#4888CA` | Azul |
+| Takeda Shirogane | `#58A894` | Jade |
+
+Os dados vivem em `public.samurai_slots` no Supabase, e **não** são inseridos como fichas comuns no cofre dos jogadores. Cada slot pode ser atribuído a **uma conta de jogador** e cada jogador pode controlar **um samurai por vez**. Os personagens criados normalmente pelos jogadores são preservados.
+
+### Como usar
+
+1. Entre com a conta de mestre e abra **Painel do Mestre → Os Cinco Samurais**.
+2. Em um samurai disponível, clique em **Editar ficha**. É possível personalizar cor, classe, NEX, origem, trilha, conceito, atributos, recursos, perícias, história, poderes, rituais e equipamento. Salve as alterações.
+3. No cartão, escolha a conta do jogador no campo **Jogador responsável** e clique em **Salvar atribuição**.
+4. O jogador deve atualizar a página ou entrar novamente. A ficha atribuída aparecerá entre os agentes, marcada com a cor do samurai. O jogador pode utilizar o sistema normal de rolagens e recursos, e suas alterações são persistidas na linha exclusiva de `samurai_slots`.
+5. Para transferir a outro jogador, selecione **Não atribuído**, salve, depois selecione a nova conta. **O progresso atual fica preservado**. Se o jogador novo precisar começar do zero, desatribua e edite os recursos e a ficha antes de transferir.
+6. A seção **Consultar ficha completa** permite ao mestre acompanhar a ficha armazenada no banco, incluindo perícias, poderes, rituais e história. Clique em **Atualizar samurais** para buscar o estado atualizado.
+
+### Regras de acesso
+
+- As tabelas estão protegidas por **Row Level Security (RLS)**.
+- Somente a conta com `profiles.role='mestre'` pode consultar e atribuir os cinco slots.
+- O jogador só consegue ler sua ficha atribuída e salvar o próprio progresso. Não pode transferir personagens para si, acessar fichas não atribuídas ou modificar a cor mestra.
+- As operações administrativas usam RPCs com verificação do usuário no servidor: `samurai_assign` e `samurai_edit`. O progresso usa `samurai_save_progress`. **A senha visual do Painel do Mestre não substitui essas permissões.**
+- O editor do modelo é bloqueado enquanto uma ficha está atribuída; desatribua para personalizar o modelo sem sobrescrever uma edição ativa do jogador.
+- Alterações locais do jogador são mantidas como pendentes se falhar a rede, para sincronizar no próximo acesso. Se houver dois navegadores editando a mesma conta ao mesmo tempo, a última gravação pode prevalecer.
+- A lista de jogadores exige contas reais com e-mail confirmado no mesmo projeto Supabase. O mestre não é exibido como jogador elegível.
+
+**Verificação:** as cinco linhas e os controles RLS foram confirmados no Supabase. Um teste de atribuição e salvamento feito dentro de uma transação desfeita comprovou que o mestre pode atribuir e um jogador pode salvar somente seu personagem, sem criar uma atribuição permanente de teste.
+
+**Segurança:** os RPCs administrativos são `SECURITY DEFINER` com verificações explícitas de `auth.uid()` e da função de mestre. O Security Advisor apresenta alertas sobre funções desse tipo executáveis por usuários autenticados; no projeto, isso é proposital para os endpoints protegidos e requer revisão sempre que forem alterados. Também é recomendável habilitar proteção contra senhas vazadas em Supabase Authentication.
