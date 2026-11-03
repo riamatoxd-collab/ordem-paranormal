@@ -338,3 +338,15 @@ Na área **Rituais conhecidos**, as fichas técnicas também ficam disponíveis.
 - Nenhuma ficha salva no navegador ou no Supabase foi alterada. A atualização amplia apenas o catálogo, a visualização e os controles de consulta/conjuração já existentes.
 - `rituais-regras-completas.js` armazena uma ficha por **nome**, compartilhada entre as quatro variantes de `Amaldiçoar Arma`; o elemento da variante é exibido pelo catálogo original.
 - As 154 notas de aprimoramento apresentam sínteses breves de seus efeitos, não todos os parágrafos originais das regras.
+
+## Executor de Rituais e Poderes — novembro de 2026
+
+O Grimório mantém **101 entradas de catálogo e 98 rituais distintos**. Uma nova seção `rituais-efeitos-dados.js` classifica todos os nomes, com modalidades, fórmulas verificadas e modificadores numéricos. O `rituais-executor.js` integra o fluxo de conjuração existente, sem substituir as fichas da campanha.
+
+**Funcionamento:** ao conjurar um ritual conhecido na ficha do agente, o site confirma os custos/requisitos existentes, aplica o gasto de PE (ou PV pela trilha Flagelador), resolve o Custo do Paranormal (Ocultismo contra DT 20 + PE do ritual, exceto Medo) e oferece uma janela para selecionar alvo, modalidade, fórmula, resistência, condições e outras escolhas. O histórico registra os resultados. O botão **Conjurar** dentro do catálogo do Grimório leva à ficha para escolher a forma Discente/Verdadeira e os poderes.
+
+Os efeitos de duração não instantânea aparecem na seção **Efeitos de Rituais e Poderes**. Bônus apropriados influenciam atributos, perícias, ataque e Defesa. Rituais sustentados exigem 1 PE no início do turno, até serem encerrados. Poderes que rolam cura podem aplicar PV ao personagem escolhido; Ataque Especial tem bônus no próximo ataque. A habilidade de Cinerária permite indicar conjuração dentro da névoa para aplicar o modificador de custo/DT conforme sua versão.
+
+**Limites:** a resolução é assistida, não uma simulação automática de todas as situações descritas nos livros. Fórmulas dos efeitos que não foram confirmadas permanecem editáveis, sem valores inventados. Áreas, múltiplos alvos, decisões de NPCs, efeitos de itens e exceções de poderes requerem decisão do mestre. Um personagem de outra conta não pode ter PV/condições alterados pelo cliente de outro jogador por causa das permissões do Supabase.
+
+O arquivo **[AUDITORIA-EFEITOS-RITUAIS.md](AUDITORIA-EFEITOS-RITUAIS.md)** discrimina o grupo e a fonte de cada uma das 98 fichas, as automatizações disponíveis e as pendências. Foram executados testes de sintaxe, cobertura do catálogo, fórmulas verificadas, Custo do Paranormal e composição de bônus em ambiente de código. Ainda falta validar o fluxo visual completo em navegador e partidas reais.

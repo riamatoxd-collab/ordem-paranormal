@@ -1,0 +1,62 @@
+
+/* Ritualeiro interativo • ficha de execução e acompanhamento dos poderes */
+.op-effect-overlay[hidden]{display:none!important}
+.op-effect-overlay{
+ position:fixed;inset:0;z-index:31000;overflow:auto;padding:12px;
+ background:#09070be9;backdrop-filter:blur(8px);
+ display:grid;place-items:center
+}
+.op-effect-dialog{
+ width:min(100%,750px);max-height:94dvh;overflow:auto;
+ color:#e6d3b9;background:radial-gradient(circle at 84% 0,#79524044,transparent 46%),#1b141b;
+ border:1px solid #a4886b;border-top:3px solid #bfa078;border-radius:13px;
+ box-shadow:0 28px 90px #000d
+}
+.op-effect-dialog>header{
+ position:sticky;z-index:2;top:0;background:#221821;border-bottom:1px solid #765444;
+ padding:15px 18px;display:flex;align-items:center;justify-content:space-between;gap:15px
+}
+.op-effect-dialog>header small{font-size:9px;letter-spacing:.15em;color:#cda675;font-weight:850}
+.op-effect-dialog>header h2{font:700 23px Georgia,serif;margin:6px 0 0;color:#fce8c8}
+.op-effect-dialog>header button,.op-effect-resist button,.op-effect-buttons button,.op-effect-item button{
+ cursor:pointer;border-radius:7px;border:1px solid #906d58;background:#32232a;color:#f2dabe;
+ padding:9px 12px;font-size:11px;font-weight:800
+}
+.op-effect-dialog>header button{font-size:17px;padding:6px 11px}
+.op-effect-dialog button:hover{border-color:#e0be91;background:#5a3933}
+.op-effect-dialog button:focus-visible,.op-effects-panel button:focus-visible{outline:2px solid #e6bf82;outline-offset:2px}
+#opEffectContent{padding:16px 18px;display:grid;gap:12px}
+.op-effect-tags{display:flex;flex-wrap:wrap;gap:7px}
+.op-effect-tags span{padding:6px 9px;background:#34252c;border:1px solid #846752;border-radius:50px;color:#f2cfa5;font-size:10px;font-weight:800}
+.op-effect-cp{margin:0;padding:12px 13px;border-left:3px solid #c39c63;background:#2b211d;font-size:12px;line-height:1.65;color:#f7dcc2}
+.op-effect-summary{color:#ebd5c1;font-size:13px;line-height:1.65;margin:0}
+.op-effect-note{color:#c5a899;font-size:11px;line-height:1.5;margin:0}
+.op-effect-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.op-effect-fields>label{display:grid;gap:7px;min-width:0;font-size:10px;letter-spacing:.045em;font-weight:800;color:#d8b99d}
+.op-effect-fields input,.op-effect-fields select,.op-effect-fields textarea{
+ width:100%;min-width:0;box-sizing:border-box;background:#ebdac2;color:#30212c;
+ padding:10px;border:1px solid #93715b;border-radius:7px;font:normal 12px/1.4 inherit;
+}
+.op-effect-fields label:has(textarea){grid-column:1/-1}
+.op-effect-resist,.op-effect-buttons{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.op-effect-resist small{font-size:11px;color:#d1b6a3;line-height:1.6;flex:1}
+.op-effect-buttons{border-top:1px solid #6d4f43;padding-top:11px}
+.op-effect-buttons button:first-child{background:#67412f;border-color:#b88c5e}
+.op-effects-panel{border:1px solid #846b52;border-radius:10px;padding:14px;margin:14px 0;background:linear-gradient(135deg,#241b20,#171419)}
+.op-effects-panel>header{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:11px}
+.op-effects-panel>header small{font-size:9px;letter-spacing:.14em;color:#cda978;font-weight:850}
+.op-effects-panel>header h3{font:700 17px Georgia,serif;color:#ffe2bc;margin:5px 0 0}
+.op-effects-panel>header b{font-size:10px;color:#f4d2a3}
+.op-effect-item{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:10px;border-top:1px solid #54433d}
+.op-effect-item>div:first-child{display:grid;gap:4px;flex:1 1 180px;min-width:0}
+.op-effect-item strong{font:700 14px Georgia,serif;color:#ffe3c2}
+.op-effect-item small,.op-effect-item p{font-size:10px;line-height:1.5;color:#ccb3a1;margin:0;overflow-wrap:anywhere}
+.op-effect-item>div:last-child{display:flex;flex-wrap:wrap;gap:7px}
+.op-effect-item button{padding:7px 9px}
+.op-effects-panel>small{color:#ac988a;font-size:10px;line-height:1.5}
+@media(max-width:640px){
+ .op-effect-dialog{max-height:96dvh}
+ #opEffectContent{padding:12px}
+ .op-effect-fields{grid-template-columns:1fr}
+ .op-effect-fields label:has(textarea),.op-effect-resist,.op-effect-buttons{grid-column:1}
+}
