@@ -10,6 +10,8 @@ let cast=null,layer=null;
 function skillBonus(c,n){return entries(c).reduce((v,e)=>v+(+e.mods?.skills||0)+(e.mods?.skillName===n?(+e.mods?.skillBonus||0):0),0)}
 function attribute(c,key){return Math.max(0,(+c?.attrs?.[key]||0)+entries(c).reduce((n,e)=>n+(e.mods?.attributeKey===key?(+e.mods?.attribute||0):0),0))}
 function defenseBonus(c){return entries(c).reduce((v,e)=>v+(+e.mods?.defense||0),0)}
+function attackBonus(c){return entries(c).reduce((v,e)=>v+(+e.mods?.attack||0),0)}
+function bonusResistance(c){return entries(c).reduce((v,e)=>v+(+e.mods?.ritualResistanceBonus||0),0)}
 function addEffect(target,e){
  target.activeRitualEffects=Array.isArray(target.activeRitualEffects)?target.activeRitualEffects.filter(x=>x.active!==false):[];
  target.activeRitualEffects=target.activeRitualEffects.filter(x=>x.source!==e.source||x.casterId!==e.casterId||x.name!==e.name);
@@ -23,6 +25,10 @@ function modifiers(name,index){
  if(name==='Aprimorar Físico'||name==='Aprimorar Mente')a.attribute=[1,2,3][index];
  if(name==='Coincidência Forçada')a.skills=index===2?5:2;
  if(name==='Armadura de Sangue')a.defense=[5,10,15][index];
+ if(name==='Embaralhar')a.defense=[6,10,16][index];
+ if(name==='Proteção contra Rituais'){a.ritualResistanceBonus=index===2?10:5;a.paranormalDR=index===2?10:5}
+ if(name==='Tela de Ruído')a.physicalTempPV=index===2?0:index===1?60:30;
+ if(name==='Desfazer Sinapses')a.condition=index===2?'esmorecido':'frustrado';
  if(name==='Arma Atroz'){a.attack=index?5:2;a.criticalMargin=index===2?2:1}
  if(name==='Cinerária'){a.ritualDT=5;a.costReduction=index?2:0;a.maximized=index===2}
  return a;
@@ -94,7 +100,7 @@ function rollResistance(){
  if(!skill||!t){el('opFxRollResult').textContent='Resistência resolvida pelo mestre.';return}
  const key=skill==='Vontade'?'pre':skill==='Fortitude'?'vig':'agi',a=attribute(t,key);
  const dice=Array.from({length:a||2},()=>1+Math.floor(Math.random()*20)),die=a?Math.max(...dice):Math.min(...dice);
- const total=die+sb(rank(t,skill))+skillBonus(t,skill),dc=10+Math.ceil((+c.nex||5)/5)+(+c.attrs.pre||0);
+ const total=die+sb(rank(t,skill))+skillBonus(t,skill)+bonusResistance(t),dc=10+Math.ceil((+c.nex||5)/5)+(+c.attrs.pre||0)+entries(c).reduce((v,e)=>v+(+e.mods?.ritualDT||0),0);
  const passed=die===20||total>=dc;
  el('opFxRes').value=passed?'passed':'failed';
  el('opFxRollResult').textContent=skill+' '+dice.join(', ')+' → '+total+' vs DT '+dc+' • '+(passed?'Passou':'Falhou');
@@ -117,23 +123,29 @@ function finish(apply){
  let result=null,damage=0,heal=0,transfer=0;
  if(apply&&!nullified&&el('opFxFormula').value.trim()){try{result=rollFormula(el('opFxFormula').value.trim())}catch(e){say(e.message);return}}
  if(result){
-  if(p.kind==='dano'||(cast.name==='Chamas do Caos'&&mode.includes('Labareda')))damage=Math.max(0,result.total);
+  if((p.kind==='dano'&&!(cast.name==='Invadir Mente'&&mode==='Ligação telepática'))||(cast.name==='Chamas do Caos'&&mode.includes('Labareda'))||(cast.name==='Transfigurar Água'&&mode==='Evaporar')||(cast.name==='Transfigurar Terra'&&mode==='Amolecer'))damage=Math.max(0,result.total);
   if(p.kind==='cura'||p.kind==='vitalidade')heal=Math.max(0,result.total);
  }
- if(resisted&&resType.includes('metade'))damage=Math.floor(damage/2);
+ if(resisted&&(resType.includes('metade')||['Eletrocussão','Miasma Entrópico','Desfazer Sinapses','Esfolar'].includes(cast.name)))damage=Math.floor(damage/2);
+ if(resisted&&cast.name==='Inexistir'&&result){const less=['2d12','3d12','4d12'][form.index];damage=rollFormula(less).total}
+ if(resisted&&['Eletrocussão','Miasma Entrópico','Desfazer Sinapses','Esfolar'].includes(cast.name))delete mods.condition;
+ if(resisted&&cast.name==='Definhar')mods.condition=form.index===0?'vulnerável':'fatigado';
+ if(cast.name==='Hemofagia'&&damage&&c){const healCaster=Math.floor(damage/2);c.pvNow=Math.min(Math.max(0,stats(c).pv-(+c.flageloSpentPV||0)),(+c.pvNow||0)+healCaster)}
+ if(cast.name==='Tela de Ruído'&&form.index<2&&target&&apply){target.pvTempPhysical=(+target.pvTempPhysical||0)+[30,60][form.index]}
+ if(cast.name==='Cicatrização'&&result&&target)mods.noteAge='Além da cura, o alvo envelhece 1 ano (registrar na história).';
  if(cast.name==='Transfusão Vital'&&result&&target){
   const max=[30,50,100][form.index];transfer=Math.min(Math.max(0,result.total),(+c.pvNow||0)-1,max);heal=transfer;
  }
  if(apply&&!nullified&&target){
   if(damage){const temp=Math.min(+target.pvTemp||0,damage);target.pvTemp=Math.max(0,(+target.pvTemp||0)-temp);target.pvNow=Math.max(0,(+target.pvNow||0)-(damage-temp))}
-  if(heal){if(p.kind==='vitalidade')target.pvTemp=(+target.pvTemp||0)+heal;else target.pvNow=Math.min(stats(target).pv,(+target.pvNow||0)+heal)}
+  if(heal){if(p.kind==='vitalidade')target.pvTemp=(+target.pvTemp||0)+heal;else target.pvNow=Math.min(Math.max(0,stats(target).pv-(+target.flageloSpentPV||0)),(+target.pvNow||0)+heal)}
   if(transfer)c.pvNow=Math.max(1,(+c.pvNow||0)-transfer);
  }
- const lasting=!/instantânea/i.test(duration),display=(apply&&!nullified),recordTarget=target||c;
+ const lasting=!/instantânea/i.test(duration)||!!mods.condition||!!mods.physicalTempPV,display=(apply&&!nullified),recordTarget=target||c;
  if(display&&lasting){
   // Um ocultista só sustenta um ritual por vez.
   if(/sustentada/i.test(duration))for(const other of agents)for(const ef of entries(other))if(ef.casterId===c.id&&ef.sustain)ef.active=false;
-  addEffect(recordTarget,{source:'ritual',casterId:c.id,name:cast.name,element:cast.element,kind:p.kind,duration,mode,variant:form.name,mods,notes,targetName:who,condition:mods.condition||'',sustain:/sustentada/i.test(duration),sustainPending:false,rounds:/1 rodada/i.test(duration)?1:/2 rodadas/i.test(duration)?2:null,external:isExternal});
+  addEffect(recordTarget,{source:'ritual',casterId:c.id,name:cast.name,element:cast.element,kind:p.kind,duration:(!/instantânea/i.test(duration)?duration:(mods.condition?'Até remover a condição':'Cena')),mode,variant:form.name,mods,notes:notes+(mods.noteAge?' • '+mods.noteAge:''),targetName:who,condition:mods.condition||'',sustain:/sustentada/i.test(duration),sustainPending:false,rounds:/1 rodada/i.test(duration)?1:/2 rodadas/i.test(duration)?2:null,external:isExternal});
  }
  const detail=(apply?'Aplicado':'Conjurado')+' • '+who+' • '+form.name+(mode?' • '+mode:'')+(damage?' • '+damage+' dano':'')+(heal?' • '+heal+' PV':'')+(nullified?' • anulado pela resistência':'')+(notes?' • '+notes:'');
  addHist({agent:c.name,label:cast.name,detail,total:damage||heal||null,dt:null,passed:null,status:apply&&!nullified?'EFEITO REGISTRADO':'EFEITO MANUAL',kind:'Ritual'});
@@ -155,11 +167,12 @@ function sustain(id,eid){
 }
 function newTurn(id){
  for(const c of agents)for(const e of entries(c))if(e.casterId===id){
-  if(e.sustain){if(e.sustainPending)e.active=false;else e.sustainPending=true}
+  if(e.sustain){if(e.sustainPending)e.active=false;else e.sustainPending=true}if(e.source==='poder'&&e.duration==='Até usar ou encerrar turno')e.active=false;
   if(Number.isInteger(e.rounds)){e.rounds--;if(e.rounds<=0)e.active=false}
  }db()
 }
-function endScene(id){for(const c of agents)for(const e of entries(c))if(e.casterId===id&&(/cena|sustentada|rodadas?/i.test(e.duration)))e.active=false;write()}
+function endScene(id){for(const c of agents){for(const e of entries(c))if(e.casterId===id&&(/cena|sustentada|rodadas?/i.test(e.duration)))e.active=false;if(c.id===id){c.pvTemp=0;c.pvTempPhysical=0}}write()}
+function rest(id){const c=get(id);if(!c)return;c.flageloSpentPV=0;addHist({agent:c.name,label:'Descanso • recuperação do Flagelo',detail:'PV anteriormente gastos para rituais podem ser recuperados por descanso conforme a regra da mesa.',status:'DESCANSO',kind:'Habilidade'});write()}
 function powerUsed(c,action,cost){
  if(!action)return;const mods={},detail=hist[0]?.detail||'';
  if(action.id==='ataque-especial')mods.attack=5*Math.max(1,cost-1);
@@ -180,7 +193,7 @@ const oldPE=window.renderPEPanel;
 if(typeof oldPE==='function')window.renderPEPanel=function(c){return oldPE(c)+activeHtml(c)};
 const oldPower=window.usePEAction;
 if(typeof oldPower==='function')window.usePEAction=function(id,actionId){
- const c=get(id),action=c?.class==='sobrevivente'?null:peActionList(c).find(x=>x.id===actionId),prev=hist[0];
+ const c=get(id),action=c&&c.class!=='sobrevivente'?peActionList(c).find(x=>x.id===actionId):null,prev=hist[0];
  oldPower(id,actionId);
  if(c&&action&&prev!==hist[0]&&hist[0]?.kind==='Habilidade')powerUsed(c,action,+hist[0].total||0);
 };
@@ -188,5 +201,5 @@ const oldTurn=window.newPETurn;
 if(typeof oldTurn==='function')window.newPETurn=function(id){oldTurn(id);newTurn(id);render()};
 const oldScene=window.endPEScene;
 if(typeof oldScene==='function')window.endPEScene=function(id){oldScene(id);endScene(id)};
-window.RitualEngine={registry:reg,afterCast,open,close,skillBonus,attribute,defenseBonus,rollFormula,newTurn,endScene,sustain,remove,activeHtml,cpTest};
+window.RitualEngine={registry:reg,afterCast,open,close,skillBonus,attribute,defenseBonus,attackBonus,bonusResistance,rollFormula,newTurn,endScene,rest,sustain,remove,activeHtml,cpTest};
 })();
