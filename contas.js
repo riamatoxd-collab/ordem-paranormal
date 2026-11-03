@@ -18,6 +18,7 @@
  let rosterCache=null;
  let lastRosterFetch=0;
  let rosterRequest=null;
+ let refreshPromise=null;
  let authTab='login';
  let knowledgeSoundEnabled=true;
  let knowledgeAudio=null;
@@ -27,6 +28,7 @@
  function readJson(key,fallback){try{const value=JSON.parse(localStorage.getItem(key));return value??fallback}catch(e){return fallback}}
  function saveJson(key,value){localStorage.setItem(key,JSON.stringify(value))}
  function vaultKey(id){return 'op_account_vault_v2_'+id}
+ function pendingKey(id){return 'op_account_pending_v2_'+id}
  function safe(s){return esc(String(s??''))}
  function accountList(){return readJson(accountKey,[])}
  function vaultSnapshot(){return {characters:agents,history:hist,selected:selected}}
@@ -36,12 +38,28 @@
   hist=Array.isArray(v.history)?v.history:[];
   selected=agents.some(x=>x.id===v.selected)?v.selected:(agents[0]?.id||null);
  }
- function api(path,method='GET',data=null,asToken=token){
+ async function refreshCloudSession(){
+  if(!refreshToken)throw Error('Sessão expirada. Entre novamente.');
+  if(refreshPromise)return refreshPromise;
+  refreshPromise=(async()=>{
+   const res=await fetch(base+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{'apikey':anon,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:refreshToken})});
+   const data=await res.json();
+   if(!res.ok||!data.access_token)throw Error('Sessão expirada. Faça login novamente.');
+   token=data.access_token;refreshToken=data.refresh_token||refreshToken;
+   if(account)storeSession();
+  })();
+  try{await refreshPromise}finally{refreshPromise=null}
+ }
+ function api(path,method='GET',data=null,asToken=token,allowRefresh=true){
   const headers={'apikey':anon,'Accept':'application/json'};
   if(asToken)headers.Authorization='Bearer '+asToken;
   if(data!==null)headers['Content-Type']='application/json';
   if(path.startsWith('/rest/v1/')&&method!=='GET')headers.Prefer='resolution=merge-duplicates,return=minimal';
   return fetch(base+path,{method,headers,body:data!==null?JSON.stringify(data):undefined}).then(async res=>{
+   if(res.status===401&&asToken&&allowRefresh&&refreshToken){
+    await refreshCloudSession();
+    return api(path,method,data,token,false);
+   }
    const raw=await res.text();let body;
    try{body=raw?JSON.parse(raw):null}catch(e){body=raw}
    if(!res.ok)throw new Error((body&&typeof body==='object'&&(body.msg||body.message||body.error_description||body.error))||'Falha de conexão ('+res.status+')');
@@ -68,9 +86,12 @@
   try{
    await api('/rest/v1/character_vaults?on_conflict=owner_id','POST',{owner_id:owner,characters:snapshot.characters,history:snapshot.history,updated_at:new Date().toISOString()});
    rosterCache=null;
+   if(!dirtySnapshot)localStorage.removeItem(pendingKey(owner));
+   const status=document.getElementById('opAccountSync');if(status)status.textContent='Ficha sincronizada.';
   }catch(e){
    if(account?.id===owner){
     dirtySnapshot=dirtySnapshot||snapshot;
+    saveJson(pendingKey(owner),dirtySnapshot);
     console.warn('Falha de sincronização:',e.message);
     const status=document.getElementById('opAccountSync');
     if(status)status.textContent='Alterações salvas localmente; falha ao sincronizar. Reabra a conta com internet para tentar novamente.';
@@ -80,6 +101,7 @@
  function queueCloudSave(){
   if(!online||!account)return;
   dirtySnapshot={characters:JSON.parse(JSON.stringify(agents)),history:JSON.parse(JSON.stringify(hist))};
+  saveJson(pendingKey(account.id),dirtySnapshot);
   cloudSaveChain=cloudSaveChain.then(syncCloud).catch(e=>console.warn(e));
  }
  db=function(){
@@ -90,6 +112,7 @@
  };
  render=function(){
   originalRender();
+  if(account)saveJson(vaultKey(account.id),vaultSnapshot());
   renderRegistrationPage();
  };
  async function loadAccount(user){
@@ -103,7 +126,10 @@
     setVault({characters:[],history:[]});
     await api('/rest/v1/character_vaults?on_conflict=owner_id','POST',{owner_id:account.id,characters:[],history:[]});
    }
+   const pending=readJson(pendingKey(account.id),null);
+   if(pending){setVault({...pending,selected:readJson(vaultKey(account.id),{}).selected});}
    saveJson(vaultKey(account.id),vaultSnapshot());
+   if(pending){dirtySnapshot=pending;cloudSaveChain=cloudSaveChain.then(syncCloud);}
   }else{
    setVault(readJson(vaultKey(account.id),{characters:[],history:[]}));
   }
@@ -317,15 +343,22 @@
   return vaults.map(v=>({...v,display_name:names.get(v.owner_id)||'Jogador'}));
  }
  function rosterCards(rows){
-  let total=0;
-  for(const r of rows)total+=(r.characters||[]).length;
+  let total=0;for(const r of rows)total+=(r.characters||[]).length;
   const pieces=rows.flatMap(row=>(row.characters||[]).map(c=>{
-   const attrs=c.attrs||{},status=stats(c);
+   const attrs=c.attrs||{},status=stats(c),skillEntries=Object.entries(c.skills||{}).filter(([,rank])=>Number(rank)>0);
+   const powers=[...(c.powers?.class||[]),...(c.powers?.paranormal||[]),...(c.sheetPowers||[]).map(p=>p.name)].filter(Boolean);
+   const rituals=(c.powers?.rituals||[]).map(p=>String(p).split('|')[0]);
+   const inventory=(c.inventory||[]).filter(i=>i?.name).map(i=>i.name+' ×'+(i.qty||1));
    const resources='PV '+safe(c.pvNow??status.pv)+' / '+status.pv+' · PE '+safe(c.peNow??status.pe)+' / '+status.pe+' · SAN '+safe(c.sanNow??status.san)+' / '+status.san;
-   return '<details class="op-master-char"><summary><div><strong>'+safe(c.name||'Sem nome')+'</strong><span>'+safe(row.display_name)+' · '+safe(className(c.class||'combatente'))+' · NEX '+safe(c.nex||5)+'%</span></div><span>Ver detalhes ▾</span></summary><div class="op-master-char-detail"><p>'+safe(resources)+'</p><p>AGI '+safe(attrs.agi??1)+' · FOR '+safe(attrs.for??1)+' · INT '+safe(attrs.int??1)+' · PRE '+safe(attrs.pre??1)+' · VIG '+safe(attrs.vig??1)+'</p><p>Origem: '+safe(c.origin||'Não informada')+' · Trilha: '+safe(c.trail||'Não definida')+'</p><small>Somente visualização. A edição da ficha pertence ao jogador que a criou.</small></div></details>';
+   const subsection=(title,values)=>'<details class="op-master-detail-group"><summary>'+safe(title)+' ('+values.length+')</summary><p>'+(values.length?values.map(safe).join(' · '):'Nenhum registro')+'</p></details>';
+   return '<details class="op-master-char"><summary><div><strong>'+safe(c.name||'Sem nome')+'</strong><span>'+safe(row.display_name)+' · '+safe(className(c.class||'combatente'))+' · '+(c.class==='sobrevivente'?'Estágio '+safe(c.stage||1):'NEX '+safe(c.nex||5)+'%')+'</span></div><span>Ver ficha ▾</span></summary><div class="op-master-char-detail"><p>'+safe(resources)+'</p><p>AGI '+safe(attrs.agi??1)+' · FOR '+safe(attrs.for??1)+' · INT '+safe(attrs.int??1)+' · PRE '+safe(attrs.pre??1)+' · VIG '+safe(attrs.vig??1)+'</p><p>Origem: '+safe(c.origin||'Não informada')+' · Trilha: '+safe(c.trail||'Não definida')+'</p>'
+    +subsection('Perícias treinadas',skillEntries.map(([name,rank])=>name+' +'+([0,5,10,15][rank]||0)))
+    +subsection('Poderes',powers)
+    +subsection('Rituais',rituals)
+    +subsection('Inventário',inventory)
+    +'<small>Somente visualização. A edição pertence à conta que criou a ficha.</small></div></details>';
   }));
-  return '<div class="op-master-roster-counter">'+total+' personagem(ns) em '+rows.length+' conta(s)</div>'
-   +(pieces.join('')||'<div class="empty">Nenhum personagem cadastrado.</div>');
+  return '<div class="op-master-roster-counter">'+total+' personagem(ns) em '+rows.length+' conta(s)</div>'+(pieces.join('')||'<div class="empty">Nenhum personagem cadastrado.</div>');
  }
  async function renderMasterRoster(force=false){
   const box=document.getElementById('masterAccountRoster');
