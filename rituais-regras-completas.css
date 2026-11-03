@@ -1,0 +1,60 @@
+
+/* Grimório técnico: consulta rápida de todas as fichas dos rituais */
+.grimoire-ritual-pills{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 10px}
+.grimoire-ritual-pills span{
+ display:inline-flex;align-items:center;gap:3px;
+ padding:5px 8px;border:1px solid #6a4d48;border-radius:999px;
+ font-size:10px;font-weight:750;letter-spacing:.02em;
+ color:#eed5bd;background:#2a2020
+}
+.grimoire-tech{margin-top:11px;border:1px solid #6d5347;background:linear-gradient(135deg,#241d20,#161317);border-radius:10px;overflow:hidden}
+.grimoire-tech>summary{
+ display:flex;align-items:center;gap:9px;justify-content:space-between;
+ cursor:pointer;list-style:none;padding:11px 13px;
+ font-size:11px;letter-spacing:.025em;color:#efcaa3;font-weight:850;
+ transition:background .18s;
+}
+.grimoire-tech>summary::-webkit-details-marker{display:none}
+.grimoire-tech>summary:hover,.grimoire-tech[open]>summary{background:#42302b}
+.grimoire-tech[open]>summary{border-bottom:1px solid #735044}
+.grimoire-tech>summary:focus-visible{outline:2px solid #d3a170;outline-offset:-3px}
+.grimoire-tech-content{padding:12px;display:grid;gap:10px}
+.grimoire-tech-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.grimoire-tech-field{min-width:0;display:flex;flex-direction:column;gap:5px;padding:10px 11px;border:1px solid #675048;border-radius:8px;background:#1c171a}
+.grimoire-tech-field small{font-size:9px;letter-spacing:.1em;color:#b9a093;text-transform:uppercase;font-weight:800}
+.grimoire-tech-field strong{font-size:12px;line-height:1.5;overflow-wrap:anywhere;color:#f1ddc6}
+.grimoire-tech h4{margin:8px 0 2px;font:700 15px Georgia,serif;color:#f1d8b6}
+.grimoire-tech-upgrade{padding:10px 11px;border:1px solid #644d42;border-radius:8px;background:#21181e;margin-bottom:7px}
+.grimoire-tech-upgrade>div{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px}
+.grimoire-tech-upgrade b{font:700 14px Georgia,serif;color:#f3d4ab}
+.grimoire-tech-upgrade span{font-size:10px;line-height:1.55;font-weight:700;color:#e4b694}
+.grimoire-tech-upgrade p{font-size:11px;line-height:1.55;color:#e0c9b9;margin:6px 0 0}
+.grimoire-tech-none{margin:0;color:#c9b3a5;font-size:11px}
+.grimoire-tech-source{margin:0;border-top:1px solid #56433e;padding-top:11px;line-height:1.5;font-size:10px;color:#aa9388}
+.grimoire-ritual-entry{min-width:0;min-height:210px;display:flex;flex-direction:column}
+.grimoire-ritual-entry .grimoire-tech{margin-bottom:12px}
+.grimoire-ritual-entry .grimoire-ritual-entry-foot{margin-top:auto}
+.grimoire-rules-filters{display:flex;flex-wrap:wrap;gap:11px;margin:-1px 0 14px}
+.grimoire-rules-filters label{display:grid;gap:6px;flex:1 1 170px;color:#c1a79a;letter-spacing:.07em;font-size:9px;font-weight:850}
+.grimoire-rules-filters select{
+ width:100%;min-width:0;border:1px solid #725b4e;background:#1a161a;color:#efdfcb;
+ border-radius:7px;padding:10px;font-size:11px;
+}
+.grimoire-ritual-variant{display:grid;gap:5px;color:#ceb098;font-size:10px;font-weight:800}
+.grimoire-ritual-variant select{width:100%;min-width:0;box-sizing:border-box;background:#281f21;border:1px solid #8b6b57;color:#f4dfc4;border-radius:7px;padding:9px 10px;font-size:11px}
+.pe-ritual-card .grimoire-tech{margin-top:9px}
+.pe-ritual-card .grimoire-tech-content{gap:10px}
+.pe-ritual-card .grimoire-tech-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:680px){
+ .grimoire-tech-fields,.pe-ritual-card .grimoire-tech-fields{grid-template-columns:1fr}
+ .grimoire-tech-content{padding:10px}
+ .grimoire-rules-filters{gap:8px}
+ .grimoire-ritual-entry{min-height:0}
+}
+@media(prefers-reduced-motion:reduce){.grimoire-tech>summary{transition:none}}
+
+/* Rituais ainda bloqueados continuam legíveis para consulta e planejamento. */
+.ritual-catalog-item.locked{opacity:.89}
+.ritual-catalog-item.locked .grimoire-tech-content{opacity:1}
+.ritual-catalog-item.locked .grimoire-ritual-description{color:#d8bfae}
+.ritual-catalog-item.locked .grimoire-ritual-status{color:#d0aba0}

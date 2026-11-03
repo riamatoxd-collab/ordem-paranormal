@@ -311,3 +311,30 @@ A ficha tradicional permanece disponível para agentes comuns, mas parte dos con
 Em **Painel do Mestre → Os Cinco Samurais**, cada cartão apresenta PV, PD, Defesa, elemento, marca, ordem no ritual e detalhes da habilidade. O botão **Editar ficha** permite ajustar atributos, PV/PD máximos e atuais, Defesa, Deslocamento, marca, ordem, arma, fórmulas de dano, perícias especiais e a única habilidade. Para editar, a ficha precisa estar **desatribuída**, evitando sobrescrever o progresso de jogadores.
 
 As alterações de fichas especiais não alteram os demais personagens e o jogador não perde suas fichas comuns. Nenhuma atribuição nova de samurai é feita automaticamente.
+
+## Grimório — fichas de regras de todos os rituais
+
+Fontes fornecidas para esta atualização: **Ordem Paranormal RPG v1.3**, seção de rituais (páginas impressas 124–143), e **Sobrevivendo ao Horror v1.3.1**, rituais adicionais (páginas impressas 48–56).
+
+### Cobertura
+
+- **101 entradas pesquisáveis**: 85 no catálogo básico (82 nomes únicos, pois Amaldiçoar Arma pode ser aprendido em quatro elementos) e 16 rituais de Sobrevivendo ao Horror.
+- **98 fichas mecânicas distintas** no arquivo `rituais-regras-completas.js`.
+- **154 versões adicionais** com seus custos de PE, exigência de círculo e afinidade quando explicitamente prevista, registradas na base de dados dos rituais.
+- **83 rituais com versões adicionais** têm notas originais e resumidas das alterações entre Discente e Verdadeiro em `rituais-aprimoramentos.js`. Os 15 restantes não têm essas versões listadas nos livros.
+- Cada ficha inclui, conforme as informações que efetivamente constam na obra: execução, alcance, alvo/área/efeito, duração, resistência, custo básico, formas aprimoradas e referência de livro/página. Campo não especificado no quadro original não é inventado.
+- O resumo geral do efeito continua sendo um texto de consulta autoral existente em `rituais-descricoes.js`; os três arquivos são carregados **antes** do sistema principal.
+
+### Como consultar
+
+Em **Grimório → Rituais**, use filtros por nome, efeito, execução, alcance e resistência, além de elemento, círculo, fonte e status de desbloqueio. Abra **Ficha técnica e formas Discente/Verdadeira** para consultar os números e requisitos. Os cartões bloqueados continuam legíveis.
+
+Na área **Rituais conhecidos**, as fichas técnicas também ficam disponíveis. Um seletor **Forma do ritual** permite preencher os PE adicionais a gastar de acordo com a versão escolhida. Opções são desabilitadas quando a versão precisa de círculo superior ao disponível pelo NEX, de afinidade não despertada ou de um gasto maior que o limite permitido. O campo manual de PE adicionais permanece para poderes e modificações especiais de ficha.
+
+### Limites da consulta
+
+- O Grimório é um **guia estruturado e reescrito**, não uma transcrição integral de conteúdo protegido por direitos autorais. Restrições narrativas, escolhas com múltiplas modalidades, interações entre regras e exceções específicas continuam sendo resolvidas nas páginas indicadas do livro.
+- Custos e requisitos são baseados nas fichas presentes nas edições listadas acima. O site não compara outras edições ou erratas não fornecidas.
+- Nenhuma ficha salva no navegador ou no Supabase foi alterada. A atualização amplia apenas o catálogo, a visualização e os controles de consulta/conjuração já existentes.
+- `rituais-regras-completas.js` armazena uma ficha por **nome**, compartilhada entre as quatro variantes de `Amaldiçoar Arma`; o elemento da variante é exibido pelo catálogo original.
+- As 154 notas de aprimoramento apresentam sínteses breves de seus efeitos, não todos os parágrafos originais das regras.
