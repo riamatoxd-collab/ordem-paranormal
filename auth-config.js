@@ -1,7 +1,6 @@
-/* Cole a URL e a chave PUBLICÁVEL (anon) do seu projeto Supabase.
-   Nunca coloque service_role/secret key no navegador.
-   Sem configuração, Entrar/Cadastrar funciona SOMENTE neste navegador. */
+/* Integração Supabase Auth + tabelas protegidas por RLS.
+   Apenas chave pública publishable; nunca inclua secret/service_role. */
 window.OP_AUTH_CONFIG = {
-  supabaseUrl: "",
-  supabaseAnonKey: ""
+  supabaseUrl: "https://dmmczcdkparacicpnkfz.supabase.co",
+  supabaseAnonKey: "sb_publishable_PoAfSBraQgYCS_ABtzk50A_nZRsqZ5P"
 };
