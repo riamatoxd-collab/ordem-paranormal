@@ -559,6 +559,16 @@
    const displayPowers=[...(c.powers?.class||[]),...(c.powers?.paranormal||[])].map(safe).join(' • ');
    const displayRituals=(c.powers?.rituals||[]).map(safe).join(' • ');
    const displayInventory=(c.inventory||[]).map(i=>safe(i?.name||'')).filter(Boolean).join(' • ');
+   const sh=c.samuraiSheet||{},skillFormula=(sh.skills||[]).map(sk=>safe(sk.name)+' '+safe(sk.dice)+'d20 + '+safe(sk.bonus)).join(' · ');
+   const ancestralInfo='<div class="samurai-special-data">'
+    +'<p><strong>ELEMENTO:</strong> '+safe(sh.element||'—')+' · <strong>Marca:</strong> '+safe(sh.mark||'—')+'</p>'
+    +'<p><strong>Ritual:</strong> '+safe(sh.order||'—')+'º a tocar a pedra · “'+safe(sh.phrase||'—')+'”</p>'
+    +'<p><strong>Armadura:</strong> '+safe(sh.armor||'—')+' · <strong>Deslocamento:</strong> '+safe(sh.speed||'—')+' m</p>'
+    +'<p><strong>Perícias especiais:</strong> '+(skillFormula||'Nenhuma')+'</p>'
+    +'<p><strong>Arma:</strong> '+safe(sh.weapon?.name||'—')+' · '+safe(sh.weapon?.dice||0)+'d20 + '+safe(sh.weapon?.bonus||0)+'</p>'
+    +'<p><strong>Dano:</strong> '+safe(sh.weapon?.damage||'—')+' · <strong>Crítico:</strong> '+safe(sh.weapon?.critical||'—')+'</p>'
+    +'<p><strong>Habilidade única:</strong> '+safe(sh.ability?.name||'—')+' · '+safe(sh.ability?.cost||0)+' PD · '+safe(sh.ability?.trigger||'—')+'</p>'
+    +'<p>'+safe(sh.ability?.description||'')+'</p></div>';
    const dossier='<details class="samurai-master-dossier"><summary>▤ Consultar ficha completa</summary><div>'
     +'<p><strong>Origem:</strong> '+safe(c.origin||'—')+'　<strong>Trilha:</strong> '+safe(c.trail||'—')+'</p>'
     +'<p><strong>Perícias:</strong> '+(displaySkills||'Nenhuma')+'</p>'
@@ -566,12 +576,12 @@
     +'<p><strong>Rituais:</strong> '+(displayRituals||'Nenhum')+'</p>'
     +'<p><strong>Equipamentos:</strong> '+(displayInventory||'Nenhum')+'</p>'
     +'<p><strong>História:</strong> '+safe(c.backstory||'—')+'</p>'
-    +'<p><strong>Objetivo:</strong> '+safe(c.objective||'—')+'</p></div></details>';
+    +'<p><strong>Objetivo:</strong> '+safe(c.objective||'—')+'</p>'+ancestralInfo+'</div></details>';
    const playerOptions='<option value="">— Não atribuído —</option>'+samuraiPlayers.map(p=>'<option value="'+safe(p.id)+'" '+(slot.assigned_to===p.id?'selected':'')+'>'+safe(p.display_name)+'</option>').join('');
    return '<article class="samurai-master-card" style="--samurai-color:'+color+'" data-samurai="'+safe(slot.slug)+'">'
     +'<div class="samurai-master-card-top"><div class="samurai-master-sigil">✦</div><div><small>'+safe(slot.epithet)+'</small><h4>'+safe(slot.name)+'</h4><span>'+safe(className(c.class||'combatente'))+' • NEX '+safe(c.nex||5)+'%</span></div><span class="samurai-master-state">'+(hasOwner?'ATRIBUÍDO':'DISPONÍVEL')+'</span></div>'
     +'<div class="samurai-master-stats"><span><b>'+safe(attr.agi??1)+'</b> AGI</span><span><b>'+safe(attr.for??1)+'</b> FOR</span><span><b>'+safe(attr.int??1)+'</b> INT</span><span><b>'+safe(attr.pre??1)+'</b> PRE</span><span><b>'+safe(attr.vig??1)+'</b> VIG</span></div>'
-    +'<div class="samurai-master-resources"><span>♥ PV '+safe(c.pvNow??st.pv)+'</span><span>✧ PE '+safe(c.peNow??st.pe)+'</span><span>◉ SAN '+safe(c.sanNow??st.san)+'</span></div>'
+    +'<div class="samurai-master-resources"><span>♥ PV '+safe(c.pvNow??st.pv)+' / '+safe(c.samuraiSheet?.pv??st.pv)+'</span><span>✧ PD '+safe(c.pdNow??c.samuraiSheet?.pd??0)+' / '+safe(c.samuraiSheet?.pd??0)+'</span><span>⛨ DEF '+safe(c.samuraiSheet?.defense??'—')+'</span></div>'
     +dossier
     +'<label class="samurai-master-owner">JOGADOR RESPONSÁVEL<select id="samuraiAssign_'+safe(slot.slug)+'" aria-label="Atribuir '+safe(slot.name)+'">'+playerOptions+'</select></label>'
     +'<div class="samurai-master-actions"><button type="button" class="btn small" data-samurai="'+safe(slot.slug)+'" onclick="OPAccounts.editSamurai(this.dataset.samurai)" '+(hasOwner?'disabled title="Para proteger o progresso do jogador, desatribua antes de editar o modelo"':'')+'>✎ Editar ficha</button><button type="button" class="btn small primary" data-samurai="'+safe(slot.slug)+'" onclick="OPAccounts.assignSamurai(this.dataset.samurai)">✧ Salvar atribuição</button></div>'
