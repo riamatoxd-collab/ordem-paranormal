@@ -180,8 +180,18 @@ function finish(apply){
 function activeHtml(c){
  if(!c)return '';const a=entries(c);
  return '<section class="op-effects-panel"><header><div><small>CONTROLE DE CENA</small><h3>EFEITOS DE RITUAIS E PODERES</h3></div><b>'+a.length+' ativos</b></header>'+
+ ((+c.pvTemp||0)>0||(+c.pvTempPhysical||0)>0?'<p class="op-effect-note">PV temporários: '+(+c.pvTemp||0)+' gerais • '+(+c.pvTempPhysical||0)+' contra dano físico <button onclick="RitualEngine.usePhysicalTemp(\''+safe(c.id)+'\')">Descontar proteção física</button></p>':'')+
+ ((+c.flageloSpentPV||0)>0?'<p class="op-effect-note">Poder do Flagelo: '+(+c.flageloSpentPV||0)+' PV só recuperáveis com descanso. <button onclick="RitualEngine.rest(\''+safe(c.id)+'\')">Registrar descanso</button></p>':'')+
  (a.length?a.map(e=>'<div class="op-effect-item"><div><strong>'+safe(e.name)+'</strong><small>'+safe(e.source==='poder'?'Poder':'Ritual')+' • '+safe(e.duration||'Cena')+' • '+safe(e.targetName||c.name)+'</small>'+(e.condition?'<p>Condição: '+safe(e.condition)+'</p>':'')+(e.notes?'<p>'+safe(e.notes)+'</p>':'')+'</div><div>'+(e.mods?.healing?'<button type="button" onclick="RitualEngine.applyPowerHealing(\''+safe(c.id)+'\',\''+safe(e.id)+'\')">Curar '+e.mods.healing+' PV</button>':'')+(e.name==='Embaralhar'?'<button type="button" onclick="RitualEngine.loseMirror(\''+safe(c.id)+'\',\''+safe(e.id)+'\')">Perder cópia</button>':'')+((e.sustain&&e.casterId===c.id)?'<button type="button" onclick="RitualEngine.sustain(\''+safe(c.id)+'\',\''+safe(e.id)+'\')">Manter 1 PE</button>':'')+'<button type="button" onclick="RitualEngine.remove(\''+safe(c.id)+'\',\''+safe(e.id)+'\')">Encerrar</button></div></div>').join(''):'<p class="build-muted">Nenhum efeito ativo.</p>')+
  '<small>Efeitos sobre NPCs e jogadores de outras contas são registrados para resolução pelo mestre.</small></section>';
+}
+function usePhysicalTemp(id){
+ const c=get(id);if(!c||!(+c.pvTempPhysical>0))return;
+ const value=prompt('Quanto dano físico será absorvido pela Tela de Ruído? (PV temporários: '+c.pvTempPhysical+')','1');
+ if(value===null)return;
+ const n=Math.floor(Number(value));if(!Number.isInteger(n)||n<0){say('Informe um valor válido.');return}
+ const lost=Math.min(+c.pvTempPhysical||0,n);c.pvTempPhysical-=lost;
+ addHist({agent:c.name,label:'Tela de Ruído',detail:'Proteção física absorveu '+lost+' dano.',total:lost,status:'DEFESA',kind:'Ritual'});write();
 }
 function applyPowerHealing(id,eid){
  const c=get(id),e=entries(c).find(x=>x.id===eid);if(!e||!e.mods?.healing)return;
@@ -247,5 +257,5 @@ if(typeof oldAttack==='function')window.attack=function(){
 };
 const oldScene=window.endPEScene;
 if(typeof oldScene==='function')window.endPEScene=function(id){oldScene(id);endScene(id)};
-window.RitualEngine={registry:reg,afterCast,open,close,skillBonus,attribute,defenseBonus,attackBonus,bonusResistance,ritualCostDiscount,rollFormula,newTurn,endScene,rest,sustain,remove,activeHtml,cpTest,applyPowerHealing,loseMirror};
+window.RitualEngine={registry:reg,afterCast,open,close,skillBonus,attribute,defenseBonus,attackBonus,bonusResistance,ritualCostDiscount,rollFormula,newTurn,endScene,rest,sustain,remove,activeHtml,cpTest,applyPowerHealing,loseMirror,usePhysicalTemp};
 })();
