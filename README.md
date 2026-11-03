@@ -124,3 +124,13 @@ Projeto independente, não oficial e sem vínculo com Ordem Paranormal, Cellbit 
 - A progressão de círculos e rituais conhecidos respeita classe, NEX, trilha e o poder **Aprender Ritual**. O arquivo de rituais permite filtrar por nome, elemento e círculo.
 - Os rituais conhecidos usam os controles de conjuração já existentes, com custos de PE, aprimoramentos e histórico.
 - A página apresenta a orientação de estudo de rituais de *Sobrevivendo ao Horror*. As regras opcionais de aprendizado lento não são ativadas automaticamente.
+
+## Poderes adicionais na ficha de agente
+
+Na seção **Poderes & Habilidades**, é possível adicionar poderes já cadastrados nos catálogos de classe, paranormal, origem e trilha; também é possível criar poderes personalizados com nome, descrição, custo opcional de PE e limite por turno ou cena.
+
+- Poderes adicionados manualmente são **concessões da mesa** e não substituem as escolhas oficiais de progressão por NEX. A aplicação de pré-requisitos e efeitos passivos deve ser acordada com o mestre.
+- Poderes personalizados ativáveis consomem PE conforme o custo informado, respeitam os limites do sistema e registram a ativação no histórico do mestre.
+- Poderes do catálogo com ações de PE implementadas no sistema podem ser utilizados na seção de habilidades de PE. Seus custos são definidos pelo sistema; custos manuais servem para poderes sem ação automática.
+- Poderes adicionais podem ser removidos, e os personalizados também podem ser editados.
+- Os poderes são armazenados na ficha no navegador atual e preservados quando o agente é editado; ainda não há sincronização entre dispositivos.
