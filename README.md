@@ -134,3 +134,15 @@ Na seção **Poderes & Habilidades**, é possível adicionar poderes já cadastr
 - Poderes do catálogo com ações de PE implementadas no sistema podem ser utilizados na seção de habilidades de PE. Seus custos são definidos pelo sistema; custos manuais servem para poderes sem ação automática.
 - Poderes adicionais podem ser removidos, e os personalizados também podem ser editados.
 - Os poderes são armazenados na ficha no navegador atual e preservados quando o agente é editado; ainda não há sincronização entre dispositivos.
+
+## Grimório — descrições e referências dos rituais
+
+O catálogo inclui **85 opções de ritual do Livro Básico v1.3**, correspondentes a 82 nomes (Amaldiçoar Arma possui quatro variações elementais), além de **16 rituais adicionais de Sobrevivendo ao Horror v1.3.1**: 101 opções no total.
+
+- Cada ritual mostra elemento, círculo, custo básico de PE, descrição resumida e o livro/página para consulta.
+- A busca do Grimório aceita tanto o nome quanto palavras dos resumos; os filtros por elemento e círculo permanecem.
+- Os rituais conhecidos na ficha têm uma seção expansível **Descrição e referência**; os botões de conjuração foram preservados.
+- Os textos de `rituais-descricoes.js` são resumos escritos para este aplicativo, não transcrições dos livros. Os aprimoramentos Discente/Verdadeiro, testes, condições, componentes e exceções continuam sujeitos às regras originais.
+- Os 16 rituais do suplemento entram no catálogo geral e podem ser aprendidos quando atenderem aos filtros de círculo/NEX já implementados na aplicação.
+
+**Fontes:** *Ordem Paranormal RPG v1.3*, seção Descrição dos Rituais, pp. 124–143; *Sobrevivendo ao Horror v1.3.1*, seção Novos Rituais, pp. 48–56.
