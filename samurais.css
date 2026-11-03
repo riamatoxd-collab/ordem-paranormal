@@ -1,0 +1,142 @@
+
+/* =======================================================
+   OS CINCO SAMURAIS — ARQUIVO DO MESTRE E FICHAS COLORIDAS
+   ======================================================= */
+#v-mestre .samurai-master-section{
+ margin:4px 15px 18px;
+ padding:16px;
+ border:1px solid #94735a;
+ border-radius:12px;
+ background:radial-gradient(circle at 84% 0,#ad6c5430,transparent 45%),linear-gradient(135deg,#20151b,#0f0d10);
+ box-shadow:inset 0 0 0 1px #47302a;
+}
+#v-mestre .samurai-master-header{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ flex-wrap:wrap;
+ gap:14px;
+ padding-bottom:15px;
+ margin-bottom:14px;
+ border-bottom:1px solid #735647;
+}
+#v-mestre .samurai-master-header>div{display:grid;gap:5px}
+#v-mestre .samurai-master-header small{color:#cdb08c;font-size:9px;letter-spacing:.16em;font-weight:800}
+#v-mestre .samurai-master-header h3{
+ font:700 clamp(21px,2.5vw,28px) Georgia,serif;
+ color:#f3d8af;
+ margin:0;
+}
+#v-mestre .samurai-master-header p{max-width:570px;color:#bea9a0;font-size:11px;line-height:1.55;margin:0}
+#v-mestre .samurai-master-header button{border-color:#98785c;color:#f6d4aa;background:#3e282d;border-radius:7px;padding:9px 12px}
+#v-mestre .samurai-master-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#v-mestre .samurai-master-card{
+ --samurai-color:#ab7a68;
+ min-width:0;
+ padding:14px;
+ border-radius:10px;
+ border:1px solid color-mix(in srgb,var(--samurai-color) 65%,#5e4a40);
+ border-top:3px solid var(--samurai-color);
+ background:radial-gradient(circle at 85% 0,color-mix(in srgb,var(--samurai-color) 15%,transparent),transparent 55%),#1a1217;
+ box-shadow:inset 0 0 0 1px #0007,0 8px 22px #0004;
+ display:grid;gap:12px;
+}
+#v-mestre .samurai-master-card-top{display:flex;align-items:center;gap:10px;min-width:0}
+#v-mestre .samurai-master-sigil{
+ flex:none;display:grid;place-items:center;width:43px;height:43px;
+ color:var(--samurai-color);font-size:27px;
+ border:1px solid var(--samurai-color);border-radius:50%;
+ box-shadow:0 0 16px color-mix(in srgb,var(--samurai-color) 22%,transparent);
+}
+#v-mestre .samurai-master-card-top>div:nth-child(2){min-width:0;display:grid;gap:4px}
+#v-mestre .samurai-master-card-top small{font-size:9px;letter-spacing:.14em;color:var(--samurai-color);font-weight:850}
+#v-mestre .samurai-master-card-top h4{font:700 18px Georgia,serif;color:#fae5cc;margin:0;overflow-wrap:anywhere}
+#v-mestre .samurai-master-card-top span:not(.samurai-master-state){font-size:10px;color:#cbb2a5}
+#v-mestre .samurai-master-state{margin-left:auto;align-self:start;white-space:nowrap;font-size:9px;color:#e5c19a;border:1px solid #8f7356;background:#271b1e;padding:5px 6px;border-radius:5px;letter-spacing:.05em}
+#v-mestre .samurai-master-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+#v-mestre .samurai-master-stats span{
+ text-align:center;border:1px solid #5d4843;background:#130e12;
+ padding:7px 2px;border-radius:6px;font-size:10px;color:#bda49b;
+ display:flex;flex-direction:column;gap:4px;
+}
+#v-mestre .samurai-master-stats b{color:#f4d8b6;font-size:19px}
+#v-mestre .samurai-master-resources{display:flex;gap:7px;flex-wrap:wrap}
+#v-mestre .samurai-master-resources span{flex:1 1 auto;font-size:11px;text-align:center;border-radius:6px;background:#39232a;border:1px solid #745448;color:#ecd3bb;padding:8px 5px}
+#v-mestre .samurai-master-owner{display:grid;gap:7px;font-size:9px;letter-spacing:.08em;font-weight:800;color:#d7b69c}
+#v-mestre .samurai-master-owner select{
+ width:100%;min-width:0;border:1px solid #a58165;border-radius:7px;background:#e1cfb1;color:#291a22;
+ font-size:12px;padding:10px;
+}
+#v-mestre .samurai-master-actions{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap}
+#v-mestre .samurai-master-actions button{flex:1 1 120px;min-height:38px;font-size:11px;border:1px solid #8e6858;border-radius:7px;color:#edd3bb;background:#3a262d;padding:8px}
+#v-mestre .samurai-master-actions button.primary{
+ background:linear-gradient(115deg,color-mix(in srgb,var(--samurai-color) 45%,#2b151d),#55262e);
+ border-color:var(--samurai-color);
+}
+#v-mestre .samurai-master-actions button:disabled{opacity:.43;cursor:not-allowed}
+#v-mestre .samurai-master-tip{font-size:10px;line-height:1.45;color:#b6a39a}
+#v-mestre .samurai-info,#v-mestre .samurai-error{color:#d4b49c;font-size:12px;line-height:1.6}
+#v-mestre .samurai-error{color:#f0a6a4}
+.samurai-editor-modal[hidden]{display:none!important}
+.samurai-editor-modal{
+ position:fixed;inset:0;z-index:30000;display:flex;align-items:center;justify-content:center;overflow-y:auto;
+ padding:12px;background:#090609ea;backdrop-filter:blur(7px);
+}
+.samurai-editor-dialog{
+ --samurai-color:#af7969;width:min(100%,910px);max-height:94dvh;overflow:auto;color:#ead6c3;
+ border-radius:12px;border:1px solid var(--samurai-color);
+ background:radial-gradient(circle at 75% 0,color-mix(in srgb,var(--samurai-color) 12%,transparent),transparent 50%),#191119;
+ box-shadow:0 24px 100px #000e;
+}
+.samurai-editor-head{position:sticky;top:0;z-index:1;background:#25171d;padding:17px 19px;border-bottom:2px solid var(--samurai-color);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.samurai-editor-head>div{display:grid;gap:6px}
+.samurai-editor-head small{font-size:9px;letter-spacing:.15em;color:var(--samurai-color);font-weight:800}
+.samurai-editor-head h2{font:700 clamp(22px,3.5vw,32px) Georgia,serif;color:#f6ddbb;margin:0}
+.samurai-editor-head button{border-color:#9d715e;color:#e9c5ac;background:#3b242a;border-radius:7px}
+#samuraiEditorForm{padding:18px;display:grid;gap:16px}
+.samurai-editor-intro{font-size:12px;color:#c5aea2;line-height:1.65;margin:0}
+.samurai-editor-group{padding:14px;border:1px solid #785549;border-radius:9px;background:#1c1419}
+.samurai-editor-group h3{font:700 16px Georgia,serif;color:#edcb9f;margin:0 0 12px}
+.samurai-editor-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.samurai-editor-fields label{display:grid;gap:6px;color:#d1b6a1;font-size:10px;font-weight:700;min-width:0}
+.samurai-editor-fields input,.samurai-editor-fields select,.samurai-editor-fields textarea{
+ width:100%;min-width:0;box-sizing:border-box;border:1px solid #92715d;border-radius:6px;background:#e4d3b8;color:#291b24;
+ padding:9px;font-family:inherit;font-size:12px;
+}
+.samurai-editor-fields textarea{resize:vertical;line-height:1.5}
+.samurai-editor-attributes{grid-template-columns:repeat(5,minmax(0,1fr))}
+.samurai-editor-skills{grid-template-columns:repeat(4,minmax(0,1fr))}
+.samurai-editor-fields label:has(textarea){grid-column:span 3}
+.samurai-editor-footer{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;border-top:1px solid #675046;padding-top:14px}
+.samurai-editor-footer .btn{border:1px solid #9c735b;padding:10px 15px;border-radius:7px}
+.samurai-editor-footer .primary{color:#fff0df;background:linear-gradient(110deg,var(--samurai-color),#612838)}
+/* Fichas atribuídas: a cor distingue sem modificar os demais agentes. */
+.agent.agent-samurai{border-left:4px solid var(--samurai-color)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--samurai-color) 35%,transparent)}
+.agent.agent-samurai .avatar{color:var(--samurai-color)!important;text-shadow:0 0 9px color-mix(in srgb,var(--samurai-color) 38%,transparent)}
+.paper-v2.paper-samurai{border-top:4px solid var(--samurai-color)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--samurai-color) 40%,transparent)}
+.paper-v2.paper-samurai .paper-head{border-bottom-color:var(--samurai-color)!important}
+.paper-v2.paper-samurai .paper-head small{color:var(--samurai-color)!important}
+.op-registration-card.op-samurai-card{border-left:4px solid var(--samurai-color)!important}
+.op-registration-card.op-samurai-card b{color:var(--samurai-color)}
+@media(max-width:910px){
+ #v-mestre .samurai-master-grid{grid-template-columns:1fr}
+ .samurai-editor-skills{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:610px){
+ #v-mestre .samurai-master-section{margin:0 9px 14px;padding:10px}
+ #v-mestre .samurai-master-card{padding:10px}
+ #v-mestre .samurai-master-card-top{flex-wrap:wrap}
+ .samurai-editor-fields,.samurai-editor-skills{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .samurai-editor-attributes{grid-template-columns:repeat(5,minmax(0,1fr));gap:3px}
+ .samurai-editor-attributes input{padding:7px 3px}
+ .samurai-editor-fields label:has(textarea){grid-column:span 2}
+ #samuraiEditorForm{padding:12px}
+ .samurai-editor-head{padding:12px}
+}
+
+#v-mestre .samurai-master-dossier{border:1px solid #71554b;border-radius:7px;background:#130f13;overflow:hidden}
+#v-mestre .samurai-master-dossier>summary{cursor:pointer;color:#e3c29e;padding:10px 11px;font-size:11px;font-weight:800}
+#v-mestre .samurai-master-dossier[open]>summary{border-bottom:1px solid #71554b;background:#302029}
+#v-mestre .samurai-master-dossier>div{padding:7px 12px;display:grid;gap:6px}
+#v-mestre .samurai-master-dossier p{color:#d6bdab;font-size:10px;line-height:1.6;overflow-wrap:anywhere;margin:0}
+#v-mestre .samurai-master-dossier strong{color:#f0d7b5}

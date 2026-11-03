@@ -20,6 +20,8 @@
  let rosterRequest=null;
  let refreshPromise=null;
  let authTab='login';
+ let assignedSamurai=null, lastSamuraiSnapshot='', pendingSamurai=null, samuraiSaveChain=Promise.resolve();
+ let samuraiRows=null, samuraiPlayers=[], samuraiFetchAt=0, samuraiFetchPromise=null;
  let knowledgeSoundEnabled=true;
  let knowledgeAudio=null;
  let authReady=false;
@@ -31,10 +33,10 @@
  function pendingKey(id){return 'op_account_pending_v2_'+id}
  function safe(s){return esc(String(s??''))}
  function accountList(){return readJson(accountKey,[])}
- function vaultSnapshot(){return {characters:agents,history:hist,selected:selected}}
+ function vaultSnapshot(){return {characters:agents.filter(c=>!c.samuraiSlug),history:hist,selected:selected}}
  function setVault(value){
   const v=value&&typeof value==='object'?value:{};
-  agents=Array.isArray(v.characters)?v.characters:[];
+  agents=Array.isArray(v.characters)?v.characters.filter(c=>!c.samuraiSlug):[];
   hist=Array.isArray(v.history)?v.history:[];
   selected=agents.some(x=>x.id===v.selected)?v.selected:(agents[0]?.id||null);
  }
@@ -100,7 +102,7 @@
  }
  function queueCloudSave(){
   if(!online||!account)return;
-  dirtySnapshot={characters:JSON.parse(JSON.stringify(agents)),history:JSON.parse(JSON.stringify(hist))};
+  dirtySnapshot={characters:JSON.parse(JSON.stringify(agents.filter(c=>!c.samuraiSlug))),history:JSON.parse(JSON.stringify(hist))};
   saveJson(pendingKey(account.id),dirtySnapshot);
   cloudSaveChain=cloudSaveChain.then(syncCloud).catch(e=>console.warn(e));
  }
@@ -108,7 +110,7 @@
   if(!account)return;
   const snap=vaultSnapshot();
   saveJson(vaultKey(account.id),snap);
-  if(online)queueCloudSave();
+  if(online){queueCloudSave();queueSamuraiSave()}
  };
  render=function(){
   originalRender();
@@ -130,6 +132,7 @@
    if(pending){setVault({...pending,selected:readJson(vaultKey(account.id),{}).selected});}
    saveJson(vaultKey(account.id),vaultSnapshot());
    if(pending){dirtySnapshot=pending;cloudSaveChain=cloudSaveChain.then(syncCloud);}
+   await loadAssignedSamurai();
   }else{
    setVault(readJson(vaultKey(account.id),{characters:[],history:[]}));
   }
@@ -192,10 +195,11 @@
  }
  async function logout(){
   if(online){
-   await cloudSaveChain.catch(()=>{});
+   await Promise.all([cloudSaveChain.catch(()=>{}),samuraiSaveChain.catch(()=>{})]);
    try{await api('/auth/v1/logout','POST',{},token)}catch(e){}
   }
   account=null;token='';refreshToken='';rosterCache=null;lastRosterFetch=0;
+  assignedSamurai=null;lastSamuraiSnapshot='';pendingSamurai=null;samuraiRows=null;samuraiPlayers=[];
   sessionStorage.removeItem(currentSessionKey);
   if(typeof window.lockMasterPanel==='function'&&document.getElementById('v-mestre')?.classList.contains('active'))window.lockMasterPanel();
   setVault({characters:[],history:[]});authReady=false;
@@ -230,7 +234,14 @@
    db();render();say('Fichas antigas importadas.');
   },
   renderMasterRoster,
-  refreshMasterRoster(){rosterCache=null;lastRosterFetch=0;renderMasterRoster(true)}
+  refreshMasterRoster(){rosterCache=null;lastRosterFetch=0;renderMasterRoster(true)},
+  renderSamurais,
+  refreshSamurais(){samuraiRows=null;samuraiFetchAt=0;renderSamurais(true)},
+  editSamurai,
+  assignSamurai,
+  closeSamuraiEditor,
+  saveSamuraiEditor,
+  selectedSamuraiColor(id){return samuraiColorOf(agents.find(c=>c.id===id))}
  };
  const authGate=document.createElement('div');
  authGate.className='op-auth-gate';authGate.id='opAuthGate';
@@ -319,11 +330,245 @@
   if(!list||!meta)return;
   meta.textContent=account?'LOGADO COMO: '+account.displayName+' • '+(online?'CONTA CONECTADA':'CONTA LOCAL'):'Faça login para registrar seus personagens.';
   list.innerHTML=agents.map(c=>
-   '<article class="op-registration-card"><div><b>'+safe(c.name)+'</b><small>'+safe(className(c.class))+' • '+(c.class==='sobrevivente'?'Estágio '+safe(c.stage):'NEX '+safe(c.nex)+'%')+'</small><small>PV '+safe(c.pvNow||0)+' • PE '+safe(c.peNow||0)+' • SAN '+safe(c.sanNow||0)+'</small></div><div><button type="button" class="btn small" data-id="'+safe(c.id)+'" onclick="OPAccounts.showCharacter(this.dataset.id)">Ver ficha</button><button type="button" class="btn small" data-id="'+safe(c.id)+'" onclick="openModal(this.dataset.id)">Editar</button></div></article>'
+   '<article class="op-registration-card '+(c.samuraiSlug?'op-samurai-card':'')+'" style="--samurai-color:'+(c.samuraiSlug?samuraiColorOf(c):'#b48e69')+'"><div><b>'+safe(c.name)+'</b><small>'+safe(className(c.class))+' • '+(c.class==='sobrevivente'?'Estágio '+safe(c.stage):'NEX '+safe(c.nex)+'%')+'</small><small>PV '+safe(c.pvNow||0)+' • PE '+safe(c.peNow||0)+' • SAN '+safe(c.sanNow||0)+'</small></div><div><button type="button" class="btn small" data-id="'+safe(c.id)+'" onclick="OPAccounts.showCharacter(this.dataset.id)">Ver ficha</button><button type="button" class="btn small" data-id="'+safe(c.id)+'" onclick="openModal(this.dataset.id)">Editar</button></div></article>'
   ).join('')||'<div class="empty">Nenhum personagem nesta conta. Clique em “Criar novo personagem”.</div>';
   noteLegacy();
  }
  window.OPAccounts.showCharacter=function(id){selected=id;view('agents')};
+
+ // Cinco Samurais — fichas individuais atribuídas por servidor, não por localStorage compartilhado.
+ const samuraiInfo=[
+  {slug:'akira',name:'Akira Kurogane',color:'#C34954',element:'Lâmina Rubra'},
+  {slug:'ichiro',name:'Ichiro Yamioka',color:'#8F70CB',element:'Sombra Violeta'},
+  {slug:'masamune',name:'Masamune Hayato',color:'#D4A14D',element:'Sol Dourado'},
+  {slug:'reiji',name:'Reiji Kuronami',color:'#4888CA',element:'Maré Azul'},
+  {slug:'takeda',name:'Takeda Shirogane',color:'#58A894',element:'Jade Silencioso'}
+ ];
+ function samuraiColorOf(character){
+  const color=String(character?.samuraiColor||'');
+  return /^#[0-9a-f]{6}$/i.test(color)?color:'#b48e69';
+ }
+ function playerHasSamurai(){return !!assignedSamurai}
+ async function loadAssignedSamurai(){
+  assignedSamurai=null;lastSamuraiSnapshot='';pendingSamurai=null;
+  if(!online||!account)return;
+  const result=await api('/rest/v1/samurai_slots?assigned_to=eq.'+encodeURIComponent(account.id)+'&select=slug,color,name,character');
+  if(!Array.isArray(result)||!result.length)return;
+  const slot=result[0];
+  const c={...slot.character,id:'samurai_'+slot.slug,name:slot.name,samuraiSlug:slot.slug,samuraiColor:slot.color};
+  const pending=readJson('op_pending_samurai_'+account.id,null);
+  if(pending&&pending.slug===slot.slug&&pending.character){
+   Object.assign(c,pending.character,{id:'samurai_'+slot.slug,name:slot.name,samuraiSlug:slot.slug,samuraiColor:slot.color});
+   pendingSamurai=pending;
+  }
+  assignedSamurai=slot.slug;
+  agents=agents.filter(x=>x.id!==c.id).concat(c);
+  lastSamuraiSnapshot=JSON.stringify(c);
+  if(pendingSamurai)samuraiSaveChain=samuraiSaveChain.then(syncSamuraiSave);
+ }
+ async function syncSamuraiSave(){
+  const pending=pendingSamurai;
+  if(!online||!account||!token||!pending)return;
+  const owner=account.id;
+  pendingSamurai=null;
+  try{
+   await api('/rest/v1/rpc/samurai_save_progress','POST',{p_slug:pending.slug,p_character:pending.character});
+   if(!pendingSamurai&&account?.id===owner)localStorage.removeItem('op_pending_samurai_'+owner);
+  }catch(e){
+   if(account?.id===owner){
+    pendingSamurai=pendingSamurai||pending;
+    saveJson('op_pending_samurai_'+owner,pendingSamurai);
+    const notice=document.getElementById('opAccountSync');
+    if(notice)notice.textContent='Ficha do samurai guardada neste navegador; sincronização pendente: '+e.message;
+   }
+  }
+ }
+ function queueSamuraiSave(){
+  if(!assignedSamurai||!online||!account)return;
+  const character=agents.find(c=>c.samuraiSlug===assignedSamurai);
+  if(!character)return;
+  const snapshot=JSON.stringify(character);
+  if(snapshot===lastSamuraiSnapshot)return;
+  lastSamuraiSnapshot=snapshot;
+  pendingSamurai={slug:assignedSamurai,character:JSON.parse(snapshot)};
+  saveJson('op_pending_samurai_'+account.id,pendingSamurai);
+  samuraiSaveChain=samuraiSaveChain.then(syncSamuraiSave).catch(e=>console.warn('Samurai:',e));
+ }
+ async function fetchSamurais(force=false){
+  if(!account||!online||account.role!=='mestre')return false;
+  if(samuraiFetchPromise)return samuraiFetchPromise;
+  if(!force&&samuraiRows&&Date.now()-samuraiFetchAt<12000)return true;
+  samuraiFetchPromise=(async()=>{
+   const [slots,players]=await Promise.all([
+    api('/rest/v1/samurai_slots?select=slug,name,color,epithet,assigned_to,character,updated_at&order=slug.asc'),
+    api('/rest/v1/profiles?select=id,display_name,role&order=display_name.asc')
+   ]);
+   samuraiRows=slots;
+   samuraiPlayers=players.filter(p=>p.role==='jogador');
+   samuraiFetchAt=Date.now();
+   return true;
+  })();
+  try{return await samuraiFetchPromise}finally{samuraiFetchPromise=null}
+ }
+ function renderSamuraiCards(){
+  const box=document.getElementById('masterSamuraiCards');
+  if(!box||!samuraiRows)return;
+  box.innerHTML=samuraiInfo.map(info=>{
+   const slot=samuraiRows.find(s=>s.slug===info.slug);if(!slot)return '';
+   const c=slot.character||{},attr=c.attrs||{},st=stats(c),owner=samuraiPlayers.find(p=>p.id===slot.assigned_to);
+   const hasOwner=!!slot.assigned_to;
+   const color=/^#[0-9a-f]{6}$/i.test(slot.color)?slot.color:info.color;
+   const displaySkills=Object.entries(c.skills||{}).filter(([,level])=>+level>0).map(([skill,level])=>safe(skill)+' +'+[0,5,10,15][Math.min(3,Math.max(0,+level||0))]).join(' • ');
+   const displayPowers=[...(c.powers?.class||[]),...(c.powers?.paranormal||[])].map(safe).join(' • ');
+   const displayRituals=(c.powers?.rituals||[]).map(safe).join(' • ');
+   const displayInventory=(c.inventory||[]).map(i=>safe(i?.name||'')).filter(Boolean).join(' • ');
+   const dossier='<details class="samurai-master-dossier"><summary>▤ Consultar ficha completa</summary><div>'
+    +'<p><strong>Origem:</strong> '+safe(c.origin||'—')+'　<strong>Trilha:</strong> '+safe(c.trail||'—')+'</p>'
+    +'<p><strong>Perícias:</strong> '+(displaySkills||'Nenhuma')+'</p>'
+    +'<p><strong>Poderes:</strong> '+(displayPowers||'Nenhum')+'</p>'
+    +'<p><strong>Rituais:</strong> '+(displayRituals||'Nenhum')+'</p>'
+    +'<p><strong>Equipamentos:</strong> '+(displayInventory||'Nenhum')+'</p>'
+    +'<p><strong>História:</strong> '+safe(c.backstory||'—')+'</p>'
+    +'<p><strong>Objetivo:</strong> '+safe(c.objective||'—')+'</p></div></details>';
+   const playerOptions='<option value="">— Não atribuído —</option>'+samuraiPlayers.map(p=>'<option value="'+safe(p.id)+'" '+(slot.assigned_to===p.id?'selected':'')+'>'+safe(p.display_name)+'</option>').join('');
+   return '<article class="samurai-master-card" style="--samurai-color:'+color+'" data-samurai="'+safe(slot.slug)+'">'
+    +'<div class="samurai-master-card-top"><div class="samurai-master-sigil">✦</div><div><small>'+safe(slot.epithet)+'</small><h4>'+safe(slot.name)+'</h4><span>'+safe(className(c.class||'combatente'))+' • NEX '+safe(c.nex||5)+'%</span></div><span class="samurai-master-state">'+(hasOwner?'ATRIBUÍDO':'DISPONÍVEL')+'</span></div>'
+    +'<div class="samurai-master-stats"><span><b>'+safe(attr.agi??1)+'</b> AGI</span><span><b>'+safe(attr.for??1)+'</b> FOR</span><span><b>'+safe(attr.int??1)+'</b> INT</span><span><b>'+safe(attr.pre??1)+'</b> PRE</span><span><b>'+safe(attr.vig??1)+'</b> VIG</span></div>'
+    +'<div class="samurai-master-resources"><span>♥ PV '+safe(c.pvNow??st.pv)+'</span><span>✧ PE '+safe(c.peNow??st.pe)+'</span><span>◉ SAN '+safe(c.sanNow??st.san)+'</span></div>'
+    +dossier
+    +'<label class="samurai-master-owner">JOGADOR RESPONSÁVEL<select id="samuraiAssign_'+safe(slot.slug)+'" aria-label="Atribuir '+safe(slot.name)+'">'+playerOptions+'</select></label>'
+    +'<div class="samurai-master-actions"><button type="button" class="btn small" data-samurai="'+safe(slot.slug)+'" onclick="OPAccounts.editSamurai(this.dataset.samurai)" '+(hasOwner?'disabled title="Para proteger o progresso do jogador, desatribua antes de editar o modelo"':'')+'>✎ Editar ficha</button><button type="button" class="btn small primary" data-samurai="'+safe(slot.slug)+'" onclick="OPAccounts.assignSamurai(this.dataset.samurai)">✧ Salvar atribuição</button></div>'
+    +'<small class="samurai-master-tip">'+(hasOwner?'A ficha do jogador é editável por ele. Desatribuir preserva o estado atual.':'Ajuste a ficha e escolha a conta que irá interpretá-lo.')+'</small>'
+    +'</article>';
+  }).join('');
+ }
+ async function renderSamurais(force=false){
+  const box=document.getElementById('masterSamuraiCards');
+  if(!box||!account)return;
+  if(!online||account.role!=='mestre'){
+   box.innerHTML='<p class="samurai-info">Entre com uma conta de mestre conectada ao Supabase para administrar os samurais.</p>';
+   return;
+  }
+  if(!samuraiRows||force){box.innerHTML='<p class="samurai-info">Consultando os arquivos dos cinco samurais...</p>'}
+  try{await fetchSamurais(force);renderSamuraiCards()}
+  catch(e){box.innerHTML='<p class="samurai-error">Falha ao consultar os samurais: '+safe(e.message)+'</p>'}
+ }
+ async function assignSamurai(slug){
+  if(!online||!account||account.role!=='mestre')return;
+  const slot=samuraiRows?.find(s=>s.slug===slug),select=document.getElementById('samuraiAssign_'+slug);
+  if(!slot||!select)return;
+  const player=select.value||null;
+  if(player===slot.assigned_to)return say('Esta atribuição já está salva.');
+  const name=player?(samuraiPlayers.find(p=>p.id===player)?.display_name||'jogador'):'nenhum jogador';
+  if(!confirm('Atribuir '+slot.name+' a '+name+'? O jogador receberá a ficha na própria conta, sem substituir seus outros personagens.'))return;
+  select.disabled=true;
+  try{
+   await api('/rest/v1/rpc/samurai_assign','POST',{p_slug:slug,p_player:player});
+   samuraiRows=null;await fetchSamurais(true);
+   renderSamuraiCards();say(player?'Samurai atribuído! O jogador deve atualizar a página.':'Samurai desatribuído. Progresso preservado.');
+  }catch(e){
+   select.disabled=false;
+   say('Não foi possível atribuir: '+e.message);await renderSamurais(true);
+  }
+ }
+ let editSamuraiSlug=null;
+ function samuraiEditorModal(){
+  let el=document.getElementById('samuraiEditorModal');if(el)return el;
+  el=document.createElement('div');el.className='samurai-editor-modal';el.id='samuraiEditorModal';el.hidden=true;
+  el.innerHTML='<section class="samurai-editor-dialog" role="dialog" aria-modal="true" aria-labelledby="samuraiEditorTitle"><header class="samurai-editor-head"><div><small>ARQUIVO DO MESTRE • O JURAMENTO DOS CINCO</small><h2 id="samuraiEditorTitle">Editar samurai</h2></div><button type="button" class="btn small" onclick="OPAccounts.closeSamuraiEditor()">✕ Fechar</button></header><form id="samuraiEditorForm"><div id="samuraiEditorFields"></div><footer class="samurai-editor-footer"><button type="button" class="btn small" onclick="OPAccounts.closeSamuraiEditor()">Cancelar</button><button class="btn primary" type="submit">✧ Salvar ficha</button></footer></form></section>';
+  document.body.appendChild(el);
+  el.addEventListener('click',e=>{if(e.target===el)closeSamuraiEditor()});
+  el.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();closeSamuraiEditor()}});
+  el.querySelector('#samuraiEditorForm').addEventListener('submit',e=>{e.preventDefault();saveSamuraiEditor()});
+  return el;
+ }
+ function editSamurai(slug){
+  if(!account||account.role!=='mestre')return;
+  const slot=samuraiRows?.find(s=>s.slug===slug);if(!slot)return;
+  if(slot.assigned_to){say('Desatribua o samurai antes de editar o modelo.');return}
+  editSamuraiSlug=slug;
+  const c=slot.character||{},attrs=c.attrs||{},st=stats(c),modal=samuraiEditorModal();
+  modal.style.setProperty('--samurai-color',slot.color);
+  modal.querySelector('#samuraiEditorTitle').textContent=slot.name;
+  const inp=(id,label,value,type='text',extra='')=>'<label>'+safe(label)+'<input id="samuraiEdit_'+id+'" type="'+type+'" value="'+safe(value)+'" '+extra+'></label>';
+  const textarea=(id,label,value,rows=3)=>'<label>'+safe(label)+'<textarea id="samuraiEdit_'+id+'" rows="'+rows+'" maxlength="2000">'+safe(value||'')+'</textarea></label>';
+  const options=(id,label,choices,current)=>'<label>'+safe(label)+'<select id="samuraiEdit_'+id+'">'+choices.map(([value,text])=>'<option value="'+safe(value)+'" '+(value===current?'selected':'')+'>'+safe(text)+'</option>').join('')+'</select></label>';
+  const attributes=[['agi','AGI'],['for','FOR'],['int','INT'],['pre','PRE'],['vig','VIG']].map(([k,name])=>inp('attr_'+k,name,attrs[k]??1,'number','min="0" max="10" step="1" required')).join('');
+  const skills=SK.map(([name])=>'<label>'+safe(name)+'<select data-samurai-skill="'+safe(name)+'">'+[0,1,2,3].map((rank)=>'<option value="'+rank+'" '+(Number(c.skills?.[name]||0)===rank?'selected':'')+'>'+['Destreinado','Treinado +5','Veterano +10','Expert +15'][rank]+'</option>').join('')+'</select></label>').join('');
+  modal.querySelector('#samuraiEditorFields').innerHTML='<p class="samurai-editor-intro">Personalize a ficha inicial antes de entregá-la ao jogador. As alterações são salvas online e não mudam os personagens comuns.</p><div class="samurai-editor-group"><h3>◈ Identidade e progressão</h3><div class="samurai-editor-fields">'
+   +inp('color','Cor da ficha',slot.color,'color','required')
+   +options('class','Classe',[['combatente','Combatente'],['especialista','Especialista'],['ocultista','Ocultista']],c.class||'combatente')
+   +inp('nex','NEX (%)',c.nex||5,'number','min="5" max="99" step="5" required')
+   +inp('origin','Origem',c.origin||'Lutador')
+   +inp('trail','Trilha',c.trail||'')
+   +inp('concept','Conceito',c.concept||'')
+   +'</div></div>'
+   +'<div class="samurai-editor-group"><h3>✧ Atributos</h3><div class="samurai-editor-fields samurai-editor-attributes">'+attributes+'</div></div>'
+   +'<div class="samurai-editor-group"><h3>♥ Recursos</h3><div class="samurai-editor-fields">'
+   +inp('pv','PV atuais',c.pvNow??st.pv,'number','min="0" max="9999" required')
+   +inp('pe','PE atuais',c.peNow??st.pe,'number','min="0" max="9999" required')
+   +inp('san','SAN atual',c.sanNow??st.san,'number','min="0" max="9999" required')
+   +'</div></div>'
+   +'<div class="samurai-editor-group"><h3>⚄ Perícias</h3><div class="samurai-editor-fields samurai-editor-skills">'+skills+'</div></div>'
+   +'<div class="samurai-editor-group"><h3>▤ História e equipamento</h3><div class="samurai-editor-fields">'
+   +textarea('backstory','História',c.backstory||'')
+   +textarea('objective','Objetivo',c.objective||'')
+   +textarea('personality','Personalidade',c.personality||'')
+   +textarea('appearance','Aparência',c.appearance||'')
+   +textarea('classPowers','Poderes de classe (um por linha)',(c.powers?.class||[]).join('\n'))
+   +textarea('paranormalPowers','Poderes paranormais (um por linha)',(c.powers?.paranormal||[]).join('\n'))
+   +textarea('rituals','Rituais conhecidos (um por linha)',(c.powers?.rituals||[]).join('\n'))
+   +textarea('inventory','Equipamentos (um por linha)',(c.inventory||[]).map(i=>i.name).join('\n'),5)
+   +'</div></div>';
+  modal.hidden=false;
+  document.getElementById('samuraiEdit_color').focus();
+ }
+ function closeSamuraiEditor(){
+  const el=document.getElementById('samuraiEditorModal');if(el)el.hidden=true;
+  editSamuraiSlug=null;
+ }
+ async function saveSamuraiEditor(){
+  if(!account||account.role!=='mestre'||!editSamuraiSlug)return;
+  const slot=samuraiRows?.find(s=>s.slug===editSamuraiSlug);
+  if(!slot||slot.assigned_to)return;
+  const get=id=>document.getElementById('samuraiEdit_'+id)?.value??'';
+  const attrs={};
+  for(const k of ['agi','for','int','pre','vig']){
+   const value=Number(get('attr_'+k));if(!Number.isInteger(value)||value<0||value>10){say('Atributos entre 0 e 10.');return}attrs[k]=value;
+  }
+  const nex=Number(get('nex'));
+  if(!Number.isInteger(nex)||nex<5||nex>99||nex%5!==0){say('Informe NEX válido em múltiplos de 5.');return}
+  const color=get('color');
+  if(!/^#[0-9a-f]{6}$/i.test(color)){say('Cor inválida.');return}
+  const skills={};
+  samuraiEditorModal().querySelectorAll('[data-samurai-skill]').forEach(el=>skills[el.dataset.samuraiSkill]=Number(el.value));
+  const c={...slot.character,id:'samurai_'+slot.slug,name:slot.name,samuraiSlug:slot.slug,samuraiColor:color,
+   class:get('class'),nex,attrs,skills,origin:get('origin').trim().slice(0,90),trail:get('trail').trim().slice(0,90),
+   concept:get('concept').trim().slice(0,200),backstory:get('backstory').trim().slice(0,2000),
+   objective:get('objective').trim().slice(0,2000),personality:get('personality').trim().slice(0,2000),
+   appearance:get('appearance').trim().slice(0,2000)};
+  const maximal=stats(c);
+  for(const [key,prop,max] of [['pv','pvNow',maximal.pv],['pe','peNow',maximal.pe],['san','sanNow',maximal.san]]){
+   const value=Number(get(key));
+   if(!Number.isInteger(value)||value<0||value>max){say('O valor de '+key.toUpperCase()+' deve estar entre 0 e '+max+'.');return}
+   c[prop]=value;
+  }
+  const byLine=field=>[...new Set(get(field).split(/\r?\n/).map(x=>x.trim().slice(0,100)).filter(Boolean))].slice(0,40);
+  c.powers={...c.powers,class:byLine('classPowers'),paranormal:byLine('paranormalPowers'),rituals:byLine('rituals')};
+  c.inventory=get('inventory').split(/\r?\n/).map(s=>s.trim()).filter(Boolean).slice(0,30).map((name,i)=>{
+   const previous=(slot.character.inventory||[]).find(item=>item.name===name);
+   const preset=INVENTORY_PRESETS.find(x=>x.name===name);
+   return previous||{id:'samurai-item-'+slot.slug+'-'+i,name:name.slice(0,80),category:preset?.category??0,spaces:preset?.spaces??1,weapon:!!preset?.weapon,qty:1,mode:'stored',benefit:false,requisitioned:false,utility:false};
+  });
+  const button=document.querySelector('#samuraiEditorForm button[type=submit]');if(button)button.disabled=true;
+  try{
+   await api('/rest/v1/rpc/samurai_edit','POST',{p_slug:slot.slug,p_color:color,p_character:c});
+   closeSamuraiEditor();samuraiRows=null;samuraiFetchAt=0;await renderSamurais(true);
+   say('Ficha inicial de '+slot.name+' atualizada online.');
+  }catch(e){say('Erro ao salvar o samurai: '+e.message)}
+  finally{if(button)button.disabled=false}
+ }
+
  function localRoster(){
   const users=accountList();
   const rows=users.map(u=>{
