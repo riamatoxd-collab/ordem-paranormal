@@ -285,3 +285,29 @@ O endereço do site precisa estar autorizado **antes de testar o link**. Como o 
 - O link deve ser usado pelo próprio dono da caixa de e-mail. Se expirou, o jogador pode solicitar outro.
 - O código também aceita links que retornam com `token_hash` em vez do token de sessão padrão.
 - Não se deve testar o fluxo em uma conta de jogador real sem que a própria pessoa solicite a recuperação.
+
+## Fichas ancestrais dos samurais — regras próprias de PD
+
+As cinco fichas foram preenchidas no **Supabase / public.samurai_slots** a partir das referências fornecidas pelo mestre. **Não** são fichas padrão de NEX 5%: PV, PD, Defesa, Deslocamento, dados de ataque e bônus das perícias são **valores autorais da campanha**, armazenados em `character.samuraiSheet`. O campo `pdNow` controla os **Pontos de Determinação** disponíveis; eles são independentes de PE e SAN convencionais.
+
+| Samurai | Elemento | PV | PD | Defesa | Deslocamento | Habilidade única |
+|---|---|---:|---:|---:|---:|---|
+| Akira Kurogane | **Sangue** | 32 | 14 | 18 | 9 m | **Passo Carmesim** — 2 PD |
+| Ichiro Yamioka | **Energia** | 40 | 10 | 16 | 9 m | **Fúria da Centelha** — 2 PD |
+| Masamune Hayato | Conhecimento | 26 | 16 | 16 | 9 m | **Olho da Verdade** — 2 PD |
+| Reiji Kuronami | Morte | 28 | 14 | 19 | 12 m | **Passo Entre Segundos** — 2 PD |
+| Takeda Shirogane | Fogo/Energia | 45 | 12 | 20 | 6 m | **Muralha de Brasa** — 2 PD |
+
+Akira e Ichiro tiveram os elementos invertidos em relação aos textos iniciais fornecidos; as marcas, as armas (dano elemental), a frase do ritual e a descrição de suas habilidades foram **adaptadas** para Sangue (Akira) e Energia (Ichiro), mantendo os papéis de liderança móvel e combate impulsivo, respectivamente. As outras três fichas mantêm os dados registrados nas referências.
+
+### Jogador
+
+Após atribuição e login, a ficha do samurai tem uma área especial destacada em sua cor com todos os recursos próprios, sua marca, ordem no ritual, arma, armadura, fórmula de dano, perícias e habilidade única. **Ativar habilidade** reduz **2 PD** e grava evento no histórico. O jogador também pode recuperar ou gastar PD pelos controles da própria ficha. Os botões de ataque e perícia rolam o número de d20 cadastrado, conservando o maior e somando o bônus; os botões de dano rolam os componentes do dano, incluindo o componente elemental, com opção de crítico. Todos são salvos na ficha online pelo `samurai_save_progress`.
+
+A ficha tradicional permanece disponível para agentes comuns, mas parte dos controles convencionais de PE/SAN/combate é ocultada para os samurais, que usam o sistema especial. Os valores fixos de atributos e habilidades dos samurais são definidos pelo mestre no editor do painel.
+
+### Mestre
+
+Em **Painel do Mestre → Os Cinco Samurais**, cada cartão apresenta PV, PD, Defesa, elemento, marca, ordem no ritual e detalhes da habilidade. O botão **Editar ficha** permite ajustar atributos, PV/PD máximos e atuais, Defesa, Deslocamento, marca, ordem, arma, fórmulas de dano, perícias especiais e a única habilidade. Para editar, a ficha precisa estar **desatribuída**, evitando sobrescrever o progresso de jogadores.
+
+As alterações de fichas especiais não alteram os demais personagens e o jogador não perde suas fichas comuns. Nenhuma atribuição nova de samurai é feita automaticamente.
