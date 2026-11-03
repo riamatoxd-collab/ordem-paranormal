@@ -64,3 +64,26 @@
 #v-mestre .op-master-char-detail small{color:#a99785}
 @media(max-width:800px){.op-registration-list{grid-template-columns:1fr}.op-auth-window{padding:23px 19px}.op-registration-card{align-items:flex-start;flex-direction:column}.op-registration-card>div:last-child{justify-content:flex-start}}
 @media(max-width:520px){.op-auth-gate{padding:12px 7px}.op-account-button{max-width:130px}.op-registration-head{padding:15px}#v-mestre .op-master-roster{margin:4px 9px 12px;padding:10px}#v-mestre .op-master-char summary{align-items:flex-start;flex-direction:column}}
+
+/* Expansão de perícias, poderes, rituais e inventário no arquivo do mestre */
+#v-mestre .op-master-detail-group{
+ border-top:1px solid #705747;
+ padding:8px 0;
+ margin-top:6px;
+}
+#v-mestre .op-master-detail-group summary{
+ display:list-item;
+ list-style:disclosure-closed;
+ cursor:pointer;
+ padding:3px 6px;
+ color:#e6c68f;
+ font-weight:750;
+ font-size:11px;
+}
+#v-mestre .op-master-detail-group[open] summary{list-style:disclosure-open}
+#v-mestre .op-master-detail-group p{
+ margin:7px 5px 5px;
+ color:#e0c8b1;
+ line-height:1.65;
+ overflow-wrap:anywhere;
+}
