@@ -969,6 +969,13 @@ function setAgentAffinityElement(element){let c=current();if(!c||+c.nex<50||!['C
 function setAgentVersatility(value){let c=current();if(!c||+c.nex<50)return;let valid=value==='class'||(value.startsWith('trail:')&&Object.prototype.hasOwnProperty.call(TRAILS[c.class]||{},value.slice(6))&&value.slice(6)!==c.trail);if(!valid)return;c.versatility=value;db();render();say('Versatilidade registrada.')}
 function addKnownRitualFromPage(){let c=current(),value=$('grimoireNewRitual')?.value;if(!c||!value)return;let r=RITUALS.find(x=>ritualValue(x)===value);if(!r||!ritualAllowed(r,c)){say('Ritual indisponível para o NEX, classe ou trilha atual.');return}let known=c.powers?.rituals||[],slots=ritualSlotCount(c.class,c.nex,c.trail,c.powers?.paranormal||[],c.attrs.int);if(known.length>=slots){say('Não há espaço de ritual disponível.');return}if(known.includes(value)){say('Esse ritual já está na ficha.');return}c.powers=c.powers||{class:[],paranormal:[],rituals:[]};c.powers.rituals=c.powers.rituals||[];c.powers.rituals.push(value);db();render();say('Ritual aprendido: '+r[0]+'.')}
 function grimoireRitualInfo(name){return (window.GRIMOIRE_RITUAL_DETAILS||Object.create(null))[name]||null}
+function openRitualFromGrimoire(agentId,index){
+ const c=agents.find(x=>x.id===agentId);if(!c||!c.powers?.rituals?.[index])return;
+ selected=c.id;view('agents');
+ const panel=document.getElementById('pePanel');
+ if(panel){panel.scrollIntoView({behavior:'smooth',block:'start'});const cards=panel.querySelectorAll('.pe-ritual-card');if(cards[index]){cards[index].style.outline='2px solid #e3bc82';cards[index].style.outlineOffset='4px';}}
+ say('Selecione a forma e os poderes disponíveis, depois clique em Conjurar.');
+}
 function renderRitualCatalog(){
  let c=current(),list=$('ritualCatalogList');if(!list)return;
  let search=($('ritualCatalogSearch')?.value||'').trim().toLocaleLowerCase('pt-BR'),element=$('ritualCatalogElement')?.value||'',circle=$('ritualCatalogCircle')?.value||'',bookFilter=$('ritualCatalogBook')?.value||'',statusFilter=$('ritualCatalogStatus')?.value||'';
@@ -991,7 +998,7 @@ function renderRitualCatalog(){
    +'<p class="grimoire-ritual-description">'+effect+'</p>'
    +'<div class="grimoire-ritual-pills"><span>⚄ '+esc(grimoireRitualRule(r[0])?.execution||'Execução variável')+'</span><span>⌁ '+esc(grimoireRitualRule(r[0])?.range||'Alcance variável')+'</span><span>✦ '+base+' PE</span></div>'
    +grimoireRitualTechnicalHtml(r[0],base)
-   +'<footer class="grimoire-ritual-entry-foot"><span>'+book+'</span><span class="grimoire-ritual-status '+(known?'is-known':'')+'">'+esc(state)+'</span></footer></article>';
+   +'<footer class="grimoire-ritual-entry-foot"><span>'+book+'</span><span class="grimoire-ritual-status '+(known?'is-known':'')+'">'+esc(state)+'</span>'+(known?'<button class="btn small" type="button" onclick="openRitualFromGrimoire(\''+esc(c.id)+'\','+(c.powers.r-ituals||[]).indexOf(ritualValue(r))+')">✧ Conjurar</button>':'')+'</footer></article>';
  }).join('')||'<div class="empty">Nenhum ritual encontrado para estes filtros.</div>';
 }
 function renderOccultPage(){let c=current(),agentSelect=$('occultAgentSelect'),button=$('transcendStartButton');if(!agentSelect)return;agentSelect.innerHTML=agents.map(x=>'<option value="'+esc(x.id)+'" '+(x.id===selected?'selected':'')+'>'+esc(x.name)+' • '+className(x.class)+'</option>').join('')||'<option value="">Nenhum agente</option>';if(!c){if(button){button.disabled=true;button.textContent='Cadastre ou selecione um agente';}return}let next=nextClassPowerSlot(c);if(button){button.disabled=!next;button.textContent=next?'✧ Atender ao chamado':'Nenhum avanço de poder pendente';button.title=next?'Marco de poder de classe NEX '+next.nex+'%':'Aguarde um novo marco de NEX.'}updateVoidSoundButtons()}
