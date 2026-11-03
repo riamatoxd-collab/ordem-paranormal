@@ -418,11 +418,24 @@
    const c=slot.character||{},attr=c.attrs||{},st=stats(c),owner=samuraiPlayers.find(p=>p.id===slot.assigned_to);
    const hasOwner=!!slot.assigned_to;
    const color=/^#[0-9a-f]{6}$/i.test(slot.color)?slot.color:info.color;
+   const displaySkills=Object.entries(c.skills||{}).filter(([,level])=>+level>0).map(([skill,level])=>safe(skill)+' +'+[0,5,10,15][Math.min(3,Math.max(0,+level||0))]).join(' • ');
+   const displayPowers=[...(c.powers?.class||[]),...(c.powers?.paranormal||[])].map(safe).join(' • ');
+   const displayRituals=(c.powers?.rituals||[]).map(safe).join(' • ');
+   const displayInventory=(c.inventory||[]).map(i=>safe(i?.name||'')).filter(Boolean).join(' • ');
+   const dossier='<details class="samurai-master-dossier"><summary>▤ Consultar ficha completa</summary><div>'
+    +'<p><strong>Origem:</strong> '+safe(c.origin||'—')+'　<strong>Trilha:</strong> '+safe(c.trail||'—')+'</p>'
+    +'<p><strong>Perícias:</strong> '+(displaySkills||'Nenhuma')+'</p>'
+    +'<p><strong>Poderes:</strong> '+(displayPowers||'Nenhum')+'</p>'
+    +'<p><strong>Rituais:</strong> '+(displayRituals||'Nenhum')+'</p>'
+    +'<p><strong>Equipamentos:</strong> '+(displayInventory||'Nenhum')+'</p>'
+    +'<p><strong>História:</strong> '+safe(c.backstory||'—')+'</p>'
+    +'<p><strong>Objetivo:</strong> '+safe(c.objective||'—')+'</p></div></details>';
    const playerOptions='<option value="">— Não atribuído —</option>'+samuraiPlayers.map(p=>'<option value="'+safe(p.id)+'" '+(slot.assigned_to===p.id?'selected':'')+'>'+safe(p.display_name)+'</option>').join('');
    return '<article class="samurai-master-card" style="--samurai-color:'+color+'" data-samurai="'+safe(slot.slug)+'">'
     +'<div class="samurai-master-card-top"><div class="samurai-master-sigil">✦</div><div><small>'+safe(slot.epithet)+'</small><h4>'+safe(slot.name)+'</h4><span>'+safe(className(c.class||'combatente'))+' • NEX '+safe(c.nex||5)+'%</span></div><span class="samurai-master-state">'+(hasOwner?'ATRIBUÍDO':'DISPONÍVEL')+'</span></div>'
     +'<div class="samurai-master-stats"><span><b>'+safe(attr.agi??1)+'</b> AGI</span><span><b>'+safe(attr.for??1)+'</b> FOR</span><span><b>'+safe(attr.int??1)+'</b> INT</span><span><b>'+safe(attr.pre??1)+'</b> PRE</span><span><b>'+safe(attr.vig??1)+'</b> VIG</span></div>'
     +'<div class="samurai-master-resources"><span>♥ PV '+safe(c.pvNow??st.pv)+'</span><span>✧ PE '+safe(c.peNow??st.pe)+'</span><span>◉ SAN '+safe(c.sanNow??st.san)+'</span></div>'
+    +dossier
     +'<label class="samurai-master-owner">JOGADOR RESPONSÁVEL<select id="samuraiAssign_'+safe(slot.slug)+'" aria-label="Atribuir '+safe(slot.name)+'">'+playerOptions+'</select></label>'
     +'<div class="samurai-master-actions"><button type="button" class="btn small" data-samurai="'+safe(slot.slug)+'" onclick="OPAccounts.editSamurai(this.dataset.samurai)" '+(hasOwner?'disabled title="Para proteger o progresso do jogador, desatribua antes de editar o modelo"':'')+'>✎ Editar ficha</button><button type="button" class="btn small primary" data-samurai="'+safe(slot.slug)+'" onclick="OPAccounts.assignSamurai(this.dataset.samurai)">✧ Salvar atribuição</button></div>'
     +'<small class="samurai-master-tip">'+(hasOwner?'A ficha do jogador é editável por ele. Desatribuir preserva o estado atual.':'Ajuste a ficha e escolha a conta que irá interpretá-lo.')+'</small>'
