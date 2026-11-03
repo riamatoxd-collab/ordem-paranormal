@@ -72,6 +72,7 @@ function open(info){
  const rule=window.grimoireRitualRules?.(info.name)||{},form=variant(info.name,info.extra),initialFormula=p.formulas?.[form.index]||p.formulas?.[0]||'';
  const targets=agents.map(c=>'<option value="'+safe(c.id)+'" '+(c.id===info.id?'selected':'')+'>'+safe(c.name)+(c.id===info.id?' (você)':'')+'</option>').join('');
  const choices=(p.modes||[]).map(x=>'<option>'+safe(x)+'</option>').join('');
+ const hasRemoval=['Dissipar Ritual','Milagre Ionizante'].includes(info.name);
  const cp=info.cp,cpText=info.element==='Medo'?'Ritual de Medo: sem teste de Custo do Paranormal.':
   'Ocultismo '+cp.rolls.join(', ')+' → '+cp.total+' / DT '+cp.dt+' • '+(cp.pass?'Sucesso':('Falha: −'+info.cost+' SAN'+(cp.permanent?', −1 SAN máxima':'')));
  el('opEffectTitle').textContent=info.name;
@@ -86,9 +87,16 @@ function open(info){
  '<label>FÓRMULA DE DANO, CURA OU PV TRANSFERIDOS<input id="opFxFormula" maxlength="70" placeholder="Ex.: 2d8+2" value="'+safe(info.name==='Transfusão Vital'?'':initialFormula)+'"></label>'+
  '<label>RESISTÊNCIA<select id="opFxRes"><option value="pending">Pendente / mestre decide</option><option value="failed">Falhou</option><option value="passed">Passou</option><option value="none">Voluntário ou sem resistência</option></select></label>'+
  '<div class="op-effect-resist"><button type="button" id="opFxRoll">⚄ Rolar resistência do alvo</button><small id="opFxRollResult">'+safe(rule.resistance||'Sem resistência obrigatória indicada')+'</small></div>'+
+ (hasRemoval?'<label>EFEITOS REGISTRADOS PARA REMOVER<select id="opFxRemove"><option value="">Escolha um efeito ativo</option></select></label>':'')+
  '<label>DECISÕES E OBSERVAÇÕES<textarea id="opFxNotes" rows="2" maxlength="450" placeholder="Área afetada, ordem, aparência, alvo, consequência..."></textarea></label>'+
  '<div class="op-effect-buttons"><button type="button" id="opFxApply">Aplicar efeito</button><button type="button" id="opFxOnly">Apenas registrar</button></div></div>';
- el('opFxTarget').onchange=()=>el('opFxExternalWrap').hidden=el('opFxTarget').value!=='external';
+ function showRemovables(){
+  const sel=el('opFxRemove'),target=get(el('opFxTarget').value);if(!sel)return;
+  const possible=entries(target).filter(e=>info.name==='Milagre Ionizante'?!!e.condition:e.source==='ritual');
+  sel.innerHTML='<option value="">Selecione o efeito</option>'+possible.map(e=>'<option value="'+safe(e.id)+'">'+safe(e.name)+(e.condition?' • '+safe(e.condition):'')+'</option>').join('');
+ }
+ el('opFxTarget').onchange=()=>{el('opFxExternalWrap').hidden=el('opFxTarget').value!=='external';showRemovables()};
+ if(hasRemoval)showRemovables();
  el('opFxRoll').onclick=rollResistance;
  el('opFxApply').onclick=()=>finish(true);
  el('opFxOnly').onclick=()=>finish(false);
@@ -132,7 +140,22 @@ function finish(apply){
  if(resisted&&cast.name==='Definhar')mods.condition=form.index===0?'vulnerável':'fatigado';
  if(cast.name==='Hemofagia'&&damage&&c){const healCaster=Math.floor(damage/2);c.pvNow=Math.min(Math.max(0,stats(c).pv-(+c.flageloSpentPV||0)),(+c.pvNow||0)+healCaster)}
  if(cast.name==='Tela de Ruído'&&form.index<2&&target&&apply){target.pvTempPhysical=(+target.pvTempPhysical||0)+[30,60][form.index]}
- if(cast.name==='Cicatrização'&&result&&target)mods.noteAge='Além da cura, o alvo envelhece 1 ano (registrar na história).';
+ if(cast.name==='Cicatrização'&&result&&target)mods.noteAge='O alvo envelhece 1 ano, como consequência da cura.';
+ if(cast.name==='Dissipar Ritual'&&apply&&target&&!nullified){
+  const selected=el('opFxRemove')?.value,chosen=entries(target).find(e=>e.id===selected&&e.source==='ritual');
+  if(chosen){
+   const a=attribute(c,'int'),dice=Array.from({length:a||2},()=>1+Math.floor(Math.random()*20));
+   const result=a?Math.max(...dice):Math.min(...dice),score=result+sb(rank(c,'Ocultismo'))+skillBonus(c,'Ocultismo');
+   const creator=get(chosen.casterId),dt=creator?10+Math.ceil((+creator.nex||5)/5)+(+creator.attrs.pre||0):20;
+   if(result===20||score>=dt){chosen.active=false;mods.dispelResult='Dissipado (Ocultismo '+score+' ≥ DT '+dt+')'}
+   else mods.dispelResult='Não dissipado (Ocultismo '+score+' < DT '+dt+')';
+  }else mods.dispelResult='Nenhum ritual selecionado: sem efeito removido';
+ }
+ if(cast.name==='Milagre Ionizante'&&apply&&target&&!nullified){
+  const selected=el('opFxRemove')?.value,chosen=entries(target).find(e=>e.id===selected&&e.condition);
+  if(chosen){chosen.active=false;mods.dispelResult='Condição '+chosen.condition+' removida; verificar possível consequência no suplemento.'}
+  else mods.dispelResult='Nenhuma condição registrada foi removida.';
+ }
  if(cast.name==='Transfusão Vital'&&result&&target){
   const max=[30,50,100][form.index];transfer=Math.min(Math.max(0,result.total),(+c.pvNow||0)-1,max);heal=transfer;
  }
@@ -147,7 +170,7 @@ function finish(apply){
   if(/sustentada/i.test(duration))for(const other of agents)for(const ef of entries(other))if(ef.casterId===c.id&&ef.sustain)ef.active=false;
   addEffect(recordTarget,{source:'ritual',casterId:c.id,name:cast.name,element:cast.element,kind:p.kind,duration:(!/instantânea/i.test(duration)?duration:(mods.condition?'Até remover a condição':'Cena')),mode,variant:form.name,mods,notes:notes+(mods.noteAge?' • '+mods.noteAge:''),targetName:who,condition:mods.condition||'',sustain:/sustentada/i.test(duration),sustainPending:false,rounds:/1 rodada/i.test(duration)?1:/2 rodadas/i.test(duration)?2:null,external:isExternal});
  }
- const detail=(apply?'Aplicado':'Conjurado')+' • '+who+' • '+form.name+(mode?' • '+mode:'')+(damage?' • '+damage+' dano':'')+(heal?' • '+heal+' PV':'')+(nullified?' • anulado pela resistência':'')+(notes?' • '+notes:'');
+ const detail=(apply?'Aplicado':'Conjurado')+' • '+who+' • '+form.name+(mode?' • '+mode:'')+(damage?' • '+damage+' dano':'')+(heal?' • '+heal+' PV':'')+(nullified?' • anulado pela resistência':'')+(notes?' • '+notes:'')+(mods.noteAge?' • '+mods.noteAge:'')+(mods.dispelResult?' • '+mods.dispelResult:'');
  addHist({agent:c.name,label:cast.name,detail,total:damage||heal||null,dt:null,passed:null,status:apply&&!nullified?'EFEITO REGISTRADO':'EFEITO MANUAL',kind:'Ritual'});
  close();write();
  if(isExternal)say('Registrado: alterações em fichas de outras contas devem ser aplicadas pelo jogador ou mestre.');
