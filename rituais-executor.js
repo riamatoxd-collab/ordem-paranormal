@@ -156,6 +156,7 @@ function finish(apply){
   if(chosen){chosen.active=false;mods.dispelResult='Condição '+chosen.condition+' removida; verificar possível consequência no suplemento.'}
   else mods.dispelResult='Nenhuma condição registrada foi removida.';
  }
+ if(cast.name==='Transfusão Vital'&&target?.id===c.id&&apply){say('Transfusão Vital exige outro ser como alvo.');return}
  if(cast.name==='Transfusão Vital'&&result&&target){
   const max=[30,50,100][form.index];transfer=Math.min(Math.max(0,result.total),(+c.pvNow||0)-1,max);heal=transfer;
  }
@@ -168,7 +169,7 @@ function finish(apply){
  if(display&&lasting){
   // Um ocultista só sustenta um ritual por vez.
   if(/sustentada/i.test(duration))for(const other of agents)for(const ef of entries(other))if(ef.casterId===c.id&&ef.sustain)ef.active=false;
-  addEffect(recordTarget,{source:'ritual',casterId:c.id,name:cast.name,element:cast.element,kind:p.kind,duration:(!/instantânea/i.test(duration)?duration:(mods.condition?'Até remover a condição':'Cena')),mode,variant:form.name,mods,notes:notes+(mods.noteAge?' • '+mods.noteAge:''),targetName:who,condition:mods.condition||'',sustain:/sustentada/i.test(duration),sustainPending:false,rounds:/1 rodada/i.test(duration)?1:/2 rodadas/i.test(duration)?2:null,external:isExternal});
+  addEffect(recordTarget,{source:'ritual',casterId:c.id,name:cast.name,element:cast.element,kind:p.kind,duration:(!/instantânea/i.test(duration)?duration:(mods.condition?'Até remover a condição':'Cena')),mode,variant:form.name,mods,notes:notes+(mods.noteAge?' • '+mods.noteAge:''),targetName:who,condition:mods.condition||'',sustain:/sustentada/i.test(duration),sustainPending:false,rounds:/1 rodada/i.test(duration)||['Eletrocussão','Desfazer Sinapses'].includes(cast.name)?1:/2 rodadas/i.test(duration)?2:null,external:isExternal});
  }
  const detail=(apply?'Aplicado':'Conjurado')+' • '+who+' • '+form.name+(mode?' • '+mode:'')+(damage?' • '+damage+' dano':'')+(heal?' • '+heal+' PV':'')+(nullified?' • anulado pela resistência':'')+(notes?' • '+notes:'')+(mods.noteAge?' • '+mods.noteAge:'')+(mods.dispelResult?' • '+mods.dispelResult:'');
  addHist({agent:c.name,label:cast.name,detail,total:damage||heal||null,dt:null,passed:null,status:apply&&!nullified?'EFEITO REGISTRADO':'EFEITO MANUAL',kind:'Ritual'});
@@ -178,8 +179,22 @@ function finish(apply){
 function activeHtml(c){
  if(!c)return '';const a=entries(c);
  return '<section class="op-effects-panel"><header><div><small>CONTROLE DE CENA</small><h3>EFEITOS DE RITUAIS E PODERES</h3></div><b>'+a.length+' ativos</b></header>'+
- (a.length?a.map(e=>'<div class="op-effect-item"><div><strong>'+safe(e.name)+'</strong><small>'+safe(e.source==='poder'?'Poder':'Ritual')+' • '+safe(e.duration||'Cena')+' • '+safe(e.targetName||c.name)+'</small>'+(e.condition?'<p>Condição: '+safe(e.condition)+'</p>':'')+(e.notes?'<p>'+safe(e.notes)+'</p>':'')+'</div><div>'+((e.sustain&&e.casterId===c.id)?'<button type="button" onclick="RitualEngine.sustain(\''+safe(c.id)+'\',\''+safe(e.id)+'\')">Manter 1 PE</button>':'')+'<button type="button" onclick="RitualEngine.remove(\''+safe(c.id)+'\',\''+safe(e.id)+'\')">Encerrar</button></div></div>').join(''):'<p class="build-muted">Nenhum efeito ativo.</p>')+
+ (a.length?a.map(e=>'<div class="op-effect-item"><div><strong>'+safe(e.name)+'</strong><small>'+safe(e.source==='poder'?'Poder':'Ritual')+' • '+safe(e.duration||'Cena')+' • '+safe(e.targetName||c.name)+'</small>'+(e.condition?'<p>Condição: '+safe(e.condition)+'</p>':'')+(e.notes?'<p>'+safe(e.notes)+'</p>':'')+'</div><div>'+(e.mods?.healing?'<button type="button" onclick="RitualEngine.applyPowerHealing(\''+safe(c.id)+'\',\''+safe(e.id)+'\')">Curar '+e.mods.healing+' PV</button>':'')+(e.name==='Embaralhar'?'<button type="button" onclick="RitualEngine.loseMirror(\''+safe(c.id)+'\',\''+safe(e.id)+'\')">Perder cópia</button>':'')+((e.sustain&&e.casterId===c.id)?'<button type="button" onclick="RitualEngine.sustain(\''+safe(c.id)+'\',\''+safe(e.id)+'\')">Manter 1 PE</button>':'')+'<button type="button" onclick="RitualEngine.remove(\''+safe(c.id)+'\',\''+safe(e.id)+'\')">Encerrar</button></div></div>').join(''):'<p class="build-muted">Nenhum efeito ativo.</p>')+
  '<small>Efeitos sobre NPCs e jogadores de outras contas são registrados para resolução pelo mestre.</small></section>';
+}
+function applyPowerHealing(id,eid){
+ const c=get(id),e=entries(c).find(x=>x.id===eid);if(!e||!e.mods?.healing)return;
+ const opts=agents.map((x,i)=>(i+1)+': '+x.name).join('\n');
+ const answer=prompt('Escolha o número do personagem que receberá '+e.mods.healing+' PV:\n'+opts,'1');
+ if(answer===null)return;
+ const idx=Number(answer)-1,target=agents[idx];if(!target){say('Alvo inválido.');return}
+ const amount=Math.max(0,Math.min(+e.mods.healing||0,Math.max(0,stats(target).pv-(+target.flageloSpentPV||0)-(+target.pvNow||0))));
+ target.pvNow=Math.min(stats(target).pv-(+target.flageloSpentPV||0),(+target.pvNow||0)+amount);
+ e.active=false;addHist({agent:c.name,label:e.name+' • cura aplicada',detail:target.name+' recuperou '+amount+' PV.',total:amount,status:'CURA',kind:'Habilidade'});write();
+}
+function loseMirror(id,eid){
+ const c=get(id),e=entries(c).find(x=>x.id===eid&&x.name==='Embaralhar');if(!e)return;
+ e.mods.defense=Math.max(0,(+e.mods.defense||0)-2);if(!e.mods.defense)e.active=false;write();
 }
 function remove(id,eid){const c=get(id),e=entries(c).find(x=>x.id===eid);if(!e)return;e.active=false;addHist({agent:c.name,label:'Encerrado: '+e.name,detail:'Efeito encerrado',status:'FIM DE EFEITO',kind:'Ritual'});write()}
 function sustain(id,eid){
@@ -201,6 +216,7 @@ function powerUsed(c,action,cost){
  if(action.id==='ataque-especial')mods.attack=5*Math.max(1,cost-1);
  if(action.id==='sentido-tatico')mods.defense=+c.attrs.int||0;
  if(action.id==='campo-protetor')mods.defense=5;
+ if(action.result==='healing'){const hit=String(hist[0]?.detail||'').match(/= (\d+) PV/);if(hit)mods.healing=+hit[1]}
  const note=(action.desc||'')+(action.result==='healing'?' • Cura rolada: aplicar PV ao alvo da habilidade.':'');
  addEffect(c,{source:'poder',casterId:c.id,name:action.name,kind:'aprimoramento',duration:action.onceScene?'Cena':'Até usar ou encerrar turno',targetName:c.name,mods,notes:note});write();
 }
@@ -222,7 +238,13 @@ if(typeof oldPower==='function')window.usePEAction=function(id,actionId){
 };
 const oldTurn=window.newPETurn;
 if(typeof oldTurn==='function')window.newPETurn=function(id){oldTurn(id);newTurn(id);render()};
+const oldAttack=window.attack;
+if(typeof oldAttack==='function')window.attack=function(){
+ const c=get(document.getElementById('cAgent')?.value);
+ oldAttack();
+ if(c){for(const e of entries(c))if(e.source==='poder'&&e.duration==='Até usar ou encerrar turno'&&(+e.mods?.attack||0)>0)e.active=false;db()}
+};
 const oldScene=window.endPEScene;
 if(typeof oldScene==='function')window.endPEScene=function(id){oldScene(id);endScene(id)};
-window.RitualEngine={registry:reg,afterCast,open,close,skillBonus,attribute,defenseBonus,attackBonus,bonusResistance,rollFormula,newTurn,endScene,rest,sustain,remove,activeHtml,cpTest};
+window.RitualEngine={registry:reg,afterCast,open,close,skillBonus,attribute,defenseBonus,attackBonus,bonusResistance,rollFormula,newTurn,endScene,rest,sustain,remove,activeHtml,cpTest,applyPowerHealing,loseMirror};
 })();
