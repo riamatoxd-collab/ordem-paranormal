@@ -142,7 +142,7 @@
   const invHtml=inventory.length?inventory.map(it=>'<div class="sheet-entry"><span class="sheet-symbol">'+(it.weapon?'⚔':'▣')+'</span><strong>'+esc(it.name||'Item')+'</strong><button class="sheet-qty" title="Diminuir quantidade" onclick="adjustInventoryQty(\''+esc(it.id)+'\',-1)">−</button><small>×'+esc(it.qty||1)+'</small><button class="sheet-qty" title="Aumentar quantidade" onclick="adjustInventoryQty(\''+esc(it.id)+'\',1)">+</button><button class="sheet-remove" title="Remover item" onclick="sheetRemoveItem(\''+esc(it.id)+'\')">✕</button></div>').join(''):'<p class="sheet-empty">Inventário vazio.</p>';
   const weapons=inventory.filter(it=>it.weapon);
   const combatHtml=weapons.length?weapons.map(it=>{const profile=weaponProfileFor(it);return '<button class="sheet-weapon" onclick="sheetRollWeapon(\''+esc(it.id)+'\')"><span>⚔</span><span><strong>'+esc(it.name)+'</strong><small>'+(profile?esc(profile.damage)+' • '+esc(profile.skill):it.sheetDamage?esc(it.sheetDamage)+' • '+esc(it.sheetSkill||'Luta'):'Clique para configurar dano')+'</small></span><b>ROLAR DADOS ⚄</b></button>'}).join(''):'<p class="sheet-empty">Adicione uma arma ao inventário para habilitar os ataques.</p>';
-  el.innerHTML='<div class="paper-sheet paper-v2"><div class="sheet-ornament" aria-hidden="true">✿　✦　鳥居　✦　✿</div><div class="paper-head"><div><small>ORDEM PARANORMAL • FICHA DE AGENTE</small><h2>'+esc(c.name)+'</h2><p>'+esc(c.origin||'Origem não definida')+' • '+esc(className(c.class))+'</p></div><div class="paper-nex">NEX <strong>'+esc(c.nex||0)+'%</strong></div></div><div class="paper-columns"><div><div class="paper-caption">ATRIBUTOS <small>CLIQUE PARA ROLAR</small></div><div class="paper-attributes"><div class="paper-core">✣<span>ATRIBUTOS</span></div>'+attrHtml+'</div><div class="paper-resources">'+resource('pv','PONTOS DE VIDA',c.pvNow,st.pv)+resource('pe','PONTOS DE ESFORÇO',(+c.peNow||0)+(+c.peTemp||0),st.pe)+resource('san','SANIDADE',c.sanNow,st.san)+resource('def','DEFESA BASE',10+(+c.attrs.agi||0),null)+'</div><div class="paper-shortcuts"><button class="btn small" onclick="openModal(\''+esc(c.id)+'\')">Editar ficha</button></div></div><div>'+skillHudHtml+'</div></div><div class="sheet-pe-overview"><span>PE DISPONÍVEL <b>'+((+c.peNow||0)+(+c.peTemp||0))+'</b></span><span>GASTO NO TURNO <b>'+(+c.peSpentTurn||0)+'</b> / '+peLimitFor(c)+'</span></div><section class="sheet-block sheet-pe-block"><h3>✧ HABILIDADES COM CUSTO DE PE <small>'+peActions.length+'</small></h3><div class="sheet-pe-list">'+peHtml+'</div></section><div class="sheet-lower"><section class="sheet-block sheet-powers-block"><h3>✦ PODERES & HABILIDADES <small>'+(powers.length+grantedPowers.length)+'</small></h3><div class="sheet-scroll sheet-powers-list">'+powerHtml+'</div>'+powerEditorHtml+'</section><section class="sheet-block"><h3>◈ RITUAIS <small>'+rituals.length+'</small></h3><div class="sheet-scroll">'+ritualHtml+'</div><div class="sheet-add"><select id="sheetRitualChoice" aria-label="Ritual para aprender"></select><button class="btn small primary" onclick="sheetLearnRitual()">+ Aprender</button></div></section><section class="sheet-block"><h3>▣ EQUIPAMENTO & INVENTÁRIO <small>'+inventory.length+'</small></h3><div class="sheet-scroll">'+invHtml+'</div><div class="sheet-add"><select id="sheetItemPreset" aria-label="Modelo de equipamento" onchange="sheetSelectPreset(this.value)"><option value="">Item personalizado</option></select><input id="sheetItemName" placeholder="Nome do equipamento" maxlength="100" aria-label="Nome do equipamento"><input id="sheetItemQty" type="number" min="1" max="999" value="1" aria-label="Quantidade"><label class="sheet-weapon-check"><input id="sheetItemWeapon" type="checkbox"> Arma</label><button class="btn small primary" onclick="sheetAddItem()">+ Adicionar</button></div></section><section class="sheet-block"><h3>⚔ ATAQUES & COMBATE <small>'+weapons.length+'</small></h3><div class="sheet-scroll">'+combatHtml+'</div><div class="sheet-add"><label class="sheet-defense">Defesa do alvo <input id="sheetTargetDefense" type="number" min="0" max="999" value="15"></label><label class="sheet-defense">Distância <select id="sheetTargetRange"><option value="curto">Curto</option><option value="medio">Médio</option><option value="longo">Longo</option><option value="extremo">Extremo</option></select></label></div><div id="sheetCombatResult" class="sheet-combat-result" aria-live="polite"></div></section></div><div class="paper-bottom">A MALDIÇÃO DOS SETE ANJOS <span>REGISTRO PARANORMAL</span></div></div><details class="paper-technical"><summary>Ficha técnica, controles e informações adicionais</summary><div class="paper-original">'+original+'</div></details>';
+  el.innerHTML='<div class="paper-sheet paper-v2"><div class="sheet-ornament" aria-hidden="true">✿　✦　鳥居　✦　✿</div><div class="paper-head"><div><small>ORDEM PARANORMAL • FICHA DE AGENTE</small><h2>'+esc(c.name)+'</h2><p>'+esc(c.origin||'Origem não definida')+' • '+esc(className(c.class))+'</p></div><div class="paper-nex">NEX <strong>'+esc(c.nex||0)+'%</strong></div></div><div class="paper-columns"><div><div class="paper-caption">ATRIBUTOS <small>CLIQUE PARA ROLAR</small></div><div class="paper-attributes"><div class="paper-core">✣<span>ATRIBUTOS</span></div>'+attrHtml+'</div><div class="paper-resources">'+resource('pv','PONTOS DE VIDA',c.pvNow,st.pv)+resource('pe','PONTOS DE ESFORÇO',(+c.peNow||0)+(+c.peTemp||0),st.pe)+resource('san','SANIDADE',c.sanNow,st.san)+resource('def','DEFESA BASE',10+(+c.attrs.agi||0),null)+'</div><div class="paper-shortcuts"><button class="btn small" onclick="openModal(\''+esc(c.id)+'\')">Editar ficha</button></div></div><div>'+skillHudHtml+'</div></div><div class="sheet-pe-overview"><span>PE DISPONÍVEL <b>'+((+c.peNow||0)+(+c.peTemp||0))+'</b></span><span>GASTO NO TURNO <b>'+(+c.peSpentTurn||0)+'</b> / '+peLimitFor(c)+'</span></div><section class="sheet-block sheet-pe-block" id="sheetPEBlock"><h3>✧ HABILIDADES COM CUSTO DE PE <small>'+peActions.length+'</small></h3><div class="sheet-pe-list">'+peHtml+'</div></section><div class="sheet-lower"><section class="sheet-block sheet-powers-block"><h3>✦ PODERES & HABILIDADES <small>'+(powers.length+grantedPowers.length)+'</small></h3><div class="sheet-scroll sheet-powers-list">'+powerHtml+'</div>'+powerEditorHtml+'</section><section class="sheet-block"><h3>◈ RITUAIS <small>'+rituals.length+'</small></h3><div class="sheet-scroll">'+ritualHtml+'</div><div class="sheet-add"><select id="sheetRitualChoice" aria-label="Ritual para aprender"></select><button class="btn small primary" onclick="sheetLearnRitual()">+ Aprender</button></div></section><section class="sheet-block"><h3>▣ EQUIPAMENTO & INVENTÁRIO <small>'+inventory.length+'</small></h3><div class="sheet-scroll">'+invHtml+'</div><div class="sheet-add"><select id="sheetItemPreset" aria-label="Modelo de equipamento" onchange="sheetSelectPreset(this.value)"><option value="">Item personalizado</option></select><input id="sheetItemName" placeholder="Nome do equipamento" maxlength="100" aria-label="Nome do equipamento"><input id="sheetItemQty" type="number" min="1" max="999" value="1" aria-label="Quantidade"><label class="sheet-weapon-check"><input id="sheetItemWeapon" type="checkbox"> Arma</label><button class="btn small primary" onclick="sheetAddItem()">+ Adicionar</button></div></section><section class="sheet-block"><h3>⚔ ATAQUES & COMBATE <small>'+weapons.length+'</small></h3><div class="sheet-scroll">'+combatHtml+'</div><div class="sheet-add"><label class="sheet-defense">Defesa do alvo <input id="sheetTargetDefense" type="number" min="0" max="999" value="15"></label><label class="sheet-defense">Distância <select id="sheetTargetRange"><option value="curto">Curto</option><option value="medio">Médio</option><option value="longo">Longo</option><option value="extremo">Extremo</option></select></label></div><div id="sheetCombatResult" class="sheet-combat-result" aria-live="polite"></div></section></div><div class="paper-bottom">A MALDIÇÃO DOS SETE ANJOS <span>REGISTRO PARANORMAL</span></div></div><details class="paper-technical"><summary>Ficha técnica, controles e informações adicionais</summary><div class="paper-original">'+original+'</div></details>';
   const powerSelect=$('sheetKnownPowerSelect');
   if(powerSelect)powerSelect.innerHTML=sheetPowerCatalogOptions(c);
   const presetSelect=$('sheetItemPreset');if(presetSelect)presetSelect.innerHTML='<option value="">Item personalizado</option>'+INVENTORY_PRESETS.map((p,i)=>'<option value="'+i+'">'+esc(p.name)+'</option>').join('');
@@ -150,6 +150,84 @@
   if(ritualSelect){const known=c.powers?.rituals||[],slots=ritualSlotCount(c.class,c.nex,c.trail,c.powers?.paranormal||[],c.attrs.int),eligible=known.length<slots?availableRitualsFor(c).filter(r=>!known.includes(ritualValue(r))):[];ritualSelect.innerHTML=eligible.map(r=>'<option value="'+esc(ritualValue(r))+'">'+esc(r[0])+' • '+r[1]+'º círculo</option>').join('')||'<option value="">Sem rituais disponíveis</option>'}
   renderSkillHudList();
  }
+
+ window.sheetAddKnownPower=function(){
+  const c=current(),select=$('sheetKnownPowerSelect');
+  if(!c||!select||select.value===''){say('Escolha um poder no catálogo.');return}
+  const index=Number(select.value),power=sheetPowerCatalog[index];
+  if(!power||!Number.isInteger(index)){say('Poder não encontrado.');return}
+  if(sheetPowerNames(c).has(power.name.toLocaleLowerCase('pt-BR'))){say('Esse poder já está na ficha.');return}
+  const value=$('sheetKnownPowerCost')?.value??'0',cost=Number(value);
+  if(value.trim()===''||!Number.isInteger(cost)||cost<0||cost>99){say('Custo de PE deve ser um número inteiro de 0 a 99.');return}
+  const activation=$('sheetKnownPowerActivation')?.value==='active';
+  if(!activation&&cost>0){say('Para usar custo de PE, selecione o tipo Ativável.');return}
+  c.sheetPowers=[...sheetPowerStore(c),{id:'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),name:power.name,description:power.description||'',source:'catalog',category:power.category,group:power.group,cost,activation,limit:'none'}];
+  db();render();say('Poder adicionado: '+power.name+'.');
+ };
+ window.sheetResetCustomPower=function(){
+  const form=$('sheetCustomPowerPanel');if(!form)return;
+  for(const id of ['sheetPowerEditId','sheetCustomPowerName','sheetCustomPowerDescription']){const field=$(id);if(field)field.value=''}
+  $('sheetCustomPowerCost').value='0';
+  $('sheetCustomPowerActivation').value='passive';
+  $('sheetCustomPowerLimit').value='none';
+  $('sheetCustomPowerSave').textContent='Salvar poder';
+ };
+ window.sheetEditCustomPower=function(id){
+  const c=current(),power=sheetPowerStore(c).find(p=>p.id===id&&p.source==='custom');
+  if(!power)return;
+  const form=$('sheetCustomPowerPanel');if(!form)return;
+  form.open=true;
+  $('sheetPowerEditId').value=power.id;
+  $('sheetCustomPowerName').value=power.name;
+  $('sheetCustomPowerDescription').value=power.description||'';
+  $('sheetCustomPowerActivation').value=power.activation?'active':'passive';
+  $('sheetCustomPowerCost').value=power.cost||0;
+  $('sheetCustomPowerLimit').value=['turn','scene'].includes(power.limit)?power.limit:'none';
+  $('sheetCustomPowerSave').textContent='Atualizar poder';
+  form.scrollIntoView({behavior:'smooth',block:'nearest'});
+  $('sheetCustomPowerName').focus();
+ };
+ window.sheetSaveCustomPower=function(){
+  const c=current();if(!c)return;
+  const name=$('sheetCustomPowerName')?.value.trim(),description=$('sheetCustomPowerDescription')?.value.trim()||'';
+  const raw=$('sheetCustomPowerCost')?.value??'0',cost=Number(raw);
+  const activation=$('sheetCustomPowerActivation')?.value==='active';
+  const limit=$('sheetCustomPowerLimit')?.value||'none',id=$('sheetPowerEditId')?.value||'';
+  if(!name||name.length>65){say('Preencha o nome do poder (até 65 caracteres).');return}
+  if(description.length>600){say('A descrição deve ter até 600 caracteres.');return}
+  if(raw.trim()===''||!Number.isInteger(cost)||cost<0||cost>99){say('O custo de PE deve ser um número inteiro de 0 a 99.');return}
+  if(!activation&&cost>0){say('Para definir gasto de PE, escolha o tipo Ativável.');return}
+  if(!['none','turn','scene'].includes(limit)){say('Limite de uso inválido.');return}
+  const old=sheetPowerStore(c).find(p=>p.id===id&&p.source==='custom');
+  if(id&&!old){say('Poder não encontrado para edição.');return}
+  const duplicate=[...(c.powers?.class||[]),...(c.powers?.paranormal||[]),...sheetPowerStore(c).filter(p=>p.id!==id).map(p=>p.name)];
+  if(duplicate.some(x=>String(x).toLocaleLowerCase('pt-BR')===name.toLocaleLowerCase('pt-BR'))){say('Esse nome de poder já está sendo usado.');return}
+  const record={id:id||'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),source:'custom',category:'Personalizado',name,description,cost,activation,limit};
+  if(old)c.sheetPowers=sheetPowerStore(c).map(p=>p.id===id?record:p);
+  else c.sheetPowers=[...sheetPowerStore(c),record];
+  db();render();say(old?'Poder atualizado.':'Poder personalizado criado.');
+ };
+ window.sheetDeletePower=function(id){
+  const c=current(),power=sheetPowerStore(c).find(p=>p.id===id);if(!c||!power)return;
+  if(!confirm('Remover "'+power.name+'" da ficha?'))return;
+  c.sheetPowers=sheetPowerStore(c).filter(p=>p.id!==id);
+  const key='sp-'+id;
+  c.peRoundUsed=(c.peRoundUsed||[]).filter(x=>x!==key);
+  c.peSceneUsed=(c.peSceneUsed||[]).filter(x=>x!==key);
+  db();render();say('Poder removido da ficha.');
+ };
+ window.sheetActivatePower=function(id){
+  const c=current(),power=sheetPowerStore(c).find(p=>p.id===id);if(!power||!power.activation)return;
+  const key='sp-'+power.id,cost=Number(power.cost)||0;
+  if(power.limit==='turn'&&(c.peRoundUsed||[]).includes(key)){say('Esse poder já foi usado neste turno.');return}
+  if(power.limit==='scene'&&(c.peSceneUsed||[]).includes(key)){say('Esse poder já foi usado nesta cena.');return}
+  if(cost>0&&!consumePE(c,cost,{minCost:cost,kind:'general'}))return;
+  if(power.limit==='turn')c.peRoundUsed=[...(c.peRoundUsed||[]),key];
+  if(power.limit==='scene')c.peSceneUsed=[...(c.peSceneUsed||[]),key];
+  db();
+  addHist({agent:c.name,label:power.name,detail:cost?'−'+cost+' PE • Poder '+(power.source==='custom'?'personalizado':'adicional'):'Poder ativado • '+(power.source==='custom'?'personalizado':'adicional'),total:cost,dt:null,passed:null,status:cost?'PE GASTO':'ATIVADO',kind:'Poder'});
+  render();say(power.name+' utilizado'+(cost?' • '+cost+' PE':'')+'.');
+ };
  window.sheetLearnRitual=function(){const value=$('sheetRitualChoice')?.value,select=$('grimoireNewRitual');if(!value||!select){say('Nenhum ritual disponível.');return}select.value=value;addKnownRitualFromPage()};
  window.sheetRemoveRitual=function(index){const c=current();if(!c?.powers?.rituals?.[index])return;if(!confirm('Remover este ritual da ficha?'))return;c.powers.rituals.splice(index,1);db();render()};
  window.sheetUsePE=function(actionId){
@@ -157,7 +235,7 @@
   const sheet=$('sheet-pe-'+a.id),target=$((a.mode==='cost'?'pe-cost-':'pe-param-')+a.id);
   if(sheet&&target)target.value=sheet.value;
   usePEAction(c.id,a.id);
-  renderPaper();
+  render();
  };
  window.sheetSelectPreset=function(value){const p=INVENTORY_PRESETS[Number(value)];if(value===''||!p)return;$('sheetItemName').value=p.name;$('sheetItemWeapon').checked=!!p.weapon};
  window.sheetRemoveItem=function(id){if(!confirm('Remover este item do inventário?'))return;removeInventoryItem(id)};
