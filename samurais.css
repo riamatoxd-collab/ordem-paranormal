@@ -140,3 +140,71 @@
 #v-mestre .samurai-master-dossier>div{padding:7px 12px;display:grid;gap:6px}
 #v-mestre .samurai-master-dossier p{color:#d6bdab;font-size:10px;line-height:1.6;overflow-wrap:anywhere;margin:0}
 #v-mestre .samurai-master-dossier strong{color:#f0d7b5}
+
+/* Ficha ancestral: sistema próprio de PD, habilidades únicas e fórmulas dos samurais */
+.paper-samurai .paper-resources .paper-resource-pe,
+.paper-samurai .paper-resources .paper-resource-san,
+.paper-samurai .paper-resources .paper-resource-def,
+.paper-samurai .sheet-pe-overview,
+.paper-samurai .sheet-pe-rest-controls,
+.paper-samurai .sheet-pe-block,
+.paper-samurai .sheet-lower,
+.paper-samurai .paper-shortcuts,
+.paper-samurai .skill-hud{display:none!important}
+.paper-samurai .paper-columns{display:block}
+.paper-samurai .paper-resources{display:flex;flex-wrap:wrap}
+.paper-samurai .paper-resources>.paper-resource-pv{width:100%;max-width:340px}
+.samurai-ancestral-sheet{
+ --samurai-color:#c04d60;
+ padding:16px 18px;
+ margin:10px 15px 18px;
+ background:radial-gradient(circle at 94% 1%,color-mix(in srgb,var(--samurai-color) 22%,transparent),transparent 48%),linear-gradient(135deg,#21151c,#100f16);
+ color:#e8d6c8;border:1px solid color-mix(in srgb,var(--samurai-color) 55%,#5d4a3c);
+ border-top:3px solid var(--samurai-color);border-radius:12px;
+ box-shadow:inset 0 0 0 1px #ffffff0b,0 8px 24px #0008
+}
+.samurai-ancestral-top{display:grid;gap:5px;margin-bottom:14px}
+.samurai-ancestral-top>small{color:var(--samurai-color);font-weight:850;letter-spacing:.12em;font-size:10px;text-transform:uppercase}
+.samurai-ancestral-top h3{font:700 clamp(18px,2.4vw,26px) Georgia,serif;margin:0;color:#fff0df}
+.samurai-ancestral-top p{margin:0;color:#d8c1b1;font-size:11px;line-height:1.6}
+.samurai-ancestral-phrase{font:italic 14px Georgia,serif!important;color:#f4d0ab!important}
+.samurai-ancestral-vitals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:10px}
+.samurai-ancestral-vitals>div{display:grid;gap:7px;padding:12px 9px;border:1px solid #856052;border-radius:8px;background:#261a21;text-align:center}
+.samurai-ancestral-vitals small{font-size:9px;color:#c9aa95;font-weight:800;letter-spacing:.09em}
+.samurai-ancestral-vitals strong{font-size:22px;color:#ffe8cf}
+.samurai-ancestral-vitals em{font-style:normal;font-size:12px;color:#c6b0a3}
+.samurai-ancestral-pd-controls{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:0 0 15px;font-size:11px;color:#e6cab2}
+.samurai-ancestral-pd-controls span{margin-right:auto;font-weight:800}
+.samurai-ancestral-sheet button{cursor:pointer;border-radius:7px;background:#39252c;border:1px solid #9a7564;color:#fff0dc;padding:9px 12px;font-size:11px;font-weight:750}
+.samurai-ancestral-sheet button:hover:not(:disabled){border-color:var(--samurai-color);background:color-mix(in srgb,var(--samurai-color) 30%,#2a1b24)}
+.samurai-ancestral-sheet button:disabled{opacity:.5;cursor:not-allowed}
+.samurai-ancestral-sheet button:focus-visible{outline:2px solid #f1d9a4;outline-offset:2px}
+.samurai-ancestral-ability{display:grid;gap:9px;grid-template-columns:1fr auto;padding:16px;border:1px solid var(--samurai-color);border-radius:9px;background:color-mix(in srgb,var(--samurai-color) 13%,#1a121a);margin:0 0 15px}
+.samurai-ancestral-ability small{color:var(--samurai-color);font-size:9px;font-weight:850;letter-spacing:.13em}
+.samurai-ancestral-ability h4{font:700 20px Georgia,serif;color:#fff0d7;margin:5px 0}
+.samurai-ability-cost{color:#f8ddbb;background:#38232c;padding:8px;border-radius:6px;border:1px solid #795c51;font-size:11px;align-self:start}
+.samurai-ancestral-ability p{grid-column:1/-1;font-size:12px;line-height:1.65;margin:0;color:#ead3bf}
+.samurai-ancestral-ability>button{grid-column:1/-1;justify-self:start;background:linear-gradient(110deg,color-mix(in srgb,var(--samurai-color) 50%,#321b28),#3a2430);border-color:var(--samurai-color)}
+.samurai-ancestral-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.samurai-ancestral-grid>div{background:#1b151b;border:1px solid #71584a;border-radius:9px;padding:13px;min-width:0}
+.samurai-ancestral-grid h4{font:700 16px Georgia,serif;color:#f1d2aa;margin:0 0 9px;overflow-wrap:anywhere}
+.samurai-ancestral-grid p{font-size:11px;color:#decab8;line-height:1.6;margin:5px 0}
+.samurai-weapon-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.samurai-quick-skills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.samurai-ancestral-sheet .samurai-quick-skill{padding:9px 7px;display:grid;gap:5px;text-align:left}
+.samurai-quick-skill strong{font-size:11px;overflow-wrap:anywhere}
+.samurai-quick-skill span{font-size:10px;color:var(--samurai-color)}
+.samurai-ancestral-foot,.samurai-ancestral-rule{font-size:10px;line-height:1.6;color:#cbb2a3;margin:13px 0 0}
+.samurai-ancestral-rule{border-top:1px solid #705548;padding-top:10px}
+.samurai-roll-formula{font-size:15px;font-weight:750;color:#bfa06f;margin:12px 0}
+.samurai-roll-detail{color:#d2bcac;font-size:12px;margin:10px 0;line-height:1.5}
+#v-mestre .samurai-master-dossier .samurai-special-data{border-top:1px solid #61483f;margin-top:7px;padding-top:8px}
+#v-mestre .samurai-master-dossier .samurai-special-data strong{color:var(--samurai-color)}
+@media (max-width:700px){
+ .samurai-ancestral-sheet{margin:6px 8px 12px;padding:12px}
+ .samurai-ancestral-grid{grid-template-columns:1fr}
+ .samurai-ancestral-vitals{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .samurai-ancestral-ability{grid-template-columns:1fr}
+ .samurai-ancestral-ability>button{justify-self:stretch}
+ .samurai-quick-skills{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
