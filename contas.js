@@ -330,7 +330,7 @@
   if(!list||!meta)return;
   meta.textContent=account?'LOGADO COMO: '+account.displayName+' • '+(online?'CONTA CONECTADA':'CONTA LOCAL'):'Faça login para registrar seus personagens.';
   list.innerHTML=agents.map(c=>
-   '<article class="op-registration-card"><div><b>'+safe(c.name)+'</b><small>'+safe(className(c.class))+' • '+(c.class==='sobrevivente'?'Estágio '+safe(c.stage):'NEX '+safe(c.nex)+'%')+'</small><small>PV '+safe(c.pvNow||0)+' • PE '+safe(c.peNow||0)+' • SAN '+safe(c.sanNow||0)+'</small></div><div><button type="button" class="btn small" data-id="'+safe(c.id)+'" onclick="OPAccounts.showCharacter(this.dataset.id)">Ver ficha</button><button type="button" class="btn small" data-id="'+safe(c.id)+'" onclick="openModal(this.dataset.id)">Editar</button></div></article>'
+   '<article class="op-registration-card '+(c.samuraiSlug?'op-samurai-card':'')+'" style="--samurai-color:'+(c.samuraiSlug?samuraiColorOf(c):'#b48e69')+'"><div><b>'+safe(c.name)+'</b><small>'+safe(className(c.class))+' • '+(c.class==='sobrevivente'?'Estágio '+safe(c.stage):'NEX '+safe(c.nex)+'%')+'</small><small>PV '+safe(c.pvNow||0)+' • PE '+safe(c.peNow||0)+' • SAN '+safe(c.sanNow||0)+'</small></div><div><button type="button" class="btn small" data-id="'+safe(c.id)+'" onclick="OPAccounts.showCharacter(this.dataset.id)">Ver ficha</button><button type="button" class="btn small" data-id="'+safe(c.id)+'" onclick="openModal(this.dataset.id)">Editar</button></div></article>'
   ).join('')||'<div class="empty">Nenhum personagem nesta conta. Clique em “Criar novo personagem”.</div>';
   noteLegacy();
  }
@@ -502,6 +502,9 @@
    +textarea('objective','Objetivo',c.objective||'')
    +textarea('personality','Personalidade',c.personality||'')
    +textarea('appearance','Aparência',c.appearance||'')
+   +textarea('classPowers','Poderes de classe (um por linha)',(c.powers?.class||[]).join('\n'))
+   +textarea('paranormalPowers','Poderes paranormais (um por linha)',(c.powers?.paranormal||[]).join('\n'))
+   +textarea('rituals','Rituais conhecidos (um por linha)',(c.powers?.rituals||[]).join('\n'))
    +textarea('inventory','Equipamentos (um por linha)',(c.inventory||[]).map(i=>i.name).join('\n'),5)
    +'</div></div>';
   modal.hidden=false;
@@ -537,6 +540,8 @@
    if(!Number.isInteger(value)||value<0||value>max){say('O valor de '+key.toUpperCase()+' deve estar entre 0 e '+max+'.');return}
    c[prop]=value;
   }
+  const byLine=field=>[...new Set(get(field).split(/\r?\n/).map(x=>x.trim().slice(0,100)).filter(Boolean))].slice(0,40);
+  c.powers={...c.powers,class:byLine('classPowers'),paranormal:byLine('paranormalPowers'),rituals:byLine('rituals')};
   c.inventory=get('inventory').split(/\r?\n/).map(s=>s.trim()).filter(Boolean).slice(0,30).map((name,i)=>{
    const previous=(slot.character.inventory||[]).find(item=>item.name===name);
    const preset=INVENTORY_PRESETS.find(x=>x.name===name);
