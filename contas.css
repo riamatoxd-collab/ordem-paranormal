@@ -87,3 +87,87 @@
  line-height:1.65;
  overflow-wrap:anywhere;
 }
+
+/* Recuperação de senha — tela do Conhecimento */
+.op-auth-gate .op-auth-tabs[hidden],
+.op-auth-gate #opAuthForm[hidden],
+.op-auth-gate .op-auth-forgot-trigger[hidden],
+.op-auth-gate .op-recovery-panel[hidden],
+.op-auth-gate #opRecoveryRequestForm[hidden],
+.op-auth-gate #opRecoveryNewForm[hidden]{display:none!important}
+.op-auth-forgot-trigger{
+ display:block;
+ margin:12px auto 5px;
+ padding:8px 12px;
+ border:1px solid #97835e;
+ background:#272020;
+ border-radius:8px;
+ font-size:11px;
+ color:#f0d7a8;
+ cursor:pointer;
+ text-decoration:underline;
+ text-underline-offset:3px;
+}
+.op-auth-forgot-trigger:hover,.op-recovery-back:hover{
+ background:#3a2b26;
+ border-color:#e6ca92;
+}
+.op-auth-forgot-trigger:focus-visible,.op-recovery-back:focus-visible{
+ outline:2px solid #e6ca92;
+ outline-offset:3px;
+}
+.op-recovery-panel{display:grid;gap:12px;margin-top:8px;text-align:left}
+.op-recovery-panel form{display:grid;gap:13px}
+.op-recovery-sigil{
+ width:64px;height:64px;display:grid;place-items:center;margin:0 auto 3px;
+ font-size:35px;color:#efd1a0;
+ border-radius:50%;border:1px solid #bfa372;background:radial-gradient(circle,#53472e,#20171d 75%);
+ box-shadow:0 0 24px #c8a66a44;
+}
+.op-recovery-panel h2{
+ margin:2px 0 0;
+ color:#f5dfb5;
+ text-align:center;
+ font:700 25px Georgia,serif;
+}
+.op-recovery-panel form>p{
+ margin:0;
+ color:#cbbb9f;
+ font-size:12px;
+ line-height:1.65;
+ text-align:center;
+}
+.op-recovery-panel label{
+ display:grid;
+ gap:7px;
+ color:#e5c792;
+ font-size:10px;
+ font-weight:800;
+ letter-spacing:.08em;
+}
+.op-recovery-panel input{
+ box-sizing:border-box;
+ width:100%;
+ min-width:0;
+ padding:13px 11px;
+ border:1px solid #a68e6b;
+ border-radius:7px;
+ background:#eee1c7;
+ color:#281a20;
+ font-size:14px;
+ outline:none;
+}
+.op-recovery-panel input:focus-visible{
+ outline:2px solid #edc78d;
+ outline-offset:2px;
+}
+.op-recovery-back{
+ justify-self:center;
+ border:1px solid #937c61;
+ border-radius:8px;
+ background:#292027;
+ color:#e9d2b3;
+ cursor:pointer;
+ padding:9px 14px;
+ font-size:11px;
+}
