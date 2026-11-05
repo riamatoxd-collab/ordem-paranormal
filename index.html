@@ -312,10 +312,11 @@
 <link rel="stylesheet" href="./contas.css?v=recuperar-senha-2">
 <link rel="stylesheet" href="./samurais.css?v=cinco-samurais-fichas-1">
 <link rel="stylesheet" href="./intro-personagens.css?v=tempus-intro-3">
+<link rel="stylesheet" href="./diretor-cenas.css?v=tempus-cenas-1">
 <link rel="stylesheet" href="./rituais-regras-completas.css?v=grimorio-livros-1">
 <link rel="stylesheet" href="./rituais-executor.css?v=rituais-execucao-1">
 </head><body>
-<div class="app"><aside class="side"><div class="brand"><span class="sig">✣</span> O OUTRO LADO<span>ARQUIVO DE OPERAÇÕES</span></div><nav class="nav"><button class="active" data-view="home">⌂ &nbsp;Painel</button><button data-view="agents">♙ &nbsp;Agentes</button><button data-view="intro">✧ &nbsp;Apresentações</button><button data-view="occult">◉ &nbsp;Transcender</button><button data-view="grimorio">▤ &nbsp;Grimório</button><button data-view="roll">⚄ &nbsp;Rolagens</button><button data-view="combat">⚔ &nbsp;Combate</button><button data-view="history">◷ &nbsp;Histórico</button></nav><small>PROTOCOLO 0-01<br>Registros salvos neste navegador.<br>Versão 2.6 • Transcender e Grimório</small></aside>
+<div class="app"><aside class="side"><div class="brand"><span class="sig">✣</span> O OUTRO LADO<span>ARQUIVO DE OPERAÇÕES</span></div><nav class="nav"><button class="active" data-view="home">⌂ &nbsp;Painel</button><button data-view="agents">♙ &nbsp;Agentes</button><button data-view="intro">✧ &nbsp;Apresentações</button><button data-view="cenas">◈ &nbsp;Diretor de cenas</button><button data-view="occult">◉ &nbsp;Transcender</button><button data-view="grimorio">▤ &nbsp;Grimório</button><button data-view="roll">⚄ &nbsp;Rolagens</button><button data-view="combat">⚔ &nbsp;Combate</button><button data-view="history">◷ &nbsp;Histórico</button></nav><small>PROTOCOLO 0-01<br>Registros salvos neste navegador.<br>Versão 2.6 • Transcender e Grimório</small></aside>
 <main><header class="top"><div><div class="eyebrow">SISTEMA DE APOIO À MESA</div><h1 id="title">Painel de operações</h1></div><button class="btn primary" onclick="openModal()">＋ Novo agente</button></header>
 <section class="view active" id="v-home"><div class="hero"><div class="eyebrow">ORDEM DA REALIDADE • TERMINAL DE CAMPO</div><h2>O OUTRO LADO<br>ESTÁ MAIS PERTO.</h2><p>Cadastre agentes, faça testes automáticos e acompanhe as rolagens da sua sessão em um só lugar.</p><div class="actions"><button class="btn primary" onclick="view('roll')">⚄ Fazer rolagem</button><button class="btn ghost" onclick="openModal()">＋ Cadastrar agente</button></div></div><div class="grid stats"><div class="card"><div class="statlabel">AGENTES</div><div class="statval" id="nAgents">0</div></div><div class="card"><div class="statlabel">ROLAGENS</div><div class="statval" id="nRolls">0</div></div><div class="card"><div class="statlabel">SUCESSOS</div><div class="statval" id="nSuccess">0</div></div><div class="card"><div class="statlabel">FALHAS</div><div class="statval" id="nFail">0</div></div></div><div class="section"><h2>Acesso rápido</h2></div><div class="grid quick"><button class="card btn" onclick="view('agents')"><span class="qicon">♙</span><span><b>Gerenciar agentes</b><br><small class="muted">Fichas e recursos</small></span></button><button class="card btn" onclick="view('roll')"><span class="qicon">⚄</span><span><b>Teste de perícia</b><br><small class="muted">Dados e modificadores</small></span></button><button class="card btn" onclick="view('combat')"><span class="qicon">⚔</span><span><b>Resolver ataque</b><br><small class="muted">Ataque e dano</small></span></button></div><div class="section"><h2>Últimas rolagens</h2><button class="btn small ghost" onclick="view('history')">Ver histórico →</button></div><div class="list" id="homeHistory"></div></section>
 <section class="view" id="v-agents">
@@ -473,6 +474,75 @@
  </div>
 </div>
 
+
+<section class="view" id="v-cenas">
+ <div class="scene-director-head">
+  <div><small>◈ TEMPUS CUSTODIA • COMANDO DA NARRATIVA</small>
+   <h2>DIRETOR DE CENAS<br>CINEMATOGRÁFICAS.</h2>
+   <p>O mestre controla as revelações em tempo real. Uma cena iniciada chega a todos os jogadores conectados, mesmo que estejam em partes diferentes do site. As escolhas ficam registradas para a decisão do mestre.</p></div>
+  <div class="scene-director-sigil" aria-hidden="true">◈</div>
+ </div>
+ <div class="scene-director-layout">
+  <section class="scene-panel scene-master-panel" id="sceneMasterPanel" hidden>
+   <h3>Estúdio do Mestre</h3>
+   <p class="scene-hint">Escolha uma cena pronta, ajuste a narração ou crie a sua. Use <strong>Prévia local</strong> para ensaiar; <strong>Iniciar para todos</strong> exibe a cena nas telas dos jogadores. Encerre a cena atual para liberar a próxima.</p>
+   <div class="scene-catalog" id="sceneCatalog"></div>
+   <div class="scene-editor">
+    <label>TÍTULO DA CENA<input id="scene_title" type="text" maxlength="90" placeholder="A Vila Devastada"></label>
+    <label>SUBTÍTULO<input id="scene_subtitle" type="text" maxlength="110" placeholder="UM LUGAR FORA DO TEMPO"></label>
+    <label>EPISÓDIO / CENÁRIO<input id="scene_chapter" type="text" maxlength="90" placeholder="EPISÓDIO 1 • A VILA"></label>
+    <label>COR TEMÁTICA<input id="scene_accent" type="color" value="#bb9b79"></label>
+    <label class="wide">TEXTO DA NARRAÇÃO<textarea id="scene_narration" maxlength="1800" rows="5" placeholder="Descreva o que todos podem perceber nesta cena."></textarea></label>
+    <label class="wide">ESCOLHAS DO JOGADOR (UMA POR LINHA, ATÉ 4)<textarea id="scene_choices" maxlength="600" rows="4" placeholder="Investigar as casas&#10;Examinar o poço&#10;Procurar o templo"></textarea><small>Se deixar vazio, os jogadores apenas concluem a cena. Cada jogador pode registrar uma escolha.</small></label>
+    <label>URL DA IMAGEM (HTTPS, OPCIONAL)<input id="scene_image_url" type="url" maxlength="500" placeholder="https://exemplo.com/vila.jpg"></label>
+    <label>URL DE ÁUDIO (HTTPS, OPCIONAL)<input id="scene_audio_url" type="url" maxlength="500" placeholder="https://exemplo.com/ambiente.mp3"><small>O som só começa quando o jogador clicar para ativá-lo.</small></label>
+   </div>
+   <div class="scene-director-actions">
+    <button id="scenePreview" class="btn" type="button">◉ Prévia local</button>
+    <button id="scenePublish" class="btn primary" type="button">◈ Iniciar para todos</button>
+   </div>
+  </section>
+  <section class="scene-panel">
+   <h3>Cena atual</h3>
+   <div class="scene-status-bar" id="sceneLiveStatus" aria-live="polite"></div>
+   <div class="scene-director-actions">
+    <button type="button" class="btn" id="sceneReload">↻ Sincronizar</button>
+    <button type="button" class="btn" id="sceneCloseLive" disabled>■ Encerrar cena</button>
+   </div>
+   <div class="scene-feedback" id="sceneFeedback" role="status"></div>
+   <div class="scene-vote-summary" id="sceneVoteSummary"></div>
+  </section>
+  <section class="scene-panel">
+   <h3>Histórico de cenas</h3>
+   <p class="scene-hint">Reveja as cenas que já foram exibidas. Os jogadores não conseguem publicar nem encerrar cenas.</p>
+   <div class="scene-history-list" id="sceneHistory"></div>
+  </section>
+ </div>
+</section>
+<div class="scene-cinema" id="sceneCinema" hidden role="dialog" aria-modal="true" aria-labelledby="sceneCinemaTitle">
+ <div class="scene-cinema-stage">
+  <button class="scene-cinema-x" id="sceneCinemaClose" type="button" aria-label="Fechar prévia" hidden>✕ Fechar prévia</button>
+  <div class="scene-cinema-picture">
+   <img id="sceneCinemaImage" alt="Arte da cena" hidden>
+   <div class="scene-cinema-art" id="sceneCinemaArt" aria-hidden="true">◈</div>
+  </div>
+  <div class="scene-cinema-content">
+   <small class="scene-cinema-chapter" id="sceneCinemaChapter">TEMPUS CUSTODIA</small>
+   <h2 id="sceneCinemaTitle">A história se revela</h2>
+   <div class="scene-cinema-subtitle" id="sceneCinemaSubtitle">UM CAMINHO INESPERADO</div>
+   <div class="scene-cinema-divider" aria-hidden="true"></div>
+   <div class="scene-cinema-narration" id="sceneCinemaNarration"></div>
+   <div class="scene-cinema-options" id="sceneOptions"></div>
+   <div class="scene-cinema-controls">
+    <button type="button" id="sceneFinish" class="scene-cinema-finish">Concluir cena</button>
+    <button type="button" id="sceneAudioToggle" class="scene-cinema-finish" hidden>♫ Ativar som</button>
+   </div>
+   <div class="scene-cinema-status" id="sceneVoteStatus" role="status" aria-live="polite"></div>
+  </div>
+  <audio id="sceneAudio" preload="none"></audio>
+ </div>
+</div>
+
 <section class="view" id="v-roll"><div class="section" style="margin-top:0"><div><h2>Central de rolagens</h2><p>O sistema escolhe o melhor d20 (ou o pior, para atributo 0) e aplica os bônus.</p></div></div><div class="grid cols"><div class="card"><div class="form"><div class="field full"><label>AGENTE</label><select id="rAgent"></select></div><div class="field"><label>TIPO</label><select id="rType" onchange="toggleRoll()"><option value="skill">Teste de perícia</option><option value="attr">Teste de atributo</option></select></div><div class="field"><label>DT</label><input id="rDT" type="number" placeholder="Ex.: 15"></div><div class="field full" id="rSkillBox"><label>PERÍCIA</label><select id="rSkill"></select></div><div class="field full" id="rAttrBox" style="display:none"><label>ATRIBUTO</label><select id="rAttr"><option value="agi">Agilidade</option><option value="for">Força</option><option value="int">Intelecto</option><option value="pre">Presença</option><option value="vig">Vigor</option></select></div><div class="field"><label>DADOS DE BÔNUS (+d20)</label><input id="rBonus" type="number" min="0" max="20" value="0"></div><div class="field"><label>DADOS DE PENALIDADE (−d20)</label><input id="rPenalty" type="number" min="0" max="20" value="0"></div><div class="field"><label>BÔNUS FIXO</label><input id="rFlat" type="number" value="0"></div><div class="field"><label>OBSERVAÇÃO</label><input id="rNote" placeholder="Ex.: sob pressão"></div></div><label class="checkline" style="margin-top:10px"><input id="rLoadPenalty" type="checkbox"> Aplicar também –5 a outra perícia afetada pela carga (as marcadas no livro são automáticas)</label><button class="btn primary" style="margin-top:14px" onclick="rollTest()">⚄ Rolar teste</button><p class="muted">Atributo 0: rola dois d20 e considera o pior. Um 20 natural no dado escolhido é sucesso automático.</p></div><div class="card"><div class="eyebrow">RESULTADO</div><div class="result" id="rollResult" style="margin-top:10px">Aguardando rolagem…<div style="font-size:46px;margin-top:15px">⚄</div></div><div class="note">O mestre define a DT e interpreta as consequências narrativas.</div></div></div><div class="section"><h2>Dados livres</h2></div><div class="card"><div class="form"><div class="field"><label>EXPRESSÃO</label><input id="freeExpr" value="1d20" placeholder="2d8+3"></div><div class="field"><label>IDENTIFICAÇÃO</label><input id="freeName" placeholder="Dano da arma"></div></div><button class="btn primary" style="margin-top:12px" onclick="rollFree()">Rolar dados livres</button><div id="freeResult" class="muted" style="margin-top:12px"></div></div></section>
 <section class="view" id="v-combat"><div class="section" style="margin-top:0"><div><h2>Terminal de combate</h2><p>Teste Luta/Pontaria contra Defesa e role dano em caso de acerto.</p></div></div><div class="grid cols"><div class="card"><div class="form"><div class="field full"><label>AGENTE</label><select id="cAgent"></select></div><div class="field"><label>PERÍCIA DE ATAQUE</label><select id="cSkill"><option>Luta</option><option>Pontaria</option></select></div><div class="field"><label>DEFESA DO ALVO</label><input id="cDefense" type="number" value="15"></div><div class="field"><label>BÔNUS FIXO NO ATAQUE</label><input id="cBonus" type="number" value="0"></div><div class="field"><label>EXPRESSÃO DE DANO</label><input id="cDamage" value="1d8+0" placeholder="2d6+3"></div><div class="field"><label>ARMA / ATAQUE</label><input id="cWeapon" placeholder="Ex.: Revólver"></div></div><button class="btn primary" style="margin-top:14px" onclick="attack()">⚔ Realizar ataque</button></div><div class="card"><div class="eyebrow">RELATÓRIO DE COMBATE</div><div class="result" id="combatResult" style="margin-top:10px">Aguardando ação…<div style="font-size:46px;margin-top:15px">⚔</div></div><div class="note">Informe bônus, Defesa e dano conforme a arma e as regras da mesa. Críticos, resistências e efeitos especiais ainda são resolvidos pelo mestre.</div></div></div></section>
 <section class="view" id="v-history"><div class="section" style="margin-top:0"><div><h2>Histórico de rolagens</h2><p>Registros salvos neste navegador.</p></div><button class="btn ghost small" onclick="clearHistory()">Limpar histórico</button></div><div class="list" id="historyList"></div></section><div class="foot">Ferramenta independente de apoio à mesa. Não é um produto oficial de Ordem Paranormal, Cellbit ou Ordo Realitas. Regras de inventário baseadas em Ordem Paranormal RPG 1.3, p. 53–57 e 66; Sobrevivendo ao Horror 1.3.1.</div></main></div>
@@ -489,7 +559,7 @@ let agents=JSON.parse(localStorage.getItem('op_agents')||'[]'),hist=JSON.parse(l
 const $=id=>document.getElementById(id),clamp=(x,a,b)=>Math.max(a,Math.min(b,Number.isFinite(+x)?+x:a));
 function db(){localStorage.setItem('op_agents',JSON.stringify(agents));localStorage.setItem('op_hist',JSON.stringify(hist))}function say(s){$('toast').textContent=s;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2200)}function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function focusAgentSection(id){let el=$(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
-function view(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));$('v-'+v).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));$('title').textContent=({home:'Painel de operações',cadastro:'Cadastrar personagem',agents:'Agentes cadastrados',intro:'Apresentações',occult:'Transcender',grimorio:'Grimório',roll:'Central de rolagens',combat:'Terminal de combate',history:'Histórico de rolagens'})[v];if(v==='occult')startVoidAudio();else stopVoidAudio();render()};document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>view(b.dataset.view));
+function view(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));$('v-'+v).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));$('title').textContent=({home:'Painel de operações',cadastro:'Cadastrar personagem',agents:'Agentes cadastrados',intro:'Apresentações',cenas:'Diretor de cenas',occult:'Transcender',grimorio:'Grimório',roll:'Central de rolagens',combat:'Terminal de combate',history:'Histórico de rolagens'})[v];if(v==='occult')startVoidAudio();else stopVoidAudio();render()};document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>view(b.dataset.view));
 
 function peLimitFor(c,kind='general'){let limit=stats(c).limit||1,pp=c.powers?.paranormal||[];if(pp.includes('Encarar a Morte'))limit+=(c.encararMorteAffinity?3:1);if(kind==='ritual'&&c.class==='ocultista'&&c.trail==='Intuitivo'&&+c.nex>=40)limit+=(+c.attrs.pre||0);return Math.max(1,limit)}
 function consumePE(c,cost,opts={}){cost=Math.floor(+cost||0);if(cost<1)return false;let limit=peLimitFor(c,opts.kind||'general'),spent=+c.peSpentTurn||0,minCost=Math.max(1,+opts.minCost||cost),exception=spent===0&&cost===minCost&&cost>limit;if(cost>limit&&!exception){say('O custo excede o limite de PE por uso ('+limit+').');return false}if(spent+cost>limit&&!exception){say('Limite de PE por turno atingido: '+spent+'/'+limit+'.');return false}if(opts.payWithPV){let pvCost=cost*2;if((+c.pvNow||0)<pvCost){say('PV insuficientes: o Poder do Flagelo exige '+pvCost+' PV.');return false}c.pvNow-=pvCost;c.flageloSpentPV=(+c.flageloSpentPV||0)+pvCost}else{let temp=Math.max(0,+c.peTemp||0),normal=Math.max(0,+c.peNow||0);if(temp+normal<cost){say('PE insuficientes. Disponível: '+(temp+normal)+'.');return false}let used=Math.min(temp,cost);c.peTemp=temp-used;c.peNow=normal-(cost-used)}if(opts.countTurn!==false)c.peSpentTurn=spent+cost;return true}
@@ -1229,5 +1299,5 @@ function renderTranscendProgression(){
 
 function render(){$('nAgents').textContent=agents.length;renderAgents();fillSelect();renderHistory();renderInventory();renderSkillPage();renderOccultPage();renderTranscendProgression();renderGrimoirePage()};setupInventoryPresets();populateOrigins();renderTrailOptions('');['class','nex','aAgi','aFor','aInt','aPre','aVig'].forEach(id=>$(id).addEventListener('input',()=>{if(id==='class')classHint();else{if(id==='nex')renderTrailOptions($('trail').value);refreshBuildEditors()}$('classSkillSummary').textContent=classSkillText($('class').value,+$('aInt').value)}));$('origin').addEventListener('change',onOriginChange);$('trail').addEventListener('change',refreshBuildEditors);render();
 </script><script src="./auth-config.js?v=supabase-online-2"></script><script src="./contas.js?v=template-samurais-pd-7"></script>
-<script src="./intro-personagens.js?v=tempus-intro-5"></script><script src="./ficha-mestre.js?v=cinco-samurais-1"></script><script src="./samurai-fichas.js?v=cinco-samurais-fichas-1"></script>
+<script src="./intro-personagens.js?v=tempus-intro-5"></script><script src="./diretor-cenas.js?v=tempus-cenas-1"></script><script src="./ficha-mestre.js?v=cinco-samurais-1"></script><script src="./samurai-fichas.js?v=cinco-samurais-fichas-1"></script>
 <script src="./rituais-executor.js?v=rituais-execucao-1"></script></body></html>
