@@ -331,11 +331,14 @@
    if(window.location.protocol!=='https:'&&!['localhost','127.0.0.1'].includes(window.location.hostname))
     throw new Error('Abra o site com HTTPS para receber o link de recuperação.');
    await api('/auth/v1/recover?redirect_to='+encodeURIComponent(redirect),'POST',{email},'');
-   setMessage('Se esse e-mail estiver cadastrado, você receberá um link para criar outra senha. Confira também a pasta de spam.');
+   setMessage('Solicitação recebida. Se a conta existir, confira a caixa de entrada e o spam. Se o link não chegar, pode haver um limite de envio ou uma configuração pendente de e-mail no site.');
   }catch(error){
    const message=String(error?.message||'');
-   setMessage(/rate.limit|too.many|429/i.test(message)?'Muitas solicitações. Aguarde um pouco antes de tentar novamente.':
-    'Não foi possível solicitar o link. Verifique a conexão e tente novamente.',true);
+   const limit=/rate[ ._-]*limit|too[ ._-]*many|429|over_email_send_rate_limit/i.test(message);
+   const smtp=/email.address.not.authorized|smtp|sending.*email|error.sending.*email/i.test(message);
+   setMessage(limit?'O envio de e-mails do site atingiu um limite temporário. Aguarde a liberação antes de solicitar outro link.':
+    smtp?'O serviço de e-mail do site não conseguiu enviar o link. Avise o administrador para verificar o SMTP no Supabase.':
+    'Não foi possível solicitar o link de recuperação. Verifique sua conexão ou avise o administrador do site.',true);
   }finally{button.disabled=false}
  });
  document.getElementById('opRecoveryNewForm').addEventListener('submit',async e=>{
