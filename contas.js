@@ -234,9 +234,27 @@
   introRequest(path,method='GET',body=null){
    if(!authReady||!account||!online)return Promise.reject(Error('Entre com uma conta conectada.'));
    if(!/^\/rest\/v1\/character_introductions(?:\?|$)/.test(path))return Promise.reject(Error('Caminho não permitido.'));
-   if(!['GET','POST'].includes(method))return Promise.reject(Error('Método não permitido.'));
+   if(!['GET','POST','PATCH'].includes(method))return Promise.reject(Error('Método não permitido.'));
    if(method==='POST'&&account.role!=='mestre')return Promise.reject(Error('Apenas o mestre pode publicar.'));
+   if(method==='PATCH'){
+    if(!/^\/rest\/v1\/character_introductions\?id=eq\.[1-9][0-9]*$/.test(path)||
+       !body||Object.keys(body).length!==1||
+       !Object.prototype.hasOwnProperty.call(body,'completed_at')||
+       !/^\d{4}-\d{2}-\d{2}T/.test(String(body.completed_at))){
+     return Promise.reject(Error('Finalização de introdução inválida.'));
+    }
+   }
    return api(path,method,body);
+  },
+  async openAssignedSamurai(slug){
+   if(!authReady||!account||!online)throw Error('Entre na conta conectada para abrir sua ficha.');
+   await loadAssignedSamurai();
+   const character=agents.find(c=>c.samuraiSlug===slug);
+   if(!character)throw Error('A ficha ainda não está atribuída a esta conta. Atualize a página ou fale com o mestre.');
+   selected=character.id;
+   render();
+   view('agents');
+   return true;
   },
   logout,
   async importLegacy(){
@@ -505,6 +523,7 @@
  function playerHasSamurai(){return !!assignedSamurai}
  async function loadAssignedSamurai(){
   assignedSamurai=null;lastSamuraiSnapshot='';pendingSamurai=null;
+  agents=agents.filter(c=>!c.samuraiSlug);
   if(!online||!account)return;
   const result=await api('/rest/v1/samurai_slots?assigned_to=eq.'+encodeURIComponent(account.id)+'&select=slug,color,name,character');
   if(!Array.isArray(result)||!result.length)return;
@@ -629,7 +648,7 @@
   try{
    await api('/rest/v1/rpc/samurai_assign','POST',{p_slug:slug,p_player:player});
    samuraiRows=null;await fetchSamurais(true);
-   renderSamuraiCards();say(player?'Samurai atribuído! O jogador deve atualizar a página.':'Samurai desatribuído. Progresso preservado.');
+   renderSamuraiCards();say(player?'Samurai atribuído! A introdução abrirá automaticamente para o jogador; ao finalizar, ele poderá abrir sua ficha.':'Samurai desatribuído. Progresso preservado.');
   }catch(e){
    select.disabled=false;
    say('Não foi possível atribuir: '+e.message);await renderSamurais(true);
