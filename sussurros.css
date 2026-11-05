@@ -74,3 +74,6 @@
  .whisper-mail{align-items:flex-start}
 }
 @media(prefers-reduced-motion:reduce){.whisper-pop:before,.whisper-paper{animation:none!important}}
+
+/* Jogador sem editor aberto visualiza a caixa de entrada em largura integral. */
+#v-sussurros .whisper-layout:has(#whisperComposer[hidden]){grid-template-columns:1fr}
