@@ -60,7 +60,10 @@
   if(data!==null)headers['Content-Type']='application/json';
   if(path.startsWith('/rest/v1/')&&method!=='GET'){
    // Introduções são apenas INSERT: não converter em UPSERT (exigiria UPDATE e falharia com 403).
-   headers.Prefer=/^\/rest\/v1\/(character_introductions|cinematic_scenes|cinematic_scene_votes|private_whispers)(\?|$)/.test(path)?'return=minimal':'resolution=merge-duplicates,return=minimal';
+   headers.Prefer=path==='/rest/v1/rpg_puzzles?select=id'&&method==='POST'
+    ?'return=representation'
+    :/^\/rest\/v1\/(character_introductions|cinematic_scenes|cinematic_scene_votes|private_whispers|rpg_puzzles|rpg_puzzle_answers|rpg_puzzle_attempts|investigation_clues|investigation_links|investigation_notes)(\?|$)/.test(path)
+     ?'return=minimal':'resolution=merge-duplicates,return=minimal';
   }
   return fetch(base+path,{method,headers,body:data!==null?JSON.stringify(data):undefined}).then(async res=>{
    if(res.status===401&&asToken&&allowRefresh&&refreshToken){
@@ -151,6 +154,7 @@
   // Ao entrar, verifique a atribuição imediatamente (sem aguardar o próximo ciclo de 4 s).
   window.TempusIntroducoes?.atualizar?.();
   window.TempusSussurros?.atualizar?.();
+  window.TempusInvestigacao?.atualizar?.();
  }
  async function hashLocalPassword(password,salt){
   if(!window.crypto?.subtle)throw new Error('O navegador exige HTTPS para proteger senhas locais.');
@@ -284,6 +288,33 @@
    if(!authReady||!account||!online||account.role!=='mestre')
     return Promise.reject(Error('Somente o mestre pode consultar a lista de jogadores.'));
    return api('/rest/v1/profiles?role=eq.jogador&select=id,display_name,role&order=display_name.asc');
+  },
+  mysteryRequest(path,method='GET',body=null){
+   if(!authReady||!account||!online)
+    return Promise.reject(Error('Entre com sua conta conectada para utilizar enigmas e investigação.'));
+   const match=path.match(/^\/rest\/v1\/(rpg_puzzles|rpg_puzzle_answers|rpg_puzzle_attempts|investigation_clues|investigation_links|investigation_notes)(?:\?|$)/);
+   if(!match||!['GET','POST','PATCH'].includes(method))return Promise.reject(Error('Ação de investigação não permitida.'));
+   const table=match[1],isMaster=account.role==='mestre';
+   if(method==='POST'&&['rpg_puzzles','rpg_puzzle_answers','investigation_clues'].includes(table)&&!isMaster)
+    return Promise.reject(Error('Somente o mestre pode criar enigmas e pistas.'));
+   if(method==='POST'&&table==='rpg_puzzle_attempts'){
+    if(isMaster||!body||Object.keys(body).sort().join(',')!=='guess,player_id,puzzle_id'||body.player_id!==account.id)
+     return Promise.reject(Error('Tentativa de enigma inválida.'));
+   }
+   if(method==='POST'&&['investigation_links','investigation_notes'].includes(table)&&
+      (!body||body.created_by!==account.id))
+    return Promise.reject(Error('A contribuição precisa ser vinculada à conta conectada.'));
+   if(method==='PATCH'){
+    if(!isMaster||!/^\/rest\/v1\/(?:rpg_puzzles|investigation_clues)\?id=eq\.[1-9][0-9]*$/.test(path))
+     return Promise.reject(Error('Alteração restrita ao mestre.'));
+    const keys=body&&typeof body==='object'?Object.keys(body).sort().join(','):'';
+    if(table==='rpg_puzzles'&&(keys!=='status'||!['active','closed'].includes(body.status)))
+     return Promise.reject(Error('Alteração de enigma inválida.'));
+    if(table==='investigation_clues'&&(keys!=='revealed_at,visible'||typeof body.visible!=='boolean'||
+       (body.revealed_at!==null&&!/^\d{4}-\d{2}-\d{2}T/.test(String(body.revealed_at)))))
+     return Promise.reject(Error('Publicação de pista inválida.'));
+   }
+   return api(path,method,body);
   },
   async introAssignedSamurai(){
    if(!authReady||!account||!online||account.role==='mestre')return null;
