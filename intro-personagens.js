@@ -108,6 +108,8 @@ function close(){
  if(activeAuto)return;
  els.overlay.hidden=true;
  byId('introCinemaPortrait')?.removeAttribute('src');
+ // Uma segunda apresentação pode ter chegado enquanto esta estava aberta.
+ if(auth())refresh();
 }
 async function finishAutomatic(){
  if(!activeAuto||finishing||!auth())return;
@@ -190,17 +192,25 @@ async function refresh(){
   // Não depende do botão "Publicar" nem de o jogador estar online no momento.
   const pending=slot&&localStorage.getItem(completedKey())!==slot.slug?assignedPreset(slot):null;
   if(pending&&els.overlay.hidden)display(pending,true);
-  const newestPublic=data[0];
+  // Entregar cada NPC publicado, em ordem, sem marcar como visto enquanto
+  // outra apresentação (inclusive o samurai automático) estiver aberta.
+  // Num primeiro acesso, o histórico antigo não deve abrir dezenas de cenas.
   const stored=Number(localStorage.getItem(seenKey())||0);
   if(firstSync){
-   firstSync=false;lastId=Math.max(lastId,stored);
-   if(newestPublic&&Number(newestPublic.id)>lastId){
-    if(Date.now()-new Date(newestPublic.created_at).getTime()<180000&&!pending&&els.overlay.hidden){
-     markSeen(newestPublic.id);display(newestPublic);
-    }else{markSeen(newestPublic.id)}
+   firstSync=false;
+   lastId=Math.max(lastId,stored);
+   if(!stored){
+    const cutoff=Date.now()-10*60*1000;
+    const stale=data.filter(e=>new Date(e.created_at).getTime()<cutoff);
+    const oldestSeen=stale.reduce((id,e)=>Math.max(id,Number(e.id)||0),0);
+    if(oldestSeen>lastId)markSeen(oldestSeen);
    }
-  }else if(newestPublic&&Number(newestPublic.id)>lastId&&!pending&&els.overlay.hidden){
-   markSeen(newestPublic.id);display(newestPublic);
+  }
+  const next=data.filter(e=>Number(e.id)>lastId)
+   .sort((a,b)=>Number(a.id)-Number(b.id))[0];
+  if(next&&els.overlay.hidden){
+   display(next);
+   markSeen(next.id);
   }
   if(els.feedback?.dataset.connection==='error'){
    els.feedback.dataset.connection='';
@@ -238,7 +248,8 @@ async function publish(){
    const data=readLocal();const nextId=Math.max(Date.now(),...data.map(x=>x.id||0))+1;
    data.unshift({...item,id:nextId,created_at:new Date().toISOString()});writeLocal(data.slice(0,40));
   }
-  feedback(restricted?'Apresentação privada publicada! Apenas quem recebeu a ficha poderá ver a entrada e revê-la.':'Apresentação publicada para todos os jogadores conectados.');
+  feedback(!online()?'A apresentação foi salva somente neste navegador. Para os outros jogadores receberem, use o site conectado ao Supabase.':
+   restricted?'Apresentação privada publicada! Apenas quem recebeu a ficha poderá vê-la e revê-la.':'NPC publicado! A entrada aparecerá para os jogadores conectados, na ordem das apresentações.');
   await refresh();
  }catch(e){feedback('Não foi possível publicar: '+e.message,true)}
  finally{isBusy=false;button.disabled=false;button.textContent='✧ Apresentar aos jogadores'}
