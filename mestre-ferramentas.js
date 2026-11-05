@@ -65,6 +65,9 @@
     for(const n of sceneNodes)sceneDock.appendChild(n);
     for(const n of whisperNodes)whisperDock.appendChild(n);
     section.hidden=false;
+    // Sincronizar os paineis logo apos receber a conta do mestre.
+    window.TempusCenas?.atualizar?.();
+    window.TempusSussurros?.atualizar?.();
     // Se a troca de conta ocorreu em uma aba antiga, solicitar acesso ao painel.
     if((scenePage.classList.contains('active')||whisperPage.classList.contains('active'))&&typeof window.view==='function')
      window.view('mestre');
@@ -72,6 +75,11 @@
     for(const n of sceneNodes)scenePage.appendChild(n);
     for(const n of whisperNodes)whisperPage.appendChild(n);
     section.hidden=true;
+    // Nenhum formulario de administracao fica exposto durante a troca de contas.
+    const sceneMaster=byId('sceneMasterPanel'),whisperMaster=byId('whisperMasterPanel'),whisperComposer=byId('whisperComposer');
+    if(sceneMaster)sceneMaster.hidden=true;
+    if(whisperMaster)whisperMaster.hidden=true;
+    if(whisperComposer)whisperComposer.hidden=true;
     if(masterView.classList.contains('active')&&typeof window.view==='function')
      window.view('home');
    }
