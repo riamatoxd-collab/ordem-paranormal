@@ -75,3 +75,6 @@
 @media(prefers-reduced-motion:reduce){
  .intro-cinema *, .intro-cinema:before,.intro-preset{animation:none!important;transition:none!important}
 }
+
+#intro_samurai_target[hidden]{display:none!important}
+#intro_samurai_target small{letter-spacing:normal;line-height:1.5;color:#b7aea8}
