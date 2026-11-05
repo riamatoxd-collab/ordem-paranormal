@@ -234,17 +234,14 @@
   introRequest(path,method='GET',body=null){
    if(!authReady||!account||!online)return Promise.reject(Error('Entre com uma conta conectada.'));
    if(!/^\/rest\/v1\/character_introductions(?:\?|$)/.test(path))return Promise.reject(Error('Caminho não permitido.'));
-   if(!['GET','POST','PATCH'].includes(method))return Promise.reject(Error('Método não permitido.'));
+   if(!['GET','POST'].includes(method))return Promise.reject(Error('Método não permitido.'));
    if(method==='POST'&&account.role!=='mestre')return Promise.reject(Error('Apenas o mestre pode publicar.'));
-   if(method==='PATCH'){
-    if(!/^\/rest\/v1\/character_introductions\?id=eq\.[1-9][0-9]*$/.test(path)||
-       !body||Object.keys(body).length!==1||
-       !Object.prototype.hasOwnProperty.call(body,'completed_at')||
-       !/^\d{4}-\d{2}-\d{2}T/.test(String(body.completed_at))){
-     return Promise.reject(Error('Finalização de introdução inválida.'));
-    }
-   }
    return api(path,method,body);
+  },
+  async introAssignedSamurai(){
+   if(!authReady||!account||!online||account.role==='mestre')return null;
+   const rows=await api('/rest/v1/samurai_slots?assigned_to=eq.'+encodeURIComponent(account.id)+'&select=slug,name,color');
+   return Array.isArray(rows)?(rows[0]||null):null;
   },
   async openAssignedSamurai(slug){
    if(!authReady||!account||!online)throw Error('Entre na conta conectada para abrir sua ficha.');
