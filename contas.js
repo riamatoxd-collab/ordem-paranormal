@@ -60,7 +60,7 @@
   if(data!==null)headers['Content-Type']='application/json';
   if(path.startsWith('/rest/v1/')&&method!=='GET'){
    // Introduções são apenas INSERT: não converter em UPSERT (exigiria UPDATE e falharia com 403).
-   headers.Prefer=path.startsWith('/rest/v1/character_introductions')?'return=minimal':'resolution=merge-duplicates,return=minimal';
+   headers.Prefer=/^\/rest\/v1\/(character_introductions|cinematic_scenes|cinematic_scene_votes)(\?|$)/.test(path)?'return=minimal':'resolution=merge-duplicates,return=minimal';
   }
   return fetch(base+path,{method,headers,body:data!==null?JSON.stringify(data):undefined}).then(async res=>{
    if(res.status===401&&asToken&&allowRefresh&&refreshToken){
@@ -241,6 +241,22 @@
    if(!/^\/rest\/v1\/character_introductions(?:\?|$)/.test(path))return Promise.reject(Error('Caminho não permitido.'));
    if(!['GET','POST'].includes(method))return Promise.reject(Error('Método não permitido.'));
    if(method==='POST'&&account.role!=='mestre')return Promise.reject(Error('Apenas o mestre pode publicar.'));
+   return api(path,method,body);
+  },
+  sceneRequest(path,method='GET',body=null){
+   if(!authReady||!account||!online)return Promise.reject(Error('Entre com uma conta conectada ao site.'));
+   const scenes=/^\/rest\/v1\/cinematic_scenes(?:\?|$)/.test(path);
+   const votes=/^\/rest\/v1\/cinematic_scene_votes(?:\?|$)/.test(path);
+   if(!scenes&&!votes)return Promise.reject(Error('Caminho de cenas não permitido.'));
+   if(!['GET','POST','PATCH'].includes(method))return Promise.reject(Error('Método não permitido.'));
+   const isMaster=account.role==='mestre';
+   if(method==='POST'&&scenes&&!isMaster)return Promise.reject(Error('Apenas o mestre pode iniciar cenas.'));
+   if(method==='POST'&&votes&&isMaster)return Promise.reject(Error('As escolhas são destinadas aos jogadores.'));
+   if(method==='PATCH'){
+    if(!isMaster||!scenes||!/^\/rest\/v1\/cinematic_scenes\?id=eq\.[1-9][0-9]*$/.test(path)||
+       !body||Object.keys(body).sort().join(',')!=='closed_at,status'||body.status!=='closed')
+     return Promise.reject(Error('Somente o mestre pode encerrar uma cena.'));
+   }
    return api(path,method,body);
   },
   async introAssignedSamurai(){
