@@ -1,5 +1,5 @@
 /* Tempus Custodia — entradas cinematográficas de personagens.
-   Somente o mestre publica. Textos publicados são VISÍVEIS a todos os jogadores conectados.
+   Somente o mestre publica. NPCs são públicos; samurais visíveis só ao responsável pela ficha.
    Sincronização por consulta periódica; modo local somente neste navegador. */
 (function(){
 'use strict';
@@ -47,11 +47,14 @@ function renderCatalog(){
  els.catalog.innerHTML=PRESETS.map(presetButton).join('')+
  '<button type="button" class="intro-preset '+(!activePreset?'selected':'')+'" data-preset="custom" style="--intro-accent:#b99777"><span class="intro-preset-glyph">＋</span><span><strong>Personagem personalizado</strong><small>Jornalista ou NPC criado por você</small></span></button>';
 }
+function syncSamuraiTarget(){const field=byId('intro_samurai_target');if(field)field.hidden=byId('intro_kind')?.value!=='samurai';}
 function fill(p){
  const data=p||{name:'',subtitle:'',quote:'',description:'',chapter:'PERSONAGEM DA CAMPANHA',kind:'jornalista',accent:'#b99777',portrait_url:''};
  for(const id of ['name','subtitle','quote','description','chapter','kind','accent','portrait_url']){
   const el=byId('intro_'+id);if(el)el.value=data[id]||((id==='accent')?'#b99777':'');
  }
+ const slug=byId('intro_samurai_slug');if(slug)slug.value=data.kind==='samurai'?(data.samurai_slug||data.key||''):'';
+ syncSamuraiTarget();
 }
 function setPreset(key){
  activePreset=PRESETS.find(p=>p.key===key)||null;
@@ -70,6 +73,7 @@ function draft(){
  item.accent=color(item.accent);
  item.portrait_url=portrait(item.portrait_url)||null;
  item.preset_key=activePreset?.key||null;
+ item.samurai_slug=item.kind==='samurai'?(byId('intro_samurai_slug')?.value||null):null;
  return item;
 }
 function feedback(msg,bad=false){if(!els.feedback)return;els.feedback.textContent=msg;els.feedback.classList.toggle('intro-error',bad)}
@@ -95,7 +99,7 @@ function recentText(i){return new Date(i.created_at||Date.now()).toLocaleString(
 function showHistory(){
  const list=els.history;if(!list)return;
  list.innerHTML=entries.length?entries.map((e,i)=>
-  '<article class="intro-public-row" style="--intro-accent:'+color(e.accent)+'"><div class="intro-public-mini">'+esc(glyph(e))+'</div><div><strong>'+esc(e.name)+'</strong><small>'+esc(e.subtitle)+' · '+esc(recentText(e))+'</small></div><button type="button" class="btn small" data-repeat="'+i+'">Rever</button></article>'
+  '<article class="intro-public-row" style="--intro-accent:'+color(e.accent)+'"><div class="intro-public-mini">'+esc(glyph(e))+'</div><div><strong>'+esc(e.name)+'</strong><small>'+esc(e.subtitle)+' · '+esc(recentText(e))+(e.kind==='samurai'?' · 🔒 Apenas o responsável':'')+'</small></div><button type="button" class="btn small" data-repeat="'+i+'">Rever</button></article>'
  ).join(''):'<p class="intro-muted">Nenhuma apresentação publicada ainda. O mestre dará início às revelações durante a sessão.</p>';
 }
 function authChanged(){
@@ -116,7 +120,7 @@ async function refresh(){
  try{
   let data;
   if(online()) {
-   data=await window.OPAccounts.introRequest('/rest/v1/character_introductions?select=id,name,subtitle,quote,description,chapter,kind,accent,portrait_url,created_at&order=id.desc&limit=20');
+   data=await window.OPAccounts.introRequest('/rest/v1/character_introductions?select=id,name,subtitle,quote,description,chapter,kind,samurai_slug,accent,portrait_url,created_at&order=id.desc&limit=20');
   }else data=readLocal().slice().sort((a,b)=>b.id-a.id).slice(0,20);
   if(!Array.isArray(data))throw Error('Resposta inválida do arquivo.');
   const newest=data[0];
@@ -130,7 +134,7 @@ async function refresh(){
    markSeen(newest.id);display(newest)
   }
   entries=data;showHistory();
-  if(els.feedback?.dataset.connection==='error'){els.feedback.dataset.connection='';feedback('Arquivo conectado. As apresentações publicadas aparecem para todos os jogadores.')}
+  if(els.feedback?.dataset.connection==='error'){els.feedback.dataset.connection='';feedback('Arquivo conectado. Apresentações dos samurais aparecem apenas para quem recebeu a ficha.')}
  }catch(e){
   if(els.feedback&&(!master()||!els.feedback.textContent.startsWith('Prévia'))){
    els.feedback.dataset.connection='error';feedback('Falha ao sincronizar as apresentações: '+e.message,true)
@@ -144,17 +148,25 @@ async function publish(){
  if(!item.name)return feedback('Informe o nome do personagem.',true);
  if(!item.subtitle)return feedback('Escreva um título curto para a apresentação.',true);
  if(!item.quote)return feedback('Adicione uma frase de entrada.',true);
- if(!confirm('Apresentar '+item.name+' agora para todos os jogadores conectados?'))return;
+ const restricted=item.kind==='samurai';
+ if(restricted&&!item.samurai_slug)return feedback('Selecione a ficha de samurai que receberá a apresentação.',true);
+ if(restricted&&!online())return feedback('As apresentações privadas dos samurais exigem conexão com o Supabase. Use a prévia local ou conecte-se.',true);
  isBusy=true;const button=byId('introPublish');button.disabled=true;button.textContent='Publicando...';
  try{
+  if(restricted){
+   const assignee=await window.OPAccounts.introSamuraiAssignment(item.samurai_slug);
+   if(!assignee)throw Error('Esta ficha ainda não foi atribuída a um jogador. Faça isso em Painel do Mestre → Os Cinco Samurais.');
+  }
+  const audience=restricted?'somente para o jogador que recebeu a ficha de '+item.name:'para todos os jogadores conectados';
+  if(!confirm('Apresentar '+item.name+' agora '+audience+'?'))return;
   if(online()){
-   const request={name:item.name,subtitle:item.subtitle,quote:item.quote,description:item.description,chapter:item.chapter,kind:item.kind,accent:item.accent,portrait_url:item.portrait_url,created_by:currentId()};
+   const request={name:item.name,subtitle:item.subtitle,quote:item.quote,description:item.description,chapter:item.chapter,kind:item.kind,samurai_slug:item.samurai_slug,accent:item.accent,portrait_url:item.portrait_url,created_by:currentId()};
    await window.OPAccounts.introRequest('/rest/v1/character_introductions','POST',request);
   }else{
    const data=readLocal();const nextId=Math.max(Date.now(),...data.map(x=>x.id||0))+1;
    data.unshift({...item,id:nextId,created_at:new Date().toISOString()});writeLocal(data.slice(0,40));
   }
-  feedback('Apresentação publicada! O personagem aparecerá para os jogadores conectados em alguns segundos.');
+  feedback(restricted?'Apresentação privada publicada! Apenas quem recebeu a ficha poderá ver a entrada e revê-la.':'Apresentação publicada para todos os jogadores conectados.');
   await refresh();
  }catch(e){feedback('Não foi possível publicar: '+e.message,true)}
  finally{isBusy=false;button.disabled=false;button.textContent='✧ Apresentar aos jogadores'}
@@ -163,6 +175,7 @@ els.catalog?.addEventListener('click',e=>{const btn=e.target.closest('[data-pres
 els.history?.addEventListener('click',e=>{const btn=e.target.closest('[data-repeat]');if(btn)display(entries[Number(btn.dataset.repeat)])});
 byId('introPreview')?.addEventListener('click',()=>{if(!master())return;const item=draft();if(!item.name)return feedback('Digite um nome para pré-visualizar.',true);display(item);feedback('Prévia local: nenhum jogador recebeu esta apresentação.')});
 byId('introPublish')?.addEventListener('click',publish);
+byId('intro_kind')?.addEventListener('change',()=>{syncSamuraiTarget();if(byId('intro_kind').value==='samurai'&&activePreset?.kind==='samurai')byId('intro_samurai_slug').value=activePreset.key});
 byId('introReload')?.addEventListener('click',refresh);
 byId('introCinemaClose')?.addEventListener('click',close);
 els.overlay.addEventListener('click',e=>{if(e.target===els.overlay)close()});
