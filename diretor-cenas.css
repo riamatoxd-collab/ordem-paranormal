@@ -20,7 +20,7 @@
 .scene-editor{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:19px}
 .scene-editor label{display:grid;gap:6px;color:#cfb9a9;font-size:11px;letter-spacing:.09em}
 .scene-editor label.wide{grid-column:1/-1}
-.scene-editor input,.scene-editor textarea{display:block;background:#0c1016;border:1px solid #61524b;color:#f7efe9;width:100%;border-radius:9px;min-height:42px;padding:11px;font:13px/1.5 inherit;letter-spacing:normal}
+.scene-editor input,.scene-editor textarea{display:block;background:#0c1016;border:1px solid #61524b;color:#f7efe9;width:100%;border-radius:9px;min-height:42px;padding:11px;font:13px/1.5 system-ui,sans-serif;letter-spacing:normal}
 .scene-editor textarea{resize:vertical;min-height:112px;font:13px/1.55 system-ui,sans-serif}
 .scene-editor input:focus,.scene-editor textarea:focus{outline:2px solid #c29d7f;outline-offset:1px}
 .scene-editor label small{font-size:11px;letter-spacing:normal;color:#a99d97;line-height:1.4}
