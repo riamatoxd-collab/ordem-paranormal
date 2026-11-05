@@ -147,9 +147,13 @@ async function enterAssignedSheet(){
 function recentText(i){return new Date(i.created_at||Date.now()).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
 function showHistory(){
  const list=els.history;if(!list)return;
- list.innerHTML=entries.length?entries.map((e,i)=>
-  '<article class="intro-public-row" style="--intro-accent:'+color(e.accent)+'"><div class="intro-public-mini">'+esc(glyph(e))+'</div><div><strong>'+esc(e.name)+'</strong><small>'+esc(e.subtitle)+' · '+esc(recentText(e))+(e.kind==='samurai'?' · 🔒 Apenas o responsável':'')+(e.recipient_id?(e.completed_at?' · Concluída':' · Pendente'):'')+'</small></div><button type="button" class="btn small" data-repeat="'+i+'">Rever</button></article>'
- ).join(''):'<p class="intro-muted">Nenhuma apresentação publicada ainda. O mestre dará início às revelações durante a sessão.</p>';
+ const own=assignedSlot&&!master()?assignedPreset(assignedSlot):null;
+ const complete=own&&localStorage.getItem(completedKey())===own.samurai_slug;
+ const ownHtml=own?'<article class="intro-public-row" style="--intro-accent:'+color(own.accent)+'"><div class="intro-public-mini">'+esc(glyph(own))+'</div><div><strong>'+esc(own.name)+'</strong><small>Ficha atribuída · '+(complete?'Introdução concluída':'Introdução pendente')+'</small></div><button type="button" class="btn small" data-assigned-repeat="1">Rever</button></article>':'';
+ const rows=entries.map((e,i)=>
+  '<article class="intro-public-row" style="--intro-accent:'+color(e.accent)+'"><div class="intro-public-mini">'+esc(glyph(e))+'</div><div><strong>'+esc(e.name)+'</strong><small>'+esc(e.subtitle)+' · '+esc(recentText(e))+(e.kind==='samurai'?' · 🔒 Apenas o responsável':'')+'</small></div><button type="button" class="btn small" data-repeat="'+i+'">Rever</button></article>'
+ ).join('');
+ list.innerHTML=ownHtml+rows||'<p class="intro-muted">Nenhuma apresentação publicada ainda. O mestre dará início às revelações durante a sessão.</p>';
 }
 function authChanged(){
  const id=auth()?currentId():'';
@@ -240,7 +244,7 @@ async function publish(){
  finally{isBusy=false;button.disabled=false;button.textContent='✧ Apresentar aos jogadores'}
 }
 els.catalog?.addEventListener('click',e=>{const btn=e.target.closest('[data-preset]');if(btn)setPreset(btn.dataset.preset)});
-els.history?.addEventListener('click',e=>{const btn=e.target.closest('[data-repeat]');if(btn)display(entries[Number(btn.dataset.repeat)])});
+els.history?.addEventListener('click',e=>{const assigned=e.target.closest('[data-assigned-repeat]');if(assigned&&assignedSlot){const item=assignedPreset(assignedSlot);display(item,localStorage.getItem(completedKey())!==item.samurai_slug);return}const btn=e.target.closest('[data-repeat]');if(btn)display(entries[Number(btn.dataset.repeat)])});
 byId('introPreview')?.addEventListener('click',()=>{if(!master())return;const item=draft();if(!item.name)return feedback('Digite um nome para pré-visualizar.',true);display(item);feedback('Prévia local: nenhum jogador recebeu esta apresentação.')});
 byId('introPublish')?.addEventListener('click',publish);
 byId('intro_kind')?.addEventListener('change',()=>{syncSamuraiTarget();if(byId('intro_kind').value==='samurai'&&activePreset?.kind==='samurai')byId('intro_samurai_slug').value=activePreset.key});
