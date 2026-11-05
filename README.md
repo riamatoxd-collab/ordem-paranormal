@@ -365,3 +365,21 @@ O arquivo **[AUDITORIA-EFEITOS-RITUAIS.md](AUDITORIA-EFEITOS-RITUAIS.md)** discr
 - Sem Supabase, a atribuição automática entre dispositivos não funciona. A apresentação manual local permanece disponível para demonstração.
 
 Arquivos: `intro-personagens.js`, `intro-personagens.css`, `index.html`, `contas.js`. A tabela `character_introductions` continua destinada às apresentações manuais. A atribuição automática usa diretamente `samurai_slots`, sem nova tabela ou alteração do banco.
+
+## Diretor de Cenas Cinematográficas — Tempus Custodia
+
+A aba **Diretor de cenas** sincroniza revelações para as contas dos jogadores autenticados no Supabase.
+
+**Fluxo do mestre**: abrir **Diretor de cenas** → escolher uma das seis cenas prontas ou criar cena personalizada → editar título, subtítulo, episódio, narração, cor, imagem HTTPS opcional, som HTTPS opcional e até quatro escolhas → clicar em **Prévia local** para ensaiar → clicar **Iniciar para todos**. Enquanto houver uma cena ativa, o botão de iniciar fica desabilitado. O mestre acompanha a quantidade de respostas por opção e clica **Encerrar cena** quando quiser liberar a próxima.
+
+**Fluxo dos jogadores**: qualquer aba do site pode receber uma cena; o sistema consulta o servidor a cada quatro segundos. O palco cinematográfico abre em tela cheia, com a narração e as escolhas. Se houver escolhas, cada jogador pode registrar uma única resposta; se não, pode simplesmente clicar **Concluir cena**. O som é opcional e **nunca inicia automaticamente**: o jogador precisa clicar **Ativar som**. Ao concluir, a cena não reaparece naquele navegador/conta. Se o jogador entrar enquanto a cena ainda está ativa, também a receberá. Se uma introdução de samurai estiver ocupando a tela, a cena aguarda.
+
+**Seis modelos prontos**: O Último Restaurante; O Caminho na Neblina; A Vila Devastada (casas de antigos moradores, não dos samurais); O Templo das Cinco Armaduras; O Dia Que Nunca Terminou (vila habitada e templo ainda inexistente); O Primeiro Eco do Sino. Todos são editáveis pelo mestre e foram escritos sem entregar segredos antecipadamente.
+
+**Histórico**: jogadores e mestre podem rever cenas publicadas com **Rever**, sem reenviar votos nem disparar uma nova cena ao grupo. A visualização permite consultar cenas fechadas, porque o histórico armazena apenas conteúdo já publicado.
+
+**Segurança**: `cinematic_scenes` tem RLS, somente a conta de mestre autenticada pode criar e encerrar, e apenas uma cena pode permanecer ativa no banco. `cinematic_scene_votes` tem RLS, aceita uma escolha por conta e cena, e somente o mestre e o autor da resposta podem ler os votos. A API do navegador usa apenas a chave pública/publishable e os tokens de sessão; o código não inclui credenciais administrativas. Os arquivos SQL versionados são `diretor-cenas-supabase.sql`, já aplicados ao projeto Supabase `eita`.
+
+**Limites**: o modo local/offline permite ensaiar, mas não transmitir para outros aparelhos. O encerramento visto pelo jogador fica no armazenamento local por conta; em outro navegador, a cena ativa pode aparecer novamente. Links de imagem e áudio são informados pelo mestre e exigem HTTPS; o áudio depende da reprodução suportada pelo navegador. Atualize o site em todos os navegadores para receber os novos arquivos. Integração visual real com navegadores separados continua sendo teste manual recomendado.
+
+**Arquivos**: `diretor-cenas.js`, `diretor-cenas.css`, `diretor-cenas-supabase.sql`, `index.html`, `contas.js`.
