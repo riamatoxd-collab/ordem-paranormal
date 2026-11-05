@@ -313,10 +313,11 @@
 <link rel="stylesheet" href="./samurais.css?v=cinco-samurais-fichas-1">
 <link rel="stylesheet" href="./intro-personagens.css?v=tempus-intro-3">
 <link rel="stylesheet" href="./diretor-cenas.css?v=tempus-cenas-2">
+<link rel="stylesheet" href="./sussurros.css?v=tempus-sussurros-1">
 <link rel="stylesheet" href="./rituais-regras-completas.css?v=grimorio-livros-1">
 <link rel="stylesheet" href="./rituais-executor.css?v=rituais-execucao-1">
 </head><body>
-<div class="app"><aside class="side"><div class="brand"><span class="sig">✣</span> O OUTRO LADO<span>ARQUIVO DE OPERAÇÕES</span></div><nav class="nav"><button class="active" data-view="home">⌂ &nbsp;Painel</button><button data-view="agents">♙ &nbsp;Agentes</button><button data-view="intro">✧ &nbsp;Apresentações</button><button data-view="cenas">◈ &nbsp;Diretor de cenas</button><button data-view="occult">◉ &nbsp;Transcender</button><button data-view="grimorio">▤ &nbsp;Grimório</button><button data-view="roll">⚄ &nbsp;Rolagens</button><button data-view="combat">⚔ &nbsp;Combate</button><button data-view="history">◷ &nbsp;Histórico</button></nav><small>PROTOCOLO 0-01<br>Registros salvos neste navegador.<br>Versão 2.6 • Transcender e Grimório</small></aside>
+<div class="app"><aside class="side"><div class="brand"><span class="sig">✣</span> O OUTRO LADO<span>ARQUIVO DE OPERAÇÕES</span></div><nav class="nav"><button class="active" data-view="home">⌂ &nbsp;Painel</button><button data-view="agents">♙ &nbsp;Agentes</button><button data-view="intro">✧ &nbsp;Apresentações</button><button data-view="cenas">◈ &nbsp;Diretor de cenas</button><button data-view="sussurros">✧ &nbsp;Sussurros <span id="whisperUnreadBadge" hidden>0</span></button><button data-view="occult">◉ &nbsp;Transcender</button><button data-view="grimorio">▤ &nbsp;Grimório</button><button data-view="roll">⚄ &nbsp;Rolagens</button><button data-view="combat">⚔ &nbsp;Combate</button><button data-view="history">◷ &nbsp;Histórico</button></nav><small>PROTOCOLO 0-01<br>Registros salvos neste navegador.<br>Versão 2.6 • Transcender e Grimório</small></aside>
 <main><header class="top"><div><div class="eyebrow">SISTEMA DE APOIO À MESA</div><h1 id="title">Painel de operações</h1></div><button class="btn primary" onclick="openModal()">＋ Novo agente</button></header>
 <section class="view active" id="v-home"><div class="hero"><div class="eyebrow">ORDEM DA REALIDADE • TERMINAL DE CAMPO</div><h2>O OUTRO LADO<br>ESTÁ MAIS PERTO.</h2><p>Cadastre agentes, faça testes automáticos e acompanhe as rolagens da sua sessão em um só lugar.</p><div class="actions"><button class="btn primary" onclick="view('roll')">⚄ Fazer rolagem</button><button class="btn ghost" onclick="openModal()">＋ Cadastrar agente</button></div></div><div class="grid stats"><div class="card"><div class="statlabel">AGENTES</div><div class="statval" id="nAgents">0</div></div><div class="card"><div class="statlabel">ROLAGENS</div><div class="statval" id="nRolls">0</div></div><div class="card"><div class="statlabel">SUCESSOS</div><div class="statval" id="nSuccess">0</div></div><div class="card"><div class="statlabel">FALHAS</div><div class="statval" id="nFail">0</div></div></div><div class="section"><h2>Acesso rápido</h2></div><div class="grid quick"><button class="card btn" onclick="view('agents')"><span class="qicon">♙</span><span><b>Gerenciar agentes</b><br><small class="muted">Fichas e recursos</small></span></button><button class="card btn" onclick="view('roll')"><span class="qicon">⚄</span><span><b>Teste de perícia</b><br><small class="muted">Dados e modificadores</small></span></button><button class="card btn" onclick="view('combat')"><span class="qicon">⚔</span><span><b>Resolver ataque</b><br><small class="muted">Ataque e dano</small></span></button></div><div class="section"><h2>Últimas rolagens</h2><button class="btn small ghost" onclick="view('history')">Ver histórico →</button></div><div class="list" id="homeHistory"></div></section>
 <section class="view" id="v-agents">
@@ -543,6 +544,84 @@
  </div>
 </div>
 
+
+<section class="view" id="v-sussurros">
+ <div class="whisper-hero">
+  <div><small>✧ TEMPUS CUSTODIA • ARQUIVOS RESERVADOS</small>
+   <h2>OS SUSSURROS<br>DO OUTRO LADO.</h2>
+   <p>Há segredos que só uma pessoa pode ouvir. O mestre pode revelar pistas para um jogador específico, e cada jogador pode responder em particular. Apenas remetente e destinatário acessam essas mensagens.</p></div>
+  <div aria-hidden="true"></div>
+ </div>
+ <div class="whisper-layout">
+  <section class="whisper-box full" id="whisperMasterPanel" hidden>
+   <h3>Cartas do Mestre</h3>
+   <p class="whisper-help">Prepare uma mensagem secreta para um único jogador. Estes modelos apenas preenchem a mensagem; nada é enviado até você clicar no botão.</p>
+   <div class="whisper-templates" id="whisperTemplates">
+    <button class="whisper-template" type="button" data-whisper-template="0"><b>⌕ Pista oculta</b><small>Algo que só um jogador percebeu</small></button>
+    <button class="whisper-template" type="button" data-whisper-template="1"><b>◷ Lembrança estranha</b><small>Uma recordação fora do tempo</small></button>
+    <button class="whisper-template" type="button" data-whisper-template="2"><b>✧ Voz distante</b><small>Uma frase que ninguém mais ouviu</small></button>
+   </div>
+  </section>
+  <section class="whisper-box" id="whisperComposer" hidden>
+   <h3>Enviar mensagem privada</h3>
+   <p class="whisper-help">O conteúdo só será enviado à conta escolhida. Nenhum outro jogador poderá ler.</p>
+   <p class="whisper-response-label" id="whisperReplyLabel" hidden>RESPOSTA PRIVADA PARA O MESTRE</p>
+   <div class="whisper-compose">
+    <label class="wide" id="whisperRecipientRow">JOGADOR DESTINATÁRIO
+     <select id="whisperRecipient"><option value="">Carregando jogadores...</option></select>
+    </label>
+    <label>TIPO DE MENSAGEM
+     <select id="whisperKind">
+      <option value="sussurro">✧ Sussurro</option>
+      <option value="pista">⌕ Pista secreta</option>
+      <option value="pressagio">◷ Presságio</option>
+     </select>
+    </label>
+    <label>TÍTULO DA MENSAGEM
+     <input id="whisperTitle" maxlength="90" placeholder="Apenas você percebe...">
+    </label>
+    <label class="wide">MENSAGEM SECRETA
+     <textarea id="whisperBody" maxlength="1500" rows="5" placeholder="Descreva aquilo que só o destinatário pode descobrir."></textarea>
+    </label>
+   </div>
+   <div class="whisper-compose-actions">
+    <button class="btn primary" id="whisperSend" type="button">✧ Enviar sussurro</button>
+    <button class="btn" id="whisperCancelReply" type="button" hidden>Cancelar resposta</button>
+   </div>
+  </section>
+  <section class="whisper-box" id="whisperMailbox">
+   <div class="whisper-box-head">
+    <h3>Correspondências secretas</h3>
+    <button class="btn small" id="whisperRefresh" type="button">↻ Atualizar</button>
+   </div>
+   <p class="whisper-count" id="whisperCounts">Verificando mensagens...</p>
+   <div class="whisper-filters" role="group" aria-label="Filtrar mensagens">
+    <button type="button" class="whisper-filter is-active" data-whisper-filter="recebidas" aria-pressed="true">Recebidas</button>
+    <button type="button" class="whisper-filter" data-whisper-filter="enviadas" aria-pressed="false">Enviadas</button>
+    <button type="button" class="whisper-filter" data-whisper-filter="todas" aria-pressed="false">Todas</button>
+   </div>
+   <div class="whisper-feedback" id="whisperFeedback" role="status"></div>
+   <div class="whisper-list" id="whisperInbox"></div>
+  </section>
+ </div>
+</section>
+<div class="whisper-pop" id="whisperPopup" hidden role="dialog" aria-modal="true" aria-labelledby="whisperPopupTitle">
+ <div class="whisper-paper">
+  <div class="whisper-crest" aria-hidden="true">✧</div>
+  <small class="whisper-kicker">UMA MENSAGEM PARA VOCÊ</small>
+  <h2 id="whisperPopupTitle">Um novo sussurro</h2>
+  <div class="whisper-meta" id="whisperPopupInfo"></div>
+  <div class="whisper-rule" aria-hidden="true"></div>
+  <p class="whisper-text" id="whisperPopupBody"></p>
+  <div class="whisper-pop-actions">
+   <button id="whisperPopupRead" type="button">✦ Marcar como lida</button>
+   <button id="whisperPopupReply" type="button" class="whisper-secondary">Responder ao mestre</button>
+   <button id="whisperPopupClose" type="button" class="whisper-secondary">Ler depois</button>
+  </div>
+  <div class="whisper-pop-status" id="whisperPopupStatus" role="status"></div>
+ </div>
+</div>
+
 <section class="view" id="v-roll"><div class="section" style="margin-top:0"><div><h2>Central de rolagens</h2><p>O sistema escolhe o melhor d20 (ou o pior, para atributo 0) e aplica os bônus.</p></div></div><div class="grid cols"><div class="card"><div class="form"><div class="field full"><label>AGENTE</label><select id="rAgent"></select></div><div class="field"><label>TIPO</label><select id="rType" onchange="toggleRoll()"><option value="skill">Teste de perícia</option><option value="attr">Teste de atributo</option></select></div><div class="field"><label>DT</label><input id="rDT" type="number" placeholder="Ex.: 15"></div><div class="field full" id="rSkillBox"><label>PERÍCIA</label><select id="rSkill"></select></div><div class="field full" id="rAttrBox" style="display:none"><label>ATRIBUTO</label><select id="rAttr"><option value="agi">Agilidade</option><option value="for">Força</option><option value="int">Intelecto</option><option value="pre">Presença</option><option value="vig">Vigor</option></select></div><div class="field"><label>DADOS DE BÔNUS (+d20)</label><input id="rBonus" type="number" min="0" max="20" value="0"></div><div class="field"><label>DADOS DE PENALIDADE (−d20)</label><input id="rPenalty" type="number" min="0" max="20" value="0"></div><div class="field"><label>BÔNUS FIXO</label><input id="rFlat" type="number" value="0"></div><div class="field"><label>OBSERVAÇÃO</label><input id="rNote" placeholder="Ex.: sob pressão"></div></div><label class="checkline" style="margin-top:10px"><input id="rLoadPenalty" type="checkbox"> Aplicar também –5 a outra perícia afetada pela carga (as marcadas no livro são automáticas)</label><button class="btn primary" style="margin-top:14px" onclick="rollTest()">⚄ Rolar teste</button><p class="muted">Atributo 0: rola dois d20 e considera o pior. Um 20 natural no dado escolhido é sucesso automático.</p></div><div class="card"><div class="eyebrow">RESULTADO</div><div class="result" id="rollResult" style="margin-top:10px">Aguardando rolagem…<div style="font-size:46px;margin-top:15px">⚄</div></div><div class="note">O mestre define a DT e interpreta as consequências narrativas.</div></div></div><div class="section"><h2>Dados livres</h2></div><div class="card"><div class="form"><div class="field"><label>EXPRESSÃO</label><input id="freeExpr" value="1d20" placeholder="2d8+3"></div><div class="field"><label>IDENTIFICAÇÃO</label><input id="freeName" placeholder="Dano da arma"></div></div><button class="btn primary" style="margin-top:12px" onclick="rollFree()">Rolar dados livres</button><div id="freeResult" class="muted" style="margin-top:12px"></div></div></section>
 <section class="view" id="v-combat"><div class="section" style="margin-top:0"><div><h2>Terminal de combate</h2><p>Teste Luta/Pontaria contra Defesa e role dano em caso de acerto.</p></div></div><div class="grid cols"><div class="card"><div class="form"><div class="field full"><label>AGENTE</label><select id="cAgent"></select></div><div class="field"><label>PERÍCIA DE ATAQUE</label><select id="cSkill"><option>Luta</option><option>Pontaria</option></select></div><div class="field"><label>DEFESA DO ALVO</label><input id="cDefense" type="number" value="15"></div><div class="field"><label>BÔNUS FIXO NO ATAQUE</label><input id="cBonus" type="number" value="0"></div><div class="field"><label>EXPRESSÃO DE DANO</label><input id="cDamage" value="1d8+0" placeholder="2d6+3"></div><div class="field"><label>ARMA / ATAQUE</label><input id="cWeapon" placeholder="Ex.: Revólver"></div></div><button class="btn primary" style="margin-top:14px" onclick="attack()">⚔ Realizar ataque</button></div><div class="card"><div class="eyebrow">RELATÓRIO DE COMBATE</div><div class="result" id="combatResult" style="margin-top:10px">Aguardando ação…<div style="font-size:46px;margin-top:15px">⚔</div></div><div class="note">Informe bônus, Defesa e dano conforme a arma e as regras da mesa. Críticos, resistências e efeitos especiais ainda são resolvidos pelo mestre.</div></div></div></section>
 <section class="view" id="v-history"><div class="section" style="margin-top:0"><div><h2>Histórico de rolagens</h2><p>Registros salvos neste navegador.</p></div><button class="btn ghost small" onclick="clearHistory()">Limpar histórico</button></div><div class="list" id="historyList"></div></section><div class="foot">Ferramenta independente de apoio à mesa. Não é um produto oficial de Ordem Paranormal, Cellbit ou Ordo Realitas. Regras de inventário baseadas em Ordem Paranormal RPG 1.3, p. 53–57 e 66; Sobrevivendo ao Horror 1.3.1.</div></main></div>
@@ -559,7 +638,7 @@ let agents=JSON.parse(localStorage.getItem('op_agents')||'[]'),hist=JSON.parse(l
 const $=id=>document.getElementById(id),clamp=(x,a,b)=>Math.max(a,Math.min(b,Number.isFinite(+x)?+x:a));
 function db(){localStorage.setItem('op_agents',JSON.stringify(agents));localStorage.setItem('op_hist',JSON.stringify(hist))}function say(s){$('toast').textContent=s;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2200)}function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function focusAgentSection(id){let el=$(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
-function view(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));$('v-'+v).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));$('title').textContent=({home:'Painel de operações',cadastro:'Cadastrar personagem',agents:'Agentes cadastrados',intro:'Apresentações',cenas:'Diretor de cenas',occult:'Transcender',grimorio:'Grimório',roll:'Central de rolagens',combat:'Terminal de combate',history:'Histórico de rolagens'})[v];if(v==='occult')startVoidAudio();else stopVoidAudio();render()};document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>view(b.dataset.view));
+function view(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));$('v-'+v).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));$('title').textContent=({home:'Painel de operações',cadastro:'Cadastrar personagem',agents:'Agentes cadastrados',intro:'Apresentações',cenas:'Diretor de cenas',sussurros:'Sussurros privados',occult:'Transcender',grimorio:'Grimório',roll:'Central de rolagens',combat:'Terminal de combate',history:'Histórico de rolagens'})[v];if(v==='occult')startVoidAudio();else stopVoidAudio();render()};document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>view(b.dataset.view));
 
 function peLimitFor(c,kind='general'){let limit=stats(c).limit||1,pp=c.powers?.paranormal||[];if(pp.includes('Encarar a Morte'))limit+=(c.encararMorteAffinity?3:1);if(kind==='ritual'&&c.class==='ocultista'&&c.trail==='Intuitivo'&&+c.nex>=40)limit+=(+c.attrs.pre||0);return Math.max(1,limit)}
 function consumePE(c,cost,opts={}){cost=Math.floor(+cost||0);if(cost<1)return false;let limit=peLimitFor(c,opts.kind||'general'),spent=+c.peSpentTurn||0,minCost=Math.max(1,+opts.minCost||cost),exception=spent===0&&cost===minCost&&cost>limit;if(cost>limit&&!exception){say('O custo excede o limite de PE por uso ('+limit+').');return false}if(spent+cost>limit&&!exception){say('Limite de PE por turno atingido: '+spent+'/'+limit+'.');return false}if(opts.payWithPV){let pvCost=cost*2;if((+c.pvNow||0)<pvCost){say('PV insuficientes: o Poder do Flagelo exige '+pvCost+' PV.');return false}c.pvNow-=pvCost;c.flageloSpentPV=(+c.flageloSpentPV||0)+pvCost}else{let temp=Math.max(0,+c.peTemp||0),normal=Math.max(0,+c.peNow||0);if(temp+normal<cost){say('PE insuficientes. Disponível: '+(temp+normal)+'.');return false}let used=Math.min(temp,cost);c.peTemp=temp-used;c.peNow=normal-(cost-used)}if(opts.countTurn!==false)c.peSpentTurn=spent+cost;return true}
@@ -1298,6 +1377,6 @@ function renderTranscendProgression(){
 }
 
 function render(){$('nAgents').textContent=agents.length;renderAgents();fillSelect();renderHistory();renderInventory();renderSkillPage();renderOccultPage();renderTranscendProgression();renderGrimoirePage()};setupInventoryPresets();populateOrigins();renderTrailOptions('');['class','nex','aAgi','aFor','aInt','aPre','aVig'].forEach(id=>$(id).addEventListener('input',()=>{if(id==='class')classHint();else{if(id==='nex')renderTrailOptions($('trail').value);refreshBuildEditors()}$('classSkillSummary').textContent=classSkillText($('class').value,+$('aInt').value)}));$('origin').addEventListener('change',onOriginChange);$('trail').addEventListener('change',refreshBuildEditors);render();
-</script><script src="./auth-config.js?v=supabase-online-2"></script><script src="./contas.js?v=template-samurais-pd-8"></script>
-<script src="./intro-personagens.js?v=tempus-intro-5"></script><script src="./diretor-cenas.js?v=tempus-cenas-1"></script><script src="./ficha-mestre.js?v=cinco-samurais-1"></script><script src="./samurai-fichas.js?v=cinco-samurais-fichas-1"></script>
+</script><script src="./auth-config.js?v=supabase-online-2"></script><script src="./contas.js?v=template-samurais-pd-9"></script>
+<script src="./intro-personagens.js?v=tempus-intro-5"></script><script src="./diretor-cenas.js?v=tempus-cenas-1"></script><script src="./sussurros.js?v=tempus-sussurros-1"></script><script src="./ficha-mestre.js?v=cinco-samurais-1"></script><script src="./samurai-fichas.js?v=cinco-samurais-fichas-1"></script>
 <script src="./rituais-executor.js?v=rituais-execucao-1"></script></body></html>
