@@ -56,7 +56,9 @@ function syncAccount(){
 }
 function renderPuzzleTemplates(){
  if(!ui.puzzleTemplates)return;
- ui.puzzleTemplates.innerHTML=PUZZLE_TEMPLATES.map((p,i)=>
+ ui.puzzleTemplates.innerHTML=
+  '<button class="mystery-template mystery-custom-template" type="button" data-puzzle-custom="1"><b>＋ Criar meu próprio enigma</b><small>Começar com os campos em branco</small></button>'+
+  PUZZLE_TEMPLATES.map((p,i)=>
   '<button class="mystery-template" type="button" data-puzzle-template="'+i+'"><b>'+esc(p.title)+'</b><small>'+esc(THEMES[p.theme])+'</small></button>').join('');
 }
 function renderPuzzles(){
@@ -208,14 +210,16 @@ async function toggleClue(id){
  }catch(e){message('clue','Não foi possível alterar a pista: '+errorMessage(e),true)}
  finally{busy=false}
 }
-async function createPuzzle(){
+async function createPuzzle(publish=true){
  if(!master()||!online()||creatingPuzzle)return message('puzzle','Somente o mestre conectado pode criar enigmas.',true);
  const title=str(ui.puzzleTitle?.value).trim(),prompt=str(ui.puzzlePrompt?.value).trim(),
   hint=str(ui.puzzleHint?.value).trim(),answer=str(ui.puzzleAnswer?.value).trim(),
   theme=ui.puzzleTheme?.value||'conhecimento',unlockId=Number(ui.puzzleUnlock?.value)||null;
  if(!title||!prompt||!answer)return message('puzzle','Preencha título, desafio e resposta secreta.',true);
  if(answer.length>70)return message('puzzle','A resposta deve ter no máximo 70 caracteres.',true);
- creatingPuzzle=true;ui.puzzleCreate.disabled=true;let id=null;
+ creatingPuzzle=true;ui.puzzleCreate.disabled=true;
+ if(window.puzzleDraftButton)window.puzzleDraftButton.disabled=true;
+ let id=null;
  try{
   const result=await rpc('/rest/v1/rpg_puzzles?select=id','POST',{
    title:title.slice(0,100),prompt:prompt.slice(0,1200),hint:hint.slice(0,420),theme,
@@ -224,14 +228,20 @@ async function createPuzzle(){
   if(!Array.isArray(result)||!Number(result[0]?.id))throw Error('O servidor não retornou o número do enigma.');
   id=Number(result[0].id);
   await rpc('/rest/v1/rpg_puzzle_answers','POST',{puzzle_id:id,answer_value:answer});
-  await rpc('/rest/v1/rpg_puzzles?id=eq.'+id,'PATCH',{status:'active'});
+  if(publish)await rpc('/rest/v1/rpg_puzzles?id=eq.'+id,'PATCH',{status:'active'});
   ui.puzzleTitle.value='';ui.puzzlePrompt.value='';ui.puzzleHint.value='';ui.puzzleAnswer.value='';
-  message('puzzle','Enigma publicado! A resposta ficou protegida no banco. Jogadores já podem tentar resolvê-lo.');
+  if(ui.puzzleUnlock)ui.puzzleUnlock.value='';
+  hidePuzzlePreview();
+  message('puzzle',publish?
+   'Enigma publicado! A resposta ficou protegida no banco. Os jogadores já podem tentar resolvê-lo.':
+   'Rascunho salvo! Apenas o mestre pode vê-lo. Quando quiser, clique em Publicar rascunho no cartão do enigma.');
   await refresh();
  }catch(e){
   message('puzzle','Falha ao criar o enigma: '+errorMessage(e)+(id?' O rascunho #'+id+' poderá ser concluído sem expor a resposta.':''),true);
   await refresh();
- }finally{creatingPuzzle=false;ui.puzzleCreate.disabled=false}
+ }finally{creatingPuzzle=false;ui.puzzleCreate.disabled=false;
+  if(window.puzzleDraftButton)window.puzzleDraftButton.disabled=false;
+ }
 }
 async function activateDraft(id){
  if(!master()||busy)return;
@@ -304,14 +314,76 @@ async function createNote(){
  }catch(e){message('clue','Falha ao salvar anotação: '+errorMessage(e),true)}
  finally{busy=false}
 }
+// Ferramentas extras do mestre: criação livre, rascunhos e prévia sem publicar.
+let previewPanel=null;
+function hidePuzzlePreview(){
+ if(previewPanel)previewPanel.hidden=true;
+}
+function setupPuzzleBuilder(){
+ if(!ui.puzzleCreate||!ui.puzzleMaster||$('puzzleBuilderExtras'))return;
+ const actions=ui.puzzleCreate.parentElement;
+ if(!actions)return;
+ const extra=document.createElement('div');
+ extra.id='puzzleBuilderExtras';extra.className='mystery-builder-extras';
+ extra.innerHTML=
+  '<button type="button" class="btn" id="puzzlePreviewButton">◉ Ver prévia do jogador</button>'+
+  '<button type="button" class="btn" id="puzzleSaveDraftButton">▤ Salvar como rascunho</button>';
+ actions.insertBefore(extra,ui.puzzleCreate);
+ ui.puzzleCreate.textContent='✦ Publicar para os jogadores';
+ const preview=document.createElement('section');
+ preview.id='puzzleBuilderPreview';preview.className='mystery-builder-preview';preview.hidden=true;
+ preview.innerHTML=
+  '<div class="mystery-preview-top"><small>PRÉVIA PRIVADA • NÃO PUBLICADA</small><button type="button" class="btn small" id="puzzlePreviewClose">✕ Fechar</button></div>'+
+  '<article class="mystery-puzzle-card"><div class="mystery-puzzle-top"><small id="puzzleDraftTheme"></small><span class="mystery-state draft">PRÉVIA</span></div>'+
+  '<h3 id="puzzleDraftTitle"></h3><p id="puzzleDraftPrompt" class="mystery-prompt"></p>'+
+  '<details id="puzzleDraftHintBlock" class="mystery-hint" hidden><summary>◈ Examinar dica</summary><p id="puzzleDraftHint"></p></details>'+
+  '<div class="mystery-answer-form"><label>Resposta do jogador</label><div class="mystery-answer-row"><input disabled placeholder="O jogador digitará aqui"><button class="btn" disabled>Responder</button></div></div></article>'+
+  '<p class="mystery-muted">Esta prévia é vista apenas pelo mestre. O gabarito permanece reservado.</p>';
+ actions.insertAdjacentElement('afterend',preview);
+ previewPanel=preview;
+ $('puzzlePreviewButton')?.addEventListener('click',previewDraft);
+ $('puzzleSaveDraftButton')?.addEventListener('click',()=>createPuzzle(false));
+ $('puzzlePreviewClose')?.addEventListener('click',hidePuzzlePreview);
+ // Mantém uma referência para bloquear cliques repetidos enquanto grava.
+ window.puzzleDraftButton=$('puzzleSaveDraftButton');
+}
+function previewDraft(){
+ if(!master())return;
+ const title=str(ui.puzzleTitle?.value).trim();
+ const prompt=str(ui.puzzlePrompt?.value).trim();
+ if(!title||!prompt)return message('puzzle','Preencha título e desafio para visualizar a prévia.',true);
+ $('puzzleDraftTheme').textContent=THEMES[ui.puzzleTheme.value]||'ENIGMA';
+ $('puzzleDraftTitle').textContent=title;
+ $('puzzleDraftPrompt').textContent=prompt;
+ const hint=str(ui.puzzleHint?.value).trim();
+ $('puzzleDraftHint').textContent=hint;
+ $('puzzleDraftHintBlock').hidden=!hint;
+ $('puzzleDraftHintBlock').open=false;
+ previewPanel.hidden=false;
+ message('puzzle','Prévia local aberta. Nenhum jogador recebeu esse enigma.');
+}
+function startCustomPuzzle(){
+ if(!master())return;
+ if([ui.puzzleTitle,ui.puzzlePrompt,ui.puzzleHint,ui.puzzleAnswer].some(x=>str(x?.value).trim()) &&
+    !confirm('Limpar os campos atuais para criar um novo enigma do zero?'))return;
+ for(const key of ['puzzleTitle','puzzlePrompt','puzzleHint','puzzleAnswer']){
+  const input=$(key);if(input)input.value='';
+ }
+ if(ui.puzzleTheme)ui.puzzleTheme.value='conhecimento';
+ if(ui.puzzleUnlock)ui.puzzleUnlock.value='';
+ hidePuzzlePreview();
+ ui.puzzleTitle?.focus();
+ message('puzzle','Criador livre ativado! Escreva seu enigma, escolha a resposta, teste a prévia e salve como rascunho ou publique.');
+}
 ui.puzzleTemplates?.addEventListener('click',e=>{
  if(!master())return;
+ if(e.target.closest('[data-puzzle-custom]')){startCustomPuzzle();return}
  const btn=e.target.closest('[data-puzzle-template]');if(!btn)return;
  const p=PUZZLE_TEMPLATES[Number(btn.dataset.puzzleTemplate)];if(!p)return;
  ui.puzzleTitle.value=p.title;ui.puzzlePrompt.value=p.prompt;ui.puzzleHint.value=p.hint;ui.puzzleTheme.value=p.theme;ui.puzzleAnswer.value='';
  message('puzzle','Modelo carregado. Defina a resposta secreta antes de publicar.');
 });
-ui.puzzleCreate?.addEventListener('click',createPuzzle);
+ui.puzzleCreate?.addEventListener('click',()=>createPuzzle(true));
 ui.clueCreate?.addEventListener('click',createClue);
 ui.clueList?.addEventListener('click',e=>{
  const pick=e.target.closest('[data-clue-pick]');if(pick){
@@ -332,7 +404,7 @@ ui.noteSend?.addEventListener('click',createNote);
 $('puzzleReload')?.addEventListener('click',refresh);
 $('clueReload')?.addEventListener('click',refresh);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
-renderPuzzleTemplates();syncAccount();renderAll();
+renderPuzzleTemplates();setupPuzzleBuilder();syncAccount();renderAll();
 setInterval(()=>{syncAccount();if(auth()&&!document.hidden)refresh()},5000);
 setTimeout(()=>{syncAccount();if(auth())refresh()},950);
 window.TempusInvestigacao={atualizar:refresh};
