@@ -224,6 +224,13 @@
   get online(){return online},
   get authenticated(){return authReady&&!!account},
   get masterRole(){return !online||account?.role==='mestre'},
+  async introSamuraiAssignment(slug){
+   const allowed=['akira','ichiro','masamune','reiji','takeda'];
+   if(!authReady||!account||!online||account.role!=='mestre')throw Error('Atribuição disponível apenas para o mestre conectado.');
+   if(!allowed.includes(String(slug)))throw Error('Selecione um dos cinco samurais.');
+   const rows=await api('/rest/v1/samurai_slots?select=slug,assigned_to&slug=eq.'+encodeURIComponent(slug));
+   return Array.isArray(rows)&&rows[0]?rows[0].assigned_to:null;
+  },
   introRequest(path,method='GET',body=null){
    if(!authReady||!account||!online)return Promise.reject(Error('Entre com uma conta conectada.'));
    if(!/^\/rest\/v1\/character_introductions(?:\?|$)/.test(path))return Promise.reject(Error('Caminho não permitido.'));
