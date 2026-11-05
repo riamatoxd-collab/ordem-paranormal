@@ -383,3 +383,19 @@ A aba **Diretor de cenas** sincroniza revelações para as contas dos jogadores 
 **Limites**: o modo local/offline permite ensaiar, mas não transmitir para outros aparelhos. O encerramento visto pelo jogador fica no armazenamento local por conta; em outro navegador, a cena ativa pode aparecer novamente. Links de imagem e áudio são informados pelo mestre e exigem HTTPS; o áudio depende da reprodução suportada pelo navegador. Atualize o site em todos os navegadores para receber os novos arquivos. Integração visual real com navegadores separados continua sendo teste manual recomendado.
 
 **Arquivos**: `diretor-cenas.js`, `diretor-cenas.css`, `diretor-cenas-supabase.sql`, `index.html`, `contas.js`.
+
+## Sussurros e mensagens privadas — Tempus Custodia
+
+A aba **✧ Sussurros** permite que o mestre entregue **pistas secretas e presságios para uma única conta de jogador**, sem revelar a mensagem aos demais. Jogadores podem **responder ao mestre** a partir de uma mensagem recebida. O sistema usa as contas já existentes; não cria novos logins.
+
+**Mestre:** abra **Sussurros**, selecione o jogador responsável pelo segredo, preencha o título, o tipo (sussurro, pista secreta ou presságio) e o texto (até 1.500 caracteres). Os modelos **Pista oculta**, **Lembrança estranha** e **Voz distante** ajudam a criar a mensagem; eles não enviam automaticamente. Clique em **Enviar sussurro**. O histórico **Enviadas** mostra a entrega registrada no banco e se foi marcada como lida pelo destinatário. Nomes de jogador repetidos são diferenciados pelos últimos caracteres do identificador da conta.
+
+**Jogadores:** assim que receber uma mensagem, o menu apresenta o número de não lidas. Fora das apresentações cinematográficas, uma revelação reservada aparece automaticamente. Use **Marcar como lida** para registrar a leitura ou **Ler depois** para manter na caixa de entrada. O botão **Responder ao mestre** abre um editor privado pré-endereçado ao autor do sussurro. O mestre recebe a resposta na própria caixa, com aviso de não lida.
+
+**Caixa de mensagens:** filtros **Recebidas**, **Enviadas** e **Todas**. Uma mensagem não lida continua na conta até que o destinatário marque a leitura, mesmo se entrar em outro dispositivo. A consulta ocorre aproximadamente a cada cinco segundos enquanto a aba do site está ativa; não são enviadas notificações fora do site ou por e-mail. Uma cena ou introdução já aberta tem prioridade visual sobre a notificação do sussurro.
+
+**Segurança:** `private_whispers` tem RLS para permitir leitura apenas a remetente e destinatário; apenas a pessoa destinatária pode registrar `read_at`, com privilégio de UPDATE limitado a essa coluna. O mestre só envia a contas com perfil de jogador; um jogador só envia a contas com papel de mestre (a interface oferece essa opção como resposta). Mensagens jogador–jogador são bloqueadas pelo banco. A função restrita `app_private.whisper_is_master(uuid)` confirma o papel do destinatário sem expor toda a tabela de perfis aos jogadores. Não é criptografia de ponta a ponta; administradores autorizados do banco ainda podem acessar os dados.
+
+**Limitações:** a função precisa do Supabase conectado. O indicador não conta mensagens antigas fora do limite de 150 registros mais recentes consultados. Sussurros são alertas dentro do site, não mensagens por SMS, e-mail ou push. Uma mensagem já adiada pode reaparecer na próxima visita até ser marcada como lida.
+
+**Arquivos:** `sussurros.js`, `sussurros.css`, `sussurros-supabase.sql`, `index.html` e `contas.js`. A estrutura SQL já foi aplicada ao projeto Supabase **eita**.
