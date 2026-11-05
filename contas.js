@@ -145,6 +145,8 @@
   render();
   updateAccountBadge();
   playKnowledge();
+  // Ao entrar, verifique a atribuição imediatamente (sem aguardar o próximo ciclo de 4 s).
+  window.TempusIntroducoes?.atualizar?.();
  }
  async function hashLocalPassword(password,salt){
   if(!window.crypto?.subtle)throw new Error('O navegador exige HTTPS para proteger senhas locais.');
