@@ -1,0 +1,77 @@
+
+/* Tempus Custodia — apresentação cinematográfica de personagens. */
+#v-intro{--intro-accent:#b99777}
+.intro-head{padding:24px;border:1px solid #5f4840;border-radius:18px;background:radial-gradient(ellipse at 78% 0%,#55232555,transparent 55%),linear-gradient(145deg,#17131a,#080b10);display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;overflow:hidden;position:relative}
+.intro-head:after{content:"◷";font-size:150px;line-height:1;color:#b9977731;position:absolute;right:25px;top:-25px;pointer-events:none}
+.intro-head > *{position:relative;z-index:1}
+.intro-head small{font-size:11px;letter-spacing:.27em;text-transform:uppercase;color:#cbb9a9}
+.intro-head h2{font-size:clamp(24px,4vw,45px);line-height:1.03;font-family:Georgia,serif;letter-spacing:.05em;margin:10px 0}
+.intro-head p{max-width:650px;color:#c8c4c2;font-size:14px;line-height:1.7}
+.intro-head .intro-crest{width:94px;height:94px;border:1px solid #9a746e;border-radius:50%;display:grid;place-items:center;font-size:47px;color:#d4b59c;box-shadow:0 0 36px #b85b4930,inset 0 0 27px #a4663b22}
+.intro-grid-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(275px,.85fr);gap:16px;margin-top:16px;align-items:start}
+.intro-manage{grid-column:1/-1}
+.intro-panel{border:1px solid #493e3b;background:linear-gradient(155deg,#171416,#0c0f13);border-radius:14px;padding:18px}
+.intro-panel h3{font-size:19px;margin:0 0 6px;color:#ede8df}
+.intro-muted{font-size:13px;color:#b6aca3;line-height:1.6;margin:6px 0}
+.intro-catalog{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:9px;margin-top:16px;max-height:355px;overflow:auto;padding:2px}
+.intro-preset{border:1px solid #413d3d;background:#121317;border-radius:10px;padding:11px;text-align:left;color:#e6e4e1;cursor:pointer;display:flex;align-items:center;gap:11px;transition:background .2s,border-color .2s,transform .2s}
+.intro-preset:hover{border-color:var(--intro-accent,#c3a186);transform:translateY(-2px)}
+.intro-preset.selected{border-color:var(--intro-accent,#b99777);background:#252126}
+.intro-preset-glyph{border:1px solid var(--intro-accent,#b99777);color:var(--intro-accent,#b99777);border-radius:8px;flex:0 0 38px;width:38px;height:38px;display:grid;place-items:center;font-family:serif;font-size:21px;background:#080808}
+.intro-preset strong{font-size:13px;display:block}
+.intro-preset small{display:block;font-size:10px;color:#aaa;line-height:1.5;padding-top:3px}
+.intro-editor{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.intro-editor label{display:flex;flex-direction:column;gap:5px;font-size:11px;letter-spacing:.09em;color:#c4b0a3}
+.intro-editor input,.intro-editor textarea,.intro-editor select{width:100%;font:inherit;font-size:13px;letter-spacing:normal;background:#0b0e13;border:1px solid #54413c;border-radius:9px;color:#f8f2ec;padding:11px;min-height:39px}
+.intro-editor input:focus,.intro-editor textarea:focus,.intro-editor select:focus{outline:1px solid #ca9b84}
+.intro-editor .wide{grid-column:1/-1}
+.intro-editor textarea{min-height:75px;resize:vertical}
+.intro-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+.intro-feedback{font-size:12px;color:#91cab5;padding:7px 0;min-height:18px}
+.intro-feedback.intro-error{color:#e7a89f}
+.intro-public-list{display:grid;gap:8px;max-height:470px;overflow:auto;padding-top:12px}
+.intro-public-row{display:flex;align-items:center;gap:11px;background:#101116;border:1px solid #3b3332;border-left:3px solid var(--intro-accent,#a68779);border-radius:9px;padding:10px}
+.intro-public-mini{width:37px;height:37px;border:1px solid #5f4540;border-radius:50%;display:grid;place-items:center;color:var(--intro-accent,#ccb2a6);flex-shrink:0}
+.intro-public-row>div:nth-child(2){flex:1;min-width:0}
+.intro-public-row strong{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.intro-public-row small{display:block;color:#b0a4a0;font-size:10px;padding-top:4px}
+.intro-public-row button{flex:0 0 auto}
+.intro-cinema[hidden]{display:none!important}
+.intro-cinema{position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at center,#1a1720dd,#050508f8 85%);display:flex;align-items:center;justify-content:center;padding:22px;overflow:auto;isolation:isolate}
+.intro-cinema:before{content:"";position:absolute;inset:-20%;background:conic-gradient(from 0deg,transparent 0deg,transparent 100deg,var(--intro-accent) 170deg,transparent 190deg,transparent 300deg,var(--intro-accent) 355deg);opacity:.08;animation:introRotate 35s linear infinite}
+.intro-cinema:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0,transparent 3px,#ffffff07 4px);pointer-events:none}
+.intro-cinema-stage{position:relative;z-index:1;width:min(100%,890px);min-height:500px;border:1px solid color-mix(in srgb,var(--intro-accent) 58%,#4e3335);border-radius:16px;box-shadow:0 0 100px #0009,0 0 65px color-mix(in srgb,var(--intro-accent) 15%,transparent);background:radial-gradient(circle at 30% 43%,color-mix(in srgb,var(--intro-accent) 22%,#0b0a12),#080b11 68%);padding:32px;display:grid;grid-template-columns:36% 1fr;gap:42px;align-items:center;overflow:hidden}
+.intro-cinema-stage:before{content:"TEMPUS CUSTODIA";position:absolute;bottom:12px;right:20px;font-size:10px;letter-spacing:.4em;color:#c0ad9b80}
+.intro-cinema-close{position:absolute;z-index:5;right:15px;top:15px;border:1px solid #8b7e754f;background:#141419;color:#e8e0da;padding:9px 12px;border-radius:7px;cursor:pointer}
+.intro-cinema-portrait{height:350px;position:relative;border:1px solid color-mix(in srgb,var(--intro-accent) 58%,transparent);background:radial-gradient(ellipse at 49% 45%,color-mix(in srgb,var(--intro-accent) 24%,#0c0c17),#080811);box-shadow:inset 0 0 50px #0008,0 0 20px #0008;border-radius:140px 140px 12px 12px;display:grid;place-items:center;overflow:hidden}
+.intro-cinema-portrait:before{content:"";position:absolute;width:200px;height:200px;border:1px solid var(--intro-accent);border-radius:50%;opacity:.4;box-shadow:0 0 38px var(--intro-accent)}
+.intro-cinema-portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:contrast(1.04) saturate(.8)}
+.intro-cinema-glyph{z-index:1;font-size:120px;font-family:serif;color:var(--intro-accent);text-shadow:0 0 20px color-mix(in srgb,var(--intro-accent) 65%,transparent)}
+.intro-cinema-body{min-width:0}
+.intro-cinema-kicker{display:block;color:#c5b09f;letter-spacing:.27em;font-size:10px;text-transform:uppercase;margin-bottom:24px}
+.intro-cinema-subtitle{font-size:13px;color:var(--intro-accent);letter-spacing:.18em;text-transform:uppercase}
+.intro-cinema-body h2{font-family:Georgia,serif;font-size:clamp(34px,5vw,61px);line-height:1.05;color:#f9f3ea;margin:14px 0 22px;text-shadow:0 0 35px #0009;overflow-wrap:anywhere}
+.intro-cinema-rule{height:2px;max-width:140px;background:linear-gradient(90deg,var(--intro-accent),transparent);margin-bottom:22px}
+.intro-cinema-quote{font-family:Georgia,serif;color:#f1dfd2;font-size:clamp(18px,2vw,24px);font-style:italic;line-height:1.45}
+.intro-cinema-desc{color:#c4b6ae;font-size:14px;line-height:1.7;margin-top:15px}
+.intro-replay .intro-cinema-stage{animation:introStage .8s cubic-bezier(.23,.87,.25,1) both}
+.intro-replay .intro-cinema-portrait{animation:introPortrait 1s ease both}
+.intro-replay .intro-cinema-body{animation:introText 1.05s .14s both}
+@keyframes introRotate{to{transform:rotate(360deg)}}
+@keyframes introStage{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+@keyframes introPortrait{from{opacity:0;transform:translateY(22px);filter:blur(12px)}to{opacity:1;transform:none;filter:none}}
+@keyframes introText{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+@media(max-width:750px){
+ .intro-grid-layout{grid-template-columns:1fr}
+ .intro-head{grid-template-columns:1fr}.intro-head .intro-crest{display:none}
+ .intro-editor{grid-template-columns:1fr}
+ .intro-cinema-stage{min-height:0;grid-template-columns:1fr;gap:15px;padding:25px 18px 45px}
+ .intro-cinema-portrait{height:180px;width:min(200px,65%);justify-self:center;border-radius:100px 100px 10px 10px}
+ .intro-cinema-portrait:before{width:105px;height:105px}
+ .intro-cinema-glyph{font-size:71px}
+ .intro-cinema-kicker{margin-bottom:12px}
+ .intro-cinema-body h2{margin:8px 0 12px}
+}
+@media(prefers-reduced-motion:reduce){
+ .intro-cinema *, .intro-cinema:before,.intro-preset{animation:none!important;transition:none!important}
+}
