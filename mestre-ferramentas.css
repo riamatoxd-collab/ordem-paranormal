@@ -1,0 +1,45 @@
+/* Mestre • direção integrada da campanha */
+.nav button[hidden]{display:none!important}
+#masterNarrativeTools[hidden],.master-narrative-dock[hidden],#masterWhisperBadge[hidden]{display:none!important}
+.master-narrative-tools{
+ margin:0 15px 18px;
+ border:1px solid #a7795d;
+ border-radius:13px;
+ background:linear-gradient(150deg,#29181d,#0e1015 75%);
+ box-shadow:inset 0 1px 0 #f0c7a019,0 8px 26px #0005;
+ padding:17px;
+ min-width:0;
+}
+.master-narrative-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+.master-narrative-head small{color:#dcb998;font-size:10px;font-weight:750;letter-spacing:.18em;text-transform:uppercase}
+.master-narrative-head h3{font:500 clamp(23px,3vw,31px)/1.1 Georgia,serif;color:#ffead6;margin:7px 0 5px}
+.master-narrative-head p{font-size:12px;color:#c7b5ad;line-height:1.55;margin:0}
+.master-narrative-glyph{font:42px Georgia,serif;color:#efc29a;border:1px solid #996e5e;border-radius:50%;width:67px;height:67px;flex:0 0 67px;display:grid;place-items:center;background:#321e24;box-shadow:0 0 24px #df9d7e30}
+.master-narrative-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:16px 0}
+.master-narrative-tabs button{font:700 13px/1.45 system-ui,sans-serif;color:#d6bdb1;background:#111319;border:1px solid #62514d;border-radius:10px;padding:13px 16px;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;min-width:0;transition:background .15s,border-color .15s}
+.master-narrative-tabs button:hover{border-color:#b9967c;background:#34222b}
+.master-narrative-tabs button.is-current{border-color:#d5a982;color:#fff1e1;background:linear-gradient(110deg,#65333c,#2d1d27);box-shadow:inset 0 1px #ffffff19}
+#masterWhisperBadge{border-radius:30px;background:#d9b489;color:#150f13;font-weight:800;font-size:11px;line-height:1;padding:4px 7px;min-width:23px;text-align:center}
+.master-narrative-dock{min-width:0}
+.master-scene-dock{--scene-accent:#bb9b79}
+.master-whisper-dock{--whisper-gold:#cab18d}
+.master-narrative-dock .scene-director-head,
+.master-narrative-dock .whisper-hero{padding:18px 20px}
+.master-narrative-dock .scene-director-head h2,
+.master-narrative-dock .whisper-hero h2{font-size:clamp(25px,3vw,36px)}
+.master-narrative-dock .scene-director-layout,
+.master-narrative-dock .whisper-layout{margin-top:11px}
+.master-narrative-dock .scene-master-panel,
+.master-narrative-dock .whisper-box{min-width:0}
+@media(max-width:800px){
+ .master-narrative-tools{margin:0 9px 14px;padding:11px}
+ .master-narrative-tabs{grid-template-columns:1fr}
+ .master-narrative-tabs button{justify-content:flex-start}
+ .master-narrative-glyph{display:none}
+ .master-narrative-dock .scene-director-layout,
+ .master-narrative-dock .whisper-layout{grid-template-columns:1fr}
+ .master-narrative-dock .scene-editor,
+ .master-narrative-dock .whisper-compose{grid-template-columns:1fr}
+ .master-narrative-dock .scene-editor label.wide,
+ .master-narrative-dock .whisper-compose label.wide{grid-column:1/-1}
+}
