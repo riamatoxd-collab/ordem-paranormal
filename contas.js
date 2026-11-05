@@ -224,6 +224,13 @@
   get online(){return online},
   get authenticated(){return authReady&&!!account},
   get masterRole(){return !online||account?.role==='mestre'},
+  introRequest(path,method='GET',body=null){
+   if(!authReady||!account||!online)return Promise.reject(Error('Entre com uma conta conectada.'));
+   if(!/^\/rest\/v1\/character_introductions(?:\?|$)/.test(path))return Promise.reject(Error('Caminho não permitido.'));
+   if(!['GET','POST'].includes(method))return Promise.reject(Error('Método não permitido.'));
+   if(method==='POST'&&account.role!=='mestre')return Promise.reject(Error('Apenas o mestre pode publicar.'));
+   return api(path,method,body);
+  },
   logout,
   async importLegacy(){
    if(!account||!legacyAgents.length||localStorage.getItem('op_legacy_imported_v2')==='1')return;
