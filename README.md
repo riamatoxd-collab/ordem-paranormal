@@ -402,8 +402,36 @@ A aba **✧ Sussurros** permite que o mestre entregue **pistas secretas e press�
 
 ## Direção da sessão — ferramentas no Painel do Mestre
 
-A conta **mestre** encontra as abas **◈ Diretor de Cenas** e **✧ Sussurros** dentro de **Painel do Mestre → Direção da sessão**, logo após o controle de PE e antes das fichas dos samurais. Os antigos botões separados do menu lateral ficam ocultos **somente** para o mestre; os jogadores continuam usando as abas públicas de **Diretor de cenas** (consultar histórico das cenas) e **Sussurros** (ler e responder às mensagens).
+A conta **mestre** encontra quatro abas — **◈ Diretor de Cenas**, **✧ Sussurros**, **◇ Enigmas interativos** e **⌕ Mural de investigação** — dentro de **Painel do Mestre → Direção da sessão**, logo após o controle de PE e antes das fichas dos samurais. Os antigos botões separados do menu lateral ficam ocultos **somente** para o mestre; os jogadores continuam usando **Diretor de cenas** (consultar histórico), **Sussurros** (ler e responder), **Enigmas** (resolver) e **Mural de investigação** (conectar pistas e anotar).
 
 O código `mestre-ferramentas.js` **move os elementos DOM originais**, sem recriar formulários ou IDs. Portanto, preserva listeners, estados e recursos existentes de início/encerramento de cenas, votações, histórico, envio de sussurros e leitura de respostas. Ao trocar uma conta de mestre por uma conta de jogador no mesmo navegador, os conteúdos voltam para suas abas originais. As janelas de cena e de sussurro permanecem fora dessas abas para abrir sobre qualquer tela do site. O mestre recebe um contador de mensagens não lidas na aba interna.
 
 A alteração é **apenas de organização de interface**: as regras de privacidade e autorização continuam aplicadas no Supabase, não no PIN visual do painel. Arquivos: `mestre-ferramentas.js`, `mestre-ferramentas.css`, `index.html`.
+
+## Enigmas interativos e Mural de Investigação — Tempus Custodia
+
+As duas ferramentas funcionam no Supabase, vinculadas às contas existentes. **Mestre:** abra **Painel do Mestre → Direção da Sessão** e selecione as novas abas **◇ Enigmas interativos** ou **⌕ Mural de investigação**. **Jogadores:** encontram **Enigmas** e **Mural de investigação** no menu lateral, sem os formulários administrativos. O menu do mestre oculta esses botões separados para manter a organização.
+
+### Mural — preparar e revelar pistas
+1. No **Mural**, o mestre cria cartões com título, tipo (pista, documento, local, testemunho ou imagem), descrição e URL HTTPS opcional. **Toda pista nasce OCULTA.**
+2. O mestre pode clicar **Revelar ao grupo**, ou vincular uma pista oculta à solução de um enigma. Só as pistas reveladas aparecem nas contas dos jogadores.
+3. Qualquer conta autenticada pode examinar as pistas visíveis, registrar uma **anotação compartilhada** e **conectar duas evidências** com uma hipótese. As conexões também ficam acessíveis ao grupo.
+4. As ligações exigem IDs ordenados e são únicas por par; tentativas repetidas não duplicam cartões. Quando o mestre oculta uma pista, ela, suas anotações e as conexões associadas deixam de ser visíveis aos jogadores.
+
+### Enigmas — desafios e solução protegida
+1. O mestre escolhe um modelo (**Cofre dos Cinco Símbolos**, **Sino que Ecoa Duas Vezes**, **Juramento Esquecido**) ou cria o próprio enigma. Modelos não possuem gabaritos embutidos no código do site.
+2. Preenche título, texto do desafio, dica opcional, tema e **resposta secreta** (até 70 caracteres). Pode escolher uma pista do mural a ser revelada quando o enigma for resolvido.
+3. O site cria primeiro um **rascunho** no Supabase, grava a solução em uma **tabela privada** e só então publica o enigma. Se houver falha de rede entre essas etapas, o mestre pode usar **Publicar rascunho** com a resposta configurada.
+4. Jogadores podem tentar resolver enigmas ativos usando até **8 tentativas por conta e por enigma**. O banco normaliza espaços nas extremidades e ignora diferenças de maiúsculas/minúsculas na validação.
+5. A verificação ocorre por **trigger de banco na área privada**, não no JavaScript. A primeira resposta correta muda o enigma para **Resolvido** e revela a pista vinculada para todos. O mestre também pode **encerrar** um enigma para bloquear novas tentativas.
+6. As pistas reveladas e o estado de resolução são sincronizados por consulta aproximadamente a cada **5 segundos**. O mestre consegue ver o número de tentativas do grupo; os jogadores só podem consultar as próprias tentativas.
+
+### Segurança e funcionamento
+
+- **Tabelas:** \`investigation_clues\`, \`investigation_links\`, \`investigation_notes\`, \`rpg_puzzles\`, \`rpg_puzzle_answers\`, \`rpg_puzzle_attempts\`. Todas têm RLS habilitada e políticas específicas.
+- A solução em \`rpg_puzzle_answers\` é legível **somente pelo mestre**. Jogadores não podem solicitar o gabarito, ver pistas ocultas nem acessar as tentativas de outros jogadores.
+- O trigger \`app_private.check_rpg_puzzle_attempt()\` lê a solução exclusivamente no servidor, valida a tentativa, impõe o limite de oito e libera a pista quando houver acerto. A função fica em esquema privado, sem permissão de execução direta por contas autenticadas.
+- Só o mestre pode criar ou revelar pistas e criar/encerrar enigmas. Jogadores podem escrever anotações e conexões apenas para evidências visíveis. As permissões reais ficam no Supabase, não dependem do PIN visual do mestre.
+- Para uso entre dispositivos é necessária conexão com Supabase. O aplicativo não inicia o enigma automaticamente em tela cheia; o jogador abre a aba **Enigmas**. Não há imagens secretas pré-carregadas para jogadores.
+- **Arquivos:** \`enigmas-mural.js\`, \`enigmas-mural.css\`, \`enigmas-mural-supabase.sql\`, \`mestre-ferramentas.js\`, \`index.html\`, \`contas.js\`. A migração de banco de dados \`20261105225116\` foi aplicada no projeto.
+- Os testes automatizados e de transação verificaram criação, revelação, resposta, bloqueio de respostas ocultas, anotações e conexões. O teste visual com duas contas reais em navegadores separados ainda é recomendado.
