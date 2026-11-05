@@ -350,3 +350,17 @@ Os efeitos de duração não instantânea aparecem na seção **Efeitos de Ritua
 **Limites:** a resolução é assistida, não uma simulação automática de todas as situações descritas nos livros. Fórmulas dos efeitos que não foram confirmadas permanecem editáveis, sem valores inventados. Áreas, múltiplos alvos, decisões de NPCs, efeitos de itens e exceções de poderes requerem decisão do mestre. Um personagem de outra conta não pode ter PV/condições alterados pelo cliente de outro jogador por causa das permissões do Supabase.
 
 O arquivo **[AUDITORIA-EFEITOS-RITUAIS.md](AUDITORIA-EFEITOS-RITUAIS.md)** discrimina o grupo e a fonte de cada uma das 98 fichas, as automatizações disponíveis e as pendências. Foram executados testes de sintaxe, cobertura do catálogo, fórmulas verificadas, Custo do Paranormal e composição de bônus em ambiente de código. Ainda falta validar o fluxo visual completo em navegador e partidas reais.
+
+## Entradas cinematográficas — personagens de Tempus Custodia
+
+A aba **Apresentações** permite revelar personagens com uma animação em tela cheia.
+
+- A conta de **mestre** vê a seleção de personagens e o editor. Há 13 perfis pré-cadastrados (restaurante, vila e cinco samurais), além da entrada personalizada para jornalistas.
+- **Prévia local** ensaia a animação sem publicar. **Apresentar aos jogadores** publica nome, título, frase, descrição, cena, cor e retrato opcional.
+- Os **jogadores conectados** consultam automaticamente as apresentações a cada quatro segundos; uma entrada recém-publicada abre em tela cheia. O histórico permite **Rever**.
+- Retratos são opcionais: uma URL HTTPS de imagem ou um sigilo abstrato. Não publique segredos do mestre: as apresentações são visíveis para todos os jogadores autenticados.
+- Somente a conta Supabase com papel de mestre pode publicar, graças à RLS. O PIN visual não substitui a autorização.
+- Sem Supabase, a publicação funciona apenas no navegador atual, sem distribuição a outros dispositivos.
+- A tabela já foi implantada no Supabase eita. Para replicar em outro projeto, aplique introducoes-supabase.sql após supabase-schema.sql.
+
+A implementação está em intro-personagens.js, intro-personagens.css, index.html e contas.js.
