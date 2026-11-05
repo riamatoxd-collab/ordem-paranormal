@@ -411,7 +411,7 @@
  <div class="intro-grid-layout">
   <section class="intro-panel intro-manage" id="introMasterPanel" hidden>
    <h3>Painel de revelações do mestre</h3>
-   <p class="intro-muted">Escolha um personagem conhecido ou crie a apresentação de um dos jornalistas. Use <strong>Prévia local</strong> para ensaiar; <strong>Apresentar aos jogadores</strong> para publicar. Nunca coloque segredos do mestre nos textos publicados.</p>
+   <p class="intro-muted">Escolha um personagem conhecido ou crie a apresentação de um dos jornalistas. Use <strong>Prévia local</strong> para ensaiar; <strong>Apresentar aos jogadores</strong> para publicar. <strong>Samurais serão revelados somente ao jogador responsável pela ficha; NPCs serão vistos por todos.</strong> Nunca coloque segredos do mestre nos textos publicados.</p>
    <div class="intro-catalog" id="introCatalog"></div>
    <div class="intro-editor">
     <label>NOME DO PERSONAGEM<input id="intro_name" maxlength="80" placeholder="Nome mostrado aos jogadores"></label>
@@ -419,7 +419,18 @@
     <label class="wide">FRASE DA ENTRADA<input id="intro_quote" maxlength="220" placeholder="O que o personagem diz ao aparecer?"></label>
     <label class="wide">APRESENTAÇÃO BREVE<textarea id="intro_description" maxlength="340" placeholder="Informação que os jogadores podem descobrir agora"></textarea></label>
     <label>EPISÓDIO / CENA<input id="intro_chapter" maxlength="80" placeholder="EPISÓDIO 1 • RESTAURANTE"></label>
-    <label>TIPO<select id="intro_kind"><option value="npc">NPC</option><option value="samurai">Samurai</option><option value="jornalista">Jornalista</option><option value="outro">Outro</option></select></label>
+    <label>TIPO<select id="intro_kind"><option value="npc">NPC • todos os jogadores</option><option value="samurai">Samurai • somente dono da ficha</option><option value="jornalista">Jornalista • todos os jogadores</option><option value="outro">Outro • todos os jogadores</option></select></label>
+    <label class="wide" id="intro_samurai_target" hidden>FICHA DE SAMURAI QUE RECEBERÁ A APRESENTAÇÃO
+      <select id="intro_samurai_slug">
+        <option value="">Escolha uma ficha atribuída</option>
+        <option value="akira">Akira Kurogane</option>
+        <option value="ichiro">Ichiro Yamioka</option>
+        <option value="masamune">Masamune Hayato</option>
+        <option value="reiji">Reiji Kuronami</option>
+        <option value="takeda">Takeda Shirogane</option>
+      </select>
+      <small>O mestre precisa atribuir a ficha no Painel do Mestre antes de publicar. Os demais jogadores não poderão acessar esta apresentação.</small>
+    </label>
     <label>COR DA APRESENTAÇÃO<input id="intro_accent" type="color" value="#b99777"></label>
     <label>URL DO RETRATO (OPCIONAL)<input id="intro_portrait_url" type="url" maxlength="500" placeholder="https://.../imagem.jpg"></label>
    </div>
@@ -1205,6 +1216,6 @@ function renderTranscendProgression(){
 }
 
 function render(){$('nAgents').textContent=agents.length;renderAgents();fillSelect();renderHistory();renderInventory();renderSkillPage();renderOccultPage();renderTranscendProgression();renderGrimoirePage()};setupInventoryPresets();populateOrigins();renderTrailOptions('');['class','nex','aAgi','aFor','aInt','aPre','aVig'].forEach(id=>$(id).addEventListener('input',()=>{if(id==='class')classHint();else{if(id==='nex')renderTrailOptions($('trail').value);refreshBuildEditors()}$('classSkillSummary').textContent=classSkillText($('class').value,+$('aInt').value)}));$('origin').addEventListener('change',onOriginChange);$('trail').addEventListener('change',refreshBuildEditors);render();
-</script><script src="./auth-config.js?v=supabase-online-2"></script><script src="./contas.js?v=template-samurais-pd-2"></script>
-<script src="./intro-personagens.js?v=tempus-intro-1"></script><script src="./ficha-mestre.js?v=cinco-samurais-1"></script><script src="./samurai-fichas.js?v=cinco-samurais-fichas-1"></script>
+</script><script src="./auth-config.js?v=supabase-online-2"></script><script src="./contas.js?v=template-samurais-pd-3"></script>
+<script src="./intro-personagens.js?v=tempus-intro-2"></script><script src="./ficha-mestre.js?v=cinco-samurais-1"></script><script src="./samurai-fichas.js?v=cinco-samurais-fichas-1"></script>
 <script src="./rituais-executor.js?v=rituais-execucao-1"></script></body></html>
