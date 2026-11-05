@@ -218,7 +218,7 @@ async function createPuzzle(publish=true){
  if(!title||!prompt||!answer)return message('puzzle','Preencha título, desafio e resposta secreta.',true);
  if(answer.length>70)return message('puzzle','A resposta deve ter no máximo 70 caracteres.',true);
  creatingPuzzle=true;ui.puzzleCreate.disabled=true;
- if(window.puzzleDraftButton)window.puzzleDraftButton.disabled=true;
+ if(draftButton)draftButton.disabled=true;
  let id=null;
  try{
   const result=await rpc('/rest/v1/rpg_puzzles?select=id','POST',{
@@ -240,7 +240,7 @@ async function createPuzzle(publish=true){
   message('puzzle','Falha ao criar o enigma: '+errorMessage(e)+(id?' O rascunho #'+id+' poderá ser concluído sem expor a resposta.':''),true);
   await refresh();
  }finally{creatingPuzzle=false;ui.puzzleCreate.disabled=false;
-  if(window.puzzleDraftButton)window.puzzleDraftButton.disabled=false;
+  if(draftButton)draftButton.disabled=false;
  }
 }
 async function activateDraft(id){
@@ -315,7 +315,7 @@ async function createNote(){
  finally{busy=false}
 }
 // Ferramentas extras do mestre: criação livre, rascunhos e prévia sem publicar.
-let previewPanel=null;
+let previewPanel=null,draftButton=null;
 function hidePuzzlePreview(){
  if(previewPanel)previewPanel.hidden=true;
 }
@@ -345,7 +345,7 @@ function setupPuzzleBuilder(){
  $('puzzleSaveDraftButton')?.addEventListener('click',()=>createPuzzle(false));
  $('puzzlePreviewClose')?.addEventListener('click',hidePuzzlePreview);
  // Mantém uma referência para bloquear cliques repetidos enquanto grava.
- window.puzzleDraftButton=$('puzzleSaveDraftButton');
+ draftButton=$('puzzleSaveDraftButton');
 }
 function previewDraft(){
  if(!master())return;
