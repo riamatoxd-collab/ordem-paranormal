@@ -311,7 +311,7 @@
 <link rel="stylesheet" href="./ficha-mestre.css?v=mestre-pe-vazio-8">
 <link rel="stylesheet" href="./contas.css?v=recuperar-senha-2">
 <link rel="stylesheet" href="./samurais.css?v=cinco-samurais-fichas-1">
-<link rel="stylesheet" href="./intro-personagens.css?v=tempus-intro-1">
+<link rel="stylesheet" href="./intro-personagens.css?v=tempus-intro-3">
 <link rel="stylesheet" href="./rituais-regras-completas.css?v=grimorio-livros-1">
 <link rel="stylesheet" href="./rituais-executor.css?v=rituais-execucao-1">
 </head><body>
@@ -405,13 +405,13 @@
 </section>
 <section class="view" id="v-intro">
  <div class="intro-head">
-  <div><small>✧ TEMPUS CUSTODIA • A MALDIÇÃO DOS SETE ANJOS</small><h2>ARQUIVO DE<br>PERSONAGENS.</h2><p>Cada encontro deixa uma marca. Quando o mestre apresentar alguém, sua entrada aparecerá em tela cheia para todos os jogadores conectados.</p></div>
+  <div><small>✧ TEMPUS CUSTODIA • A MALDIÇÃO DOS SETE ANJOS</small><h2>ARQUIVO DE<br>PERSONAGENS.</h2><p>Cada encontro deixa uma marca. Quando o mestre atribuir um samurai, a apresentação aparece automaticamente apenas para o jogador responsável. Os demais personagens podem ser apresentados a todos.</p></div>
   <div class="intro-crest" aria-hidden="true">時</div>
  </div>
  <div class="intro-grid-layout">
   <section class="intro-panel intro-manage" id="introMasterPanel" hidden>
    <h3>Painel de revelações do mestre</h3>
-   <p class="intro-muted">Escolha um personagem conhecido ou crie a apresentação de um dos jornalistas. Use <strong>Prévia local</strong> para ensaiar; <strong>Apresentar aos jogadores</strong> para publicar. <strong>Samurais serão revelados somente ao jogador responsável pela ficha; NPCs serão vistos por todos.</strong> Nunca coloque segredos do mestre nos textos publicados.</p>
+   <p class="intro-muted">Ao atribuir um samurai no Painel do Mestre, a apresentação será enviada automaticamente ao dono da ficha — sem precisar clicar em publicar. A introdução permanece pendente até o jogador finalizá-la e entrar na ficha. Esta aba serve para prévias e apresentações extras de NPCs e jornalistas.</p>
    <div class="intro-catalog" id="introCatalog"></div>
    <div class="intro-editor">
     <label>NOME DO PERSONAGEM<input id="intro_name" maxlength="80" placeholder="Nome mostrado aos jogadores"></label>
@@ -447,7 +447,7 @@
  </div>
 </section>
 <div class="intro-cinema" id="introCinema" hidden role="dialog" aria-modal="true" aria-labelledby="introCinemaName">
- <div class="intro-cinema-stage">
+ <div class="intro-cinema-stage" id="introCinemaStage">
   <button id="introCinemaClose" class="intro-cinema-close" type="button" aria-label="Fechar apresentação">✕ Fechar</button>
   <div class="intro-cinema-portrait"><img id="introCinemaPortrait" alt="" hidden><span class="intro-cinema-glyph" id="introCinemaGlyph">✧</span></div>
   <div class="intro-cinema-body">
@@ -457,7 +457,19 @@
    <div class="intro-cinema-rule" aria-hidden="true"></div>
    <p class="intro-cinema-quote" id="introCinemaQuote"></p>
    <p class="intro-cinema-desc" id="introCinemaDesc"></p>
+   <div class="intro-cinema-actions">
+    <button class="intro-cinema-finish" id="introCinemaFinish" type="button" hidden>✦ Finalizar introdução</button>
+    <p class="intro-cinema-status" id="introCinemaStatus" role="status" aria-live="polite"></p>
+   </div>
   </div>
+  <section class="intro-cinema-end" id="introCinemaEnd" hidden aria-label="Introdução finalizada">
+   <div class="intro-cinema-end-sigil" aria-hidden="true">✧</div>
+   <small>INTRODUÇÃO CONCLUÍDA • TEMPUS CUSTODIA</small>
+   <h2 id="introCinemaFinalName">Seu personagem</h2>
+   <p>O juramento foi reconhecido. A sua ficha está pronta para começar a jornada.</p>
+   <button class="intro-cinema-finish" id="introCinemaOpenSheet" type="button">✦ Entrar na minha ficha</button>
+   <p class="intro-cinema-status" id="introCinemaFinalStatus" role="status" aria-live="polite"></p>
+  </section>
  </div>
 </div>
 
@@ -1216,6 +1228,6 @@ function renderTranscendProgression(){
 }
 
 function render(){$('nAgents').textContent=agents.length;renderAgents();fillSelect();renderHistory();renderInventory();renderSkillPage();renderOccultPage();renderTranscendProgression();renderGrimoirePage()};setupInventoryPresets();populateOrigins();renderTrailOptions('');['class','nex','aAgi','aFor','aInt','aPre','aVig'].forEach(id=>$(id).addEventListener('input',()=>{if(id==='class')classHint();else{if(id==='nex')renderTrailOptions($('trail').value);refreshBuildEditors()}$('classSkillSummary').textContent=classSkillText($('class').value,+$('aInt').value)}));$('origin').addEventListener('change',onOriginChange);$('trail').addEventListener('change',refreshBuildEditors);render();
-</script><script src="./auth-config.js?v=supabase-online-2"></script><script src="./contas.js?v=template-samurais-pd-4"></script>
-<script src="./intro-personagens.js?v=tempus-intro-2"></script><script src="./ficha-mestre.js?v=cinco-samurais-1"></script><script src="./samurai-fichas.js?v=cinco-samurais-fichas-1"></script>
+</script><script src="./auth-config.js?v=supabase-online-2"></script><script src="./contas.js?v=template-samurais-pd-5"></script>
+<script src="./intro-personagens.js?v=tempus-intro-3"></script><script src="./ficha-mestre.js?v=cinco-samurais-1"></script><script src="./samurai-fichas.js?v=cinco-samurais-fichas-1"></script>
 <script src="./rituais-executor.js?v=rituais-execucao-1"></script></body></html>
