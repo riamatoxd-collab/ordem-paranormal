@@ -353,14 +353,14 @@ O arquivo **[AUDITORIA-EFEITOS-RITUAIS.md](AUDITORIA-EFEITOS-RITUAIS.md)** discr
 
 ## Entradas cinematográficas — personagens de Tempus Custodia
 
-A aba **Apresentações** permite revelar personagens com uma animação em tela cheia.
+**Fluxo automático de personagem atribuído:** mestre escolhe um jogador em **Painel do Mestre → Os Cinco Samurais** e clica **Salvar atribuição** → o site do jogador consulta a atribuição diretamente no Supabase (RLS) a cada 4 segundos e abre a animação em tela cheia → o jogador clica **Finalizar introdução** → aparece a tela de encerramento com **Entrar na minha ficha** → a ficha é sincronizada e aberta, sem necessidade de atualizar a página.
 
-- A conta de **mestre** vê a seleção de personagens e o editor. Há 13 perfis pré-cadastrados (restaurante, vila e cinco samurais), além da entrada personalizada para jornalistas.
-- **Prévia local** ensaia a animação sem publicar. **Apresentar aos jogadores** publica nome, título, frase, descrição, cena, cor e retrato opcional.
-- Os **jogadores conectados** consultam automaticamente as apresentações a cada quatro segundos. NPCs e jornalistas aparecem a todos; as apresentações dos samurais aparecem somente para o jogador que recebeu a ficha correspondente (e para o mestre). O histórico e a opção **Rever** respeitam essa restrição.
-- Retratos são opcionais: uma URL HTTPS de imagem ou um sigilo abstrato. Não publique segredos do mestre nas introduções públicas; a descrição de um samurai é privada somente ao jogador que recebeu sua ficha.
-- Somente a conta Supabase com papel de mestre pode publicar, graças à RLS. Para publicar um samurai, sua ficha deve estar atribuída no **Painel do Mestre → Os Cinco Samurais**. A RLS vincula a apresentação à atribuição atual da ficha; se a atribuição mudar, o acesso também muda. O PIN visual não substitui a autorização.
-- Sem Supabase, a publicação funciona apenas no navegador atual, sem distribuição a outros dispositivos.
-- A tabela e a política de privacidade já foram implantadas no Supabase eita. Para replicar em outro projeto, crie primeiro o esquema de contas e a tabela samurai_slots; então aplique introducoes-supabase.sql.
+- O mestre **não precisa** clicar em **Apresentações → Publicar** para iniciar esse fluxo. Isso continua disponível para NPCs, jornalistas e apresentações extras.
+- A cena automática aparece somente na conta à qual foi atribuído o personagem. Quem não recebeu a ficha não vê a introdução. A proteção de leitura dos registros de atribuição é aplicada pelo Supabase.
+- A atribuição é verificada também ao entrar no site: quem estiver desconectado durante a atribuição verá sua introdução na próxima entrada, mesmo dias depois.
+- A conclusão é guardada no **localStorage do navegador**, com separação por conta e personagem. Assim não repete em logins seguintes no mesmo navegador. **Limite:** em outro dispositivo ou após limpar os dados do site, a cena poderá ser mostrada novamente; não existe ainda confirmação de conclusão sincronizada entre dispositivos.
+- Em **Apresentações**, o jogador pode usar **Rever** para assistir à sua introdução novamente; uma cena já concluída é exibida como prévia, sem bloquear sua ficha.
+- A conta de mestre ainda dispõe de 13 perfis pré-cadastrados e editor de introduções, com retratos HTTPS opcionais. Introduções manuais do banco respeitam as políticas RLS existentes; NPCs e jornalistas são públicas para contas autenticadas.
+- Sem Supabase, a atribuição automática entre dispositivos não funciona. A apresentação manual local permanece disponível para demonstração.
 
-A implementação está em intro-personagens.js, intro-personagens.css, index.html e contas.js.
+Arquivos: `intro-personagens.js`, `intro-personagens.css`, `index.html`, `contas.js`. A tabela `character_introductions` continua destinada às apresentações manuais. A atribuição automática usa diretamente `samurai_slots`, sem nova tabela ou alteração do banco.
