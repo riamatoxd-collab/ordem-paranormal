@@ -32,7 +32,7 @@ const PRESETS=[
 const els={panel:byId('introMasterPanel'),catalog:byId('introCatalog'),history:byId('introPublished'),feedback:byId('introFeedback'),overlay:byId('introCinema')};
 if(!els.panel||!els.overlay)return;
 let entries=[],activePreset=PRESETS[0],isBusy=false,fetching=false;
-let lastAccount='',firstSync=true,lastId=0,localSeq=0;
+let lastAccount='',firstSync=true,lastId=0,activeAuto=null,finishing=false,openingSheet=false;
 function readLocal(){try{return JSON.parse(localStorage.getItem(localKey())||'[]')}catch{return []}}
 function writeLocal(rows){localStorage.setItem(localKey(),JSON.stringify(rows))}
 function glyph(item){
@@ -77,9 +77,10 @@ function draft(){
  return item;
 }
 function feedback(msg,bad=false){if(!els.feedback)return;els.feedback.textContent=msg;els.feedback.classList.toggle('intro-error',bad)}
-function display(item){
+function display(item,automatic=false){
  if(!item)return;
  const overlay=els.overlay,accent=color(item.accent),url=portrait(item.portrait_url);
+ activeAuto=automatic?item:null;
  overlay.style.setProperty('--intro-accent',accent);
  byId('introCinemaChapter').textContent=item.chapter||'TEMPUS CUSTODIA';
  byId('introCinemaSubtitle').textContent=item.subtitle||'PERSONAGEM';
@@ -89,17 +90,65 @@ function display(item){
  const img=byId('introCinemaPortrait'),sig=byId('introCinemaGlyph');
  if(url){img.src=url;img.alt='Retrato de '+item.name;img.hidden=false;sig.hidden=true}
  else{img.removeAttribute('src');img.hidden=true;sig.textContent=glyph(item);sig.hidden=false}
+ byId('introCinemaStage')?.classList.remove('is-final');
+ byId('introCinemaFinish').hidden=!automatic;
+ byId('introCinemaFinish').disabled=false;
+ byId('introCinemaFinish').textContent='✦ Finalizar introdução';
+ byId('introCinemaClose').hidden=!!automatic;
+ byId('introCinemaEnd').hidden=true;
+ const status=byId('introCinemaStatus');if(status)status.textContent='';
  overlay.hidden=false;
  overlay.classList.remove('intro-replay');void overlay.offsetWidth;
  overlay.classList.add('intro-replay');
- byId('introCinemaClose')?.focus({preventScroll:true});
+ (automatic?byId('introCinemaFinish'):byId('introCinemaClose'))?.focus({preventScroll:true});
 }
-function close(){els.overlay.hidden=true;byId('introCinemaPortrait')?.removeAttribute('src')}
+function close(){
+ if(activeAuto)return;
+ els.overlay.hidden=true;
+ byId('introCinemaPortrait')?.removeAttribute('src');
+}
+async function finishAutomatic(){
+ if(!activeAuto||finishing||!auth()||!online())return;
+ const event=activeAuto,button=byId('introCinemaFinish'),status=byId('introCinemaStatus');
+ finishing=true;button.disabled=true;button.textContent='Registrando conclusão...';
+ if(status)status.textContent='';
+ try{
+  const completed_at=new Date().toISOString();
+  await window.OPAccounts.introRequest('/rest/v1/character_introductions?id=eq.'+Number(event.id),'PATCH',{completed_at});
+  event.completed_at=completed_at;
+  entries=entries.map(e=>Number(e.id)===Number(event.id)?{...e,completed_at}:e);
+  showHistory();
+  byId('introCinemaStage').classList.add('is-final');
+  byId('introCinemaEnd').hidden=false;
+  byId('introCinemaFinalName').textContent=event.name;
+  byId('introCinemaOpenSheet').focus({preventScroll:true});
+ }catch(error){
+  button.disabled=false;button.textContent='✦ Tentar finalizar introdução';
+  if(status)status.textContent='Não foi possível registrar a conclusão. Confira a conexão e tente novamente: '+error.message;
+ }finally{finishing=false}
+}
+async function enterAssignedSheet(){
+ if(!activeAuto||openingSheet)return;
+ const button=byId('introCinemaOpenSheet'),status=byId('introCinemaFinalStatus');
+ openingSheet=true;button.disabled=true;
+ if(status)status.textContent='Carregando sua ficha...';
+ try{
+  await window.OPAccounts.openAssignedSamurai(activeAuto.samurai_slug);
+  activeAuto=null;
+  els.overlay.hidden=true;
+  byId('introCinemaPortrait')?.removeAttribute('src');
+  byId('introCinemaStage')?.classList.remove('is-final');
+  if(status)status.textContent='';
+  refresh();
+ }catch(error){
+  if(status)status.textContent='Não foi possível abrir a ficha: '+error.message;
+ }finally{openingSheet=false;button.disabled=false}
+}
 function recentText(i){return new Date(i.created_at||Date.now()).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
 function showHistory(){
  const list=els.history;if(!list)return;
  list.innerHTML=entries.length?entries.map((e,i)=>
-  '<article class="intro-public-row" style="--intro-accent:'+color(e.accent)+'"><div class="intro-public-mini">'+esc(glyph(e))+'</div><div><strong>'+esc(e.name)+'</strong><small>'+esc(e.subtitle)+' · '+esc(recentText(e))+(e.kind==='samurai'?' · 🔒 Apenas o responsável':'')+'</small></div><button type="button" class="btn small" data-repeat="'+i+'">Rever</button></article>'
+  '<article class="intro-public-row" style="--intro-accent:'+color(e.accent)+'"><div class="intro-public-mini">'+esc(glyph(e))+'</div><div><strong>'+esc(e.name)+'</strong><small>'+esc(e.subtitle)+' · '+esc(recentText(e))+(e.kind==='samurai'?' · 🔒 Apenas o responsável':'')+(e.recipient_id?(e.completed_at?' · Concluída':' · Pendente'):'')+'</small></div><button type="button" class="btn small" data-repeat="'+i+'">Rever</button></article>'
  ).join(''):'<p class="intro-muted">Nenhuma apresentação publicada ainda. O mestre dará início às revelações durante a sessão.</p>';
 }
 function authChanged(){
@@ -119,25 +168,38 @@ async function refresh(){
  fetching=true;
  try{
   let data;
-  if(online()) {
-   data=await window.OPAccounts.introRequest('/rest/v1/character_introductions?select=id,name,subtitle,quote,description,chapter,kind,samurai_slug,accent,portrait_url,created_at&order=id.desc&limit=20');
-  }else data=readLocal().slice().sort((a,b)=>b.id-a.id).slice(0,20);
+  if(online()){
+   data=await window.OPAccounts.introRequest('/rest/v1/character_introductions?select=id,name,subtitle,quote,description,chapter,kind,samurai_slug,recipient_id,completed_at,accent,portrait_url,created_at&order=id.desc&limit=80');
+  }else data=readLocal().slice().sort((a,b)=>b.id-a.id).slice(0,40);
   if(!Array.isArray(data))throw Error('Resposta inválida do arquivo.');
-  const newest=data[0];
+  entries=data;showHistory();
+  // Eventos de atribuição ficam pendentes, mesmo que o jogador faça login dias depois.
+  const pending=online()&&!master()?data.filter(e=>e.kind==='samurai'&&e.recipient_id===currentId()&&!e.completed_at).sort((a,b)=>Number(a.id)-Number(b.id))[0]:null;
+  if(pending&&els.overlay.hidden){
+   markSeen(pending.id);
+   display(pending,true);
+  }
+  // NPCs e apresentações manuais continuam sendo exibidos quando publicados.
+  const newestPublic=data.find(e=>!e.recipient_id);
   const stored=Number(localStorage.getItem(seenKey())||0);
   if(firstSync){
-   firstSync=false;lastId=Math.max(0,stored);
-   if(newest&&Number(newest.id)>lastId&&Date.now()-new Date(newest.created_at).getTime()<180000){
-    markSeen(newest.id);display(newest)
-   }else if(newest){markSeen(newest.id)}
-  } else if(newest&&Number(newest.id)>lastId){
-   markSeen(newest.id);display(newest)
+   firstSync=false;lastId=Math.max(lastId,stored);
+   if(newestPublic&&Number(newestPublic.id)>lastId){
+    if(Date.now()-new Date(newestPublic.created_at).getTime()<180000&&!pending&&els.overlay.hidden){
+     markSeen(newestPublic.id);display(newestPublic);
+    }else if(!pending){markSeen(newestPublic.id)}
+   }
+  }else if(newestPublic&&Number(newestPublic.id)>lastId&&!pending&&els.overlay.hidden){
+   markSeen(newestPublic.id);display(newestPublic);
   }
-  entries=data;showHistory();
-  if(els.feedback?.dataset.connection==='error'){els.feedback.dataset.connection='';feedback('Arquivo conectado. Apresentações dos samurais aparecem apenas para quem recebeu a ficha.')}
+  if(els.feedback?.dataset.connection==='error'){
+   els.feedback.dataset.connection='';
+   feedback('Arquivo conectado. Samurai atribuído abre automaticamente somente para o jogador responsável.');
+  }
  }catch(e){
   if(els.feedback&&(!master()||!els.feedback.textContent.startsWith('Prévia'))){
-   els.feedback.dataset.connection='error';feedback('Falha ao sincronizar as apresentações: '+e.message,true)
+   els.feedback.dataset.connection='error';
+   feedback('Falha ao sincronizar as apresentações: '+e.message,true);
   }
  }finally{fetching=false}
 }
@@ -178,6 +240,8 @@ byId('introPublish')?.addEventListener('click',publish);
 byId('intro_kind')?.addEventListener('change',()=>{syncSamuraiTarget();if(byId('intro_kind').value==='samurai'&&activePreset?.kind==='samurai')byId('intro_samurai_slug').value=activePreset.key});
 byId('introReload')?.addEventListener('click',refresh);
 byId('introCinemaClose')?.addEventListener('click',close);
+byId('introCinemaFinish')?.addEventListener('click',finishAutomatic);
+byId('introCinemaOpenSheet')?.addEventListener('click',enterAssignedSheet);
 els.overlay.addEventListener('click',e=>{if(e.target===els.overlay)close()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!els.overlay.hidden)close()});
 window.addEventListener('storage',e=>{if(e.key===localKey()&&!online())refresh()});
