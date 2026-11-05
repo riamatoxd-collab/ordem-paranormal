@@ -357,10 +357,10 @@ A aba **Apresentações** permite revelar personagens com uma animação em tela
 
 - A conta de **mestre** vê a seleção de personagens e o editor. Há 13 perfis pré-cadastrados (restaurante, vila e cinco samurais), além da entrada personalizada para jornalistas.
 - **Prévia local** ensaia a animação sem publicar. **Apresentar aos jogadores** publica nome, título, frase, descrição, cena, cor e retrato opcional.
-- Os **jogadores conectados** consultam automaticamente as apresentações a cada quatro segundos; uma entrada recém-publicada abre em tela cheia. O histórico permite **Rever**.
-- Retratos são opcionais: uma URL HTTPS de imagem ou um sigilo abstrato. Não publique segredos do mestre: as apresentações são visíveis para todos os jogadores autenticados.
-- Somente a conta Supabase com papel de mestre pode publicar, graças à RLS. O PIN visual não substitui a autorização.
+- Os **jogadores conectados** consultam automaticamente as apresentações a cada quatro segundos. NPCs e jornalistas aparecem a todos; as apresentações dos samurais aparecem somente para o jogador que recebeu a ficha correspondente (e para o mestre). O histórico e a opção **Rever** respeitam essa restrição.
+- Retratos são opcionais: uma URL HTTPS de imagem ou um sigilo abstrato. Não publique segredos do mestre nas introduções públicas; a descrição de um samurai é privada somente ao jogador que recebeu sua ficha.
+- Somente a conta Supabase com papel de mestre pode publicar, graças à RLS. Para publicar um samurai, sua ficha deve estar atribuída no **Painel do Mestre → Os Cinco Samurais**. A RLS vincula a apresentação à atribuição atual da ficha; se a atribuição mudar, o acesso também muda. O PIN visual não substitui a autorização.
 - Sem Supabase, a publicação funciona apenas no navegador atual, sem distribuição a outros dispositivos.
-- A tabela já foi implantada no Supabase eita. Para replicar em outro projeto, aplique introducoes-supabase.sql após supabase-schema.sql.
+- A tabela e a política de privacidade já foram implantadas no Supabase eita. Para replicar em outro projeto, crie primeiro o esquema de contas e a tabela samurai_slots; então aplique introducoes-supabase.sql.
 
 A implementação está em intro-personagens.js, intro-personagens.css, index.html e contas.js.
