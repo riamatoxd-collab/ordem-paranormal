@@ -102,3 +102,7 @@
  .mystery-connections-editor{grid-template-columns:1fr}
 }
 @media(prefers-reduced-motion:reduce){.mystery-clue{transition:none}}
+
+/* O menu cresceu com Enigmas e Mural: permita alcançar todas as abas em telas menores. */
+.side{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
+.side .nav{flex-shrink:0}
