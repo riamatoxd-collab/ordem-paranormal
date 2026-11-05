@@ -58,7 +58,10 @@
   const headers={'apikey':anon,'Accept':'application/json'};
   if(asToken)headers.Authorization='Bearer '+asToken;
   if(data!==null)headers['Content-Type']='application/json';
-  if(path.startsWith('/rest/v1/')&&method!=='GET')headers.Prefer='resolution=merge-duplicates,return=minimal';
+  if(path.startsWith('/rest/v1/')&&method!=='GET'){
+   // Introduções são apenas INSERT: não converter em UPSERT (exigiria UPDATE e falharia com 403).
+   headers.Prefer=path.startsWith('/rest/v1/character_introductions')?'return=minimal':'resolution=merge-duplicates,return=minimal';
+  }
   return fetch(base+path,{method,headers,body:data!==null?JSON.stringify(data):undefined}).then(async res=>{
    if(res.status===401&&asToken&&allowRefresh&&refreshToken){
     await refreshCloudSession();
