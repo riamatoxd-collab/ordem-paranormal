@@ -370,7 +370,7 @@ Arquivos: `intro-personagens.js`, `intro-personagens.css`, `index.html`, `contas
 
 A aba **Diretor de cenas** sincroniza revelações para as contas dos jogadores autenticados no Supabase.
 
-**Fluxo do mestre**: abrir **Diretor de cenas** → escolher uma das seis cenas prontas ou criar cena personalizada → editar título, subtítulo, episódio, narração, cor, imagem HTTPS opcional, som HTTPS opcional e até quatro escolhas → clicar em **Prévia local** para ensaiar → clicar **Iniciar para todos**. Enquanto houver uma cena ativa, o botão de iniciar fica desabilitado. O mestre acompanha a quantidade de respostas por opção e clica **Encerrar cena** quando quiser liberar a próxima.
+**Fluxo do mestre**: abrir **Painel do Mestre → Direção da sessão → Diretor de Cenas** → escolher uma das seis cenas prontas ou criar cena personalizada → editar título, subtítulo, episódio, narração, cor, imagem HTTPS opcional, som HTTPS opcional e até quatro escolhas → clicar em **Prévia local** para ensaiar → clicar **Iniciar para todos**. Enquanto houver uma cena ativa, o botão de iniciar fica desabilitado. O mestre acompanha a quantidade de respostas por opção e clica **Encerrar cena** quando quiser liberar a próxima.
 
 **Fluxo dos jogadores**: qualquer aba do site pode receber uma cena; o sistema consulta o servidor a cada quatro segundos. O palco cinematográfico abre em tela cheia, com a narração e as escolhas. Se houver escolhas, cada jogador pode registrar uma única resposta; se não, pode simplesmente clicar **Concluir cena**. O som é opcional e **nunca inicia automaticamente**: o jogador precisa clicar **Ativar som**. Ao concluir, a cena não reaparece naquele navegador/conta. Se o jogador entrar enquanto a cena ainda está ativa, também a receberá. Se uma introdução de samurai estiver ocupando a tela, a cena aguarda.
 
@@ -388,7 +388,7 @@ A aba **Diretor de cenas** sincroniza revelações para as contas dos jogadores 
 
 A aba **✧ Sussurros** permite que o mestre entregue **pistas secretas e presságios para uma única conta de jogador**, sem revelar a mensagem aos demais. Jogadores podem **responder ao mestre** a partir de uma mensagem recebida. O sistema usa as contas já existentes; não cria novos logins.
 
-**Mestre:** abra **Sussurros**, selecione o jogador responsável pelo segredo, preencha o título, o tipo (sussurro, pista secreta ou presságio) e o texto (até 1.500 caracteres). Os modelos **Pista oculta**, **Lembrança estranha** e **Voz distante** ajudam a criar a mensagem; eles não enviam automaticamente. Clique em **Enviar sussurro**. O histórico **Enviadas** mostra a entrega registrada no banco e se foi marcada como lida pelo destinatário. Nomes de jogador repetidos são diferenciados pelos últimos caracteres do identificador da conta.
+**Mestre:** abra **Painel do Mestre → Direção da sessão → Sussurros**, selecione o jogador responsável pelo segredo, preencha o título, o tipo (sussurro, pista secreta ou presságio) e o texto (até 1.500 caracteres). Os modelos **Pista oculta**, **Lembrança estranha** e **Voz distante** ajudam a criar a mensagem; eles não enviam automaticamente. Clique em **Enviar sussurro**. O histórico **Enviadas** mostra a entrega registrada no banco e se foi marcada como lida pelo destinatário. Nomes de jogador repetidos são diferenciados pelos últimos caracteres do identificador da conta.
 
 **Jogadores:** assim que receber uma mensagem, o menu apresenta o número de não lidas. Fora das apresentações cinematográficas, uma revelação reservada aparece automaticamente. Use **Marcar como lida** para registrar a leitura ou **Ler depois** para manter na caixa de entrada. O botão **Responder ao mestre** abre um editor privado pré-endereçado ao autor do sussurro. O mestre recebe a resposta na própria caixa, com aviso de não lida.
 
@@ -399,3 +399,11 @@ A aba **✧ Sussurros** permite que o mestre entregue **pistas secretas e press�
 **Limitações:** a função precisa do Supabase conectado. O indicador não conta mensagens antigas fora do limite de 150 registros mais recentes consultados. Sussurros são alertas dentro do site, não mensagens por SMS, e-mail ou push. Uma mensagem já adiada pode reaparecer na próxima visita até ser marcada como lida.
 
 **Arquivos:** `sussurros.js`, `sussurros.css`, `sussurros-supabase.sql`, `index.html` e `contas.js`. A estrutura SQL já foi aplicada ao projeto Supabase **eita**.
+
+## Direção da sessão — ferramentas no Painel do Mestre
+
+A conta **mestre** encontra as abas **◈ Diretor de Cenas** e **✧ Sussurros** dentro de **Painel do Mestre → Direção da sessão**, logo após o controle de PE e antes das fichas dos samurais. Os antigos botões separados do menu lateral ficam ocultos **somente** para o mestre; os jogadores continuam usando as abas públicas de **Diretor de cenas** (consultar histórico das cenas) e **Sussurros** (ler e responder às mensagens).
+
+O código `mestre-ferramentas.js` **move os elementos DOM originais**, sem recriar formulários ou IDs. Portanto, preserva listeners, estados e recursos existentes de início/encerramento de cenas, votações, histórico, envio de sussurros e leitura de respostas. Ao trocar uma conta de mestre por uma conta de jogador no mesmo navegador, os conteúdos voltam para suas abas originais. As janelas de cena e de sussurro permanecem fora dessas abas para abrir sobre qualquer tela do site. O mestre recebe um contador de mensagens não lidas na aba interna.
+
+A alteração é **apenas de organização de interface**: as regras de privacidade e autorização continuam aplicadas no Supabase, não no PIN visual do painel. Arquivos: `mestre-ferramentas.js`, `mestre-ferramentas.css`, `index.html`.
