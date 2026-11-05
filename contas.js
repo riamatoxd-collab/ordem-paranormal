@@ -60,7 +60,7 @@
   if(data!==null)headers['Content-Type']='application/json';
   if(path.startsWith('/rest/v1/')&&method!=='GET'){
    // Introduções são apenas INSERT: não converter em UPSERT (exigiria UPDATE e falharia com 403).
-   headers.Prefer=/^\/rest\/v1\/(character_introductions|cinematic_scenes|cinematic_scene_votes)(\?|$)/.test(path)?'return=minimal':'resolution=merge-duplicates,return=minimal';
+   headers.Prefer=/^\/rest\/v1\/(character_introductions|cinematic_scenes|cinematic_scene_votes|private_whispers)(\?|$)/.test(path)?'return=minimal':'resolution=merge-duplicates,return=minimal';
   }
   return fetch(base+path,{method,headers,body:data!==null?JSON.stringify(data):undefined}).then(async res=>{
    if(res.status===401&&asToken&&allowRefresh&&refreshToken){
@@ -150,6 +150,7 @@
   playKnowledge();
   // Ao entrar, verifique a atribuição imediatamente (sem aguardar o próximo ciclo de 4 s).
   window.TempusIntroducoes?.atualizar?.();
+  window.TempusSussurros?.atualizar?.();
  }
  async function hashLocalPassword(password,salt){
   if(!window.crypto?.subtle)throw new Error('O navegador exige HTTPS para proteger senhas locais.');
@@ -258,6 +259,31 @@
      return Promise.reject(Error('Somente o mestre pode encerrar uma cena.'));
    }
    return api(path,method,body);
+  },
+  whisperRequest(path,method='GET',body=null){
+   if(!authReady||!account||!online)return Promise.reject(Error('Entre com uma conta conectada para acessar sussurros.'));
+   if(!/^\/rest\/v1\/private_whispers(?:\?|$)/.test(path))
+    return Promise.reject(Error('Caminho de mensagens não permitido.'));
+   if(!['GET','POST','PATCH'].includes(method))return Promise.reject(Error('Operação não permitida.'));
+   if(method==='POST'){
+    const keys=body&&typeof body==='object'?Object.keys(body).sort().join(','):'';
+    if(keys!=='body,kind,recipient_id,sender_id,title'||
+       body.sender_id!==account.id||
+       !/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(String(body.recipient_id))||
+       !['sussurro','pista','pressagio'].includes(body.kind)||
+       String(body.title||'').length<1||String(body.title).length>90||
+       String(body.body||'').length<1||String(body.body).length>1500)
+      return Promise.reject(Error('Dados de mensagem inválidos.'));
+   }
+   if(method==='PATCH'&&(!/^\/rest\/v1\/private_whispers\?id=eq\.[1-9][0-9]*$/.test(path)||
+      !body||Object.keys(body).join(',')!=='read_at'||!/^\d{4}-\d{2}-\d{2}T/.test(String(body.read_at))))
+      return Promise.reject(Error('Atualização de leitura inválida.'));
+   return api(path,method,body);
+  },
+  whisperPlayers(){
+   if(!authReady||!account||!online||account.role!=='mestre')
+    return Promise.reject(Error('Somente o mestre pode consultar a lista de jogadores.'));
+   return api('/rest/v1/profiles?role=eq.jogador&select=id,display_name,role&order=display_name.asc');
   },
   async introAssignedSamurai(){
    if(!authReady||!account||!online||account.role==='mestre')return null;
