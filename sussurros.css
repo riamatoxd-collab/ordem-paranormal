@@ -1,0 +1,76 @@
+/* Tempus Custodia — Sussurros privados: cartas, caixa e revelação secreta. */
+#v-sussurros{--whisper-gold:#cab18d}
+.whisper-hero{position:relative;overflow:hidden;border-radius:17px;border:1px solid #65534d;padding:28px 29px;background:radial-gradient(ellipse at 84% 20%,#69527940,transparent 60%),linear-gradient(145deg,#17121c,#080b12);display:grid;grid-template-columns:minmax(0,1fr) 100px;gap:20px}
+.whisper-hero:after{content:"✧";font:120px/1 Georgia,serif;color:#be9d9b6b;position:absolute;right:39px;top:0;pointer-events:none}
+.whisper-hero > *{position:relative;z-index:1}
+.whisper-hero small{color:#ceb8aa;font-size:10px;letter-spacing:.25em}
+.whisper-hero h2{font:500 clamp(28px,4vw,45px)/1.08 Georgia,serif;color:#f8eee3;margin:10px 0 14px}
+.whisper-hero p{color:#c5b9bb;font-size:14px;line-height:1.7;max-width:700px;margin:0}
+.whisper-layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(300px,.95fr);gap:16px;align-items:start;margin-top:16px}
+.whisper-box{border:1px solid #534745;border-radius:14px;padding:19px;background:linear-gradient(145deg,#17151c,#0b0d13)}
+.whisper-box h3{font:500 21px Georgia,serif;color:#f3eae1;margin:0 0 8px}
+.whisper-help{font-size:13px;color:#c1b4aa;line-height:1.6;margin:3px 0 13px}
+.whisper-box.full{grid-column:1/-1}
+.whisper-templates{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:14px 0}
+.whisper-template{border:1px solid #66544d;background:#121117;color:#e8dcd1;min-height:72px;border-radius:10px;padding:10px 12px;text-align:left;cursor:pointer;display:grid;align-content:center;gap:4px}
+.whisper-template:hover{background:#261d28;border-color:#c0a48b}
+.whisper-template b{font-size:12px}
+.whisper-template small{font-size:10px;color:#b6a49c}
+.whisper-compose{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px}
+.whisper-compose label{display:grid;gap:6px;color:#d1bcae;font-size:11px;letter-spacing:.08em}
+.whisper-compose label.wide{grid-column:1/-1}
+.whisper-compose select,.whisper-compose input,.whisper-compose textarea{font:13px/1.55 system-ui,sans-serif;border:1px solid #62504b;border-radius:9px;background:#0e1117;color:#f8eee8;padding:11px;width:100%;min-height:43px;letter-spacing:normal}
+.whisper-compose textarea{resize:vertical;min-height:144px}
+.whisper-compose select:focus,.whisper-compose input:focus,.whisper-compose textarea:focus{outline:2px solid #c4a38c;outline-offset:1px}
+.whisper-compose-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.whisper-compose-actions button:disabled{opacity:.5;cursor:wait}
+.whisper-response-label{margin:13px 0 5px;color:#d7bba4;font-size:11px;letter-spacing:.14em}
+.whisper-feedback{min-height:19px;font-size:12px;color:#9dc4b4;line-height:1.5;margin-top:8px}
+.whisper-feedback.is-error{color:#eaa9a5}
+.whisper-box-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between}
+.whisper-count{color:#c8bdb5;font-size:12px;margin:5px 0 13px}
+.whisper-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.whisper-filter{padding:9px 12px;color:#cdbdb5;background:#101217;border:1px solid #554840;border-radius:8px;cursor:pointer;font-size:12px}
+.whisper-filter.is-active{border-color:#c9ab89;color:#f6e9dd;background:#2a2227}
+.whisper-list{display:grid;gap:9px;max-height:580px;overflow:auto}
+.whisper-mail{border:1px solid #453e3f;border-left:3px solid #886c78;background:#0f1218;border-radius:10px;padding:12px;display:flex;align-items:center;gap:12px}
+.whisper-mail.unread{border-color:#a48a75;border-left-color:#e4bd92;background:linear-gradient(95deg,#2d2225,#12151b)}
+.whisper-mail-icon{color:#c9a88b;width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;border:1px solid #745e54;border-radius:50%;font:23px Georgia,serif}
+.whisper-mail-body{min-width:0;flex:1}
+.whisper-mail-body small{display:block;color:#bead9f;font-size:10px;letter-spacing:.07em}
+.whisper-mail-body b{display:block;color:#fff4e8;font-size:14px;margin:5px 0}
+.whisper-mail-body p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;color:#c8bdb6;font-size:12px;line-height:1.5;white-space:pre-line;margin:0 0 5px}
+.whisper-mail-body span{color:#d7b18d;font-size:10px}
+.whisper-empty{font-size:13px;line-height:1.7;color:#b6a9a2;padding:20px 8px}
+#whisperUnreadBadge[hidden]{display:none!important}
+#whisperUnreadBadge{margin-left:auto;padding:2px 8px;min-width:23px;text-align:center;color:#140c12;background:#d5aa7a;border-radius:99px;font-size:11px;font-weight:800}
+.nav button[data-view="sussurros"]{display:flex;align-items:center;gap:5px}
+.whisper-pop[hidden]{display:none!important}
+.whisper-pop{position:fixed;inset:0;z-index:9970;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at center,#221820ee,#030508fa 88%);isolation:isolate;overflow:auto}
+.whisper-pop:before{content:"";position:absolute;inset:-20%;pointer-events:none;opacity:.1;background:conic-gradient(from 10deg,transparent,#d9aa7f,transparent 40%,#a596d4,transparent 68%);animation:whisperRotate 24s linear infinite}
+.whisper-paper{position:relative;width:min(100%,680px);border:1px solid #8d7362;border-radius:18px;background:radial-gradient(ellipse at 35% 8%,#5f48502a,transparent 55%),linear-gradient(150deg,#1d1822,#0a0d14 72%);padding:41px 38px;box-shadow:0 18px 90px #000b,0 0 55px #ae8e8240;animation:whisperReveal .75s ease both}
+.whisper-crest{width:74px;height:74px;border:1px solid #b99c83;border-radius:50%;display:grid;place-items:center;color:#dfbd99;font:43px Georgia,serif;margin:0 auto 18px}
+.whisper-kicker{text-align:center;display:block;letter-spacing:.25em;color:#c7a68e;font-size:10px}
+.whisper-paper h2{font:500 clamp(29px,5vw,48px)/1.13 Georgia,serif;margin:19px 0 11px;color:#f8efe4;text-align:center;overflow-wrap:anywhere}
+.whisper-meta{text-align:center;color:#b6a9a2;font-size:11px;letter-spacing:.1em}
+.whisper-rule{width:110px;height:2px;background:linear-gradient(90deg,transparent,#bc9d85,transparent);margin:23px auto}
+.whisper-text{color:#e2d3c7;font:16px/1.85 Georgia,serif;white-space:pre-wrap;overflow-wrap:anywhere;max-height:340px;overflow:auto;margin:0 0 26px}
+.whisper-pop-actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+.whisper-pop-actions button{cursor:pointer;padding:12px 15px;border-radius:9px;border:1px solid #9d7b67;background:#2c2028;color:#fff0e1;font:600 12px system-ui,sans-serif}
+.whisper-pop-actions button.whisper-secondary{background:#10141a;border-color:#63544b;color:#d7c8bc}
+.whisper-pop-actions button:hover:not(:disabled){filter:brightness(1.2)}
+.whisper-pop-actions button:disabled{opacity:.5;cursor:wait}
+.whisper-pop-status{min-height:16px;text-align:center;color:#e5a79c;font-size:12px;margin-top:14px}
+@keyframes whisperRotate{to{transform:rotate(360deg)}}
+@keyframes whisperReveal{from{opacity:0;transform:translateY(20px) scale(.96)}to{opacity:1;transform:none}}
+@media(max-width:780px){
+ .whisper-hero{grid-template-columns:1fr;padding:22px}
+ .whisper-layout{grid-template-columns:1fr}
+ .whisper-compose{grid-template-columns:1fr}
+ .whisper-compose label.wide{grid-column:1}
+ .whisper-paper{padding:25px 20px}
+ .whisper-crest{width:58px;height:58px;font-size:32px}
+ .whisper-text{font-size:15px}
+ .whisper-mail{align-items:flex-start}
+}
+@media(prefers-reduced-motion:reduce){.whisper-pop:before,.whisper-paper{animation:none!important}}
