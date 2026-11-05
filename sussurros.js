@@ -171,6 +171,7 @@ async function send(){
    sender_id:own(),recipient_id:to,title,body,kind
   });
   say('Sussurro enviado. Somente o destinatário e você podem lê-lo.');
+  filter='enviadas';
   ui.body.value='';ui.title.value='';
   if(!master())cancelReply();
   await refresh();
