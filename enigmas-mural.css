@@ -106,3 +106,16 @@
 /* O menu cresceu com Enigmas e Mural: permita alcançar todas as abas em telas menores. */
 .side{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
 .side .nav{flex-shrink:0}
+
+/* Criador livre: prévia não publicada e salvamento de rascunhos. */
+.mystery-custom-template{border:1px solid #d8a478;background:linear-gradient(135deg,#5b3335,#271e28);box-shadow:inset 0 1px #f6d3a025}
+.mystery-custom-template b{color:#fff1d9}
+.mystery-custom-template small{color:#eed5bb}
+.mystery-builder-extras{display:contents}
+.mystery-builder-extras button{white-space:normal}
+.mystery-builder-preview{margin-top:18px;border:1px solid #8c705a;border-radius:13px;padding:17px;background:radial-gradient(ellipse at 80% 0,#ad765c24,transparent 52%),#121217}
+.mystery-builder-preview[hidden],.mystery-hint[hidden]{display:none!important}
+.mystery-preview-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.mystery-preview-top small{color:#d2aa85;letter-spacing:.15em;font-size:10px}
+.mystery-builder-preview .mystery-puzzle-card{max-width:750px;margin:0 auto 12px}
+.mystery-builder-preview .mystery-answer-row input:disabled,.mystery-builder-preview .mystery-answer-row button:disabled{opacity:.65;cursor:default}
