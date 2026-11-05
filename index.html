@@ -314,11 +314,12 @@
 <link rel="stylesheet" href="./intro-personagens.css?v=tempus-intro-3">
 <link rel="stylesheet" href="./diretor-cenas.css?v=tempus-cenas-2">
 <link rel="stylesheet" href="./sussurros.css?v=tempus-sussurros-2">
-<link rel="stylesheet" href="./mestre-ferramentas.css?v=narrativa-mestre-1">
+<link rel="stylesheet" href="./mestre-ferramentas.css?v=narrativa-mestre-2">
+<link rel="stylesheet" href="./enigmas-mural.css?v=tempus-investigacao-1">
 <link rel="stylesheet" href="./rituais-regras-completas.css?v=grimorio-livros-1">
 <link rel="stylesheet" href="./rituais-executor.css?v=rituais-execucao-1">
 </head><body>
-<div class="app"><aside class="side"><div class="brand"><span class="sig">✣</span> O OUTRO LADO<span>ARQUIVO DE OPERAÇÕES</span></div><nav class="nav"><button class="active" data-view="home">⌂ &nbsp;Painel</button><button data-view="agents">♙ &nbsp;Agentes</button><button data-view="intro">✧ &nbsp;Apresentações</button><button data-view="cenas">◈ &nbsp;Diretor de cenas</button><button data-view="sussurros">✧ &nbsp;Sussurros <span id="whisperUnreadBadge" hidden>0</span></button><button data-view="occult">◉ &nbsp;Transcender</button><button data-view="grimorio">▤ &nbsp;Grimório</button><button data-view="roll">⚄ &nbsp;Rolagens</button><button data-view="combat">⚔ &nbsp;Combate</button><button data-view="history">◷ &nbsp;Histórico</button></nav><small>PROTOCOLO 0-01<br>Registros salvos neste navegador.<br>Versão 2.6 • Transcender e Grimório</small></aside>
+<div class="app"><aside class="side"><div class="brand"><span class="sig">✣</span> O OUTRO LADO<span>ARQUIVO DE OPERAÇÕES</span></div><nav class="nav"><button class="active" data-view="home">⌂ &nbsp;Painel</button><button data-view="agents">♙ &nbsp;Agentes</button><button data-view="intro">✧ &nbsp;Apresentações</button><button data-view="cenas">◈ &nbsp;Diretor de cenas</button><button data-view="sussurros">✧ &nbsp;Sussurros <span id="whisperUnreadBadge" hidden>0</span></button><button data-view="enigmas">◇ &nbsp;Enigmas</button><button data-view="mural">⌕ &nbsp;Mural de investigação</button><button data-view="occult">◉ &nbsp;Transcender</button><button data-view="grimorio">▤ &nbsp;Grimório</button><button data-view="roll">⚄ &nbsp;Rolagens</button><button data-view="combat">⚔ &nbsp;Combate</button><button data-view="history">◷ &nbsp;Histórico</button></nav><small>PROTOCOLO 0-01<br>Registros salvos neste navegador.<br>Versão 2.6 • Transcender e Grimório</small></aside>
 <main><header class="top"><div><div class="eyebrow">SISTEMA DE APOIO À MESA</div><h1 id="title">Painel de operações</h1></div><button class="btn primary" onclick="openModal()">＋ Novo agente</button></header>
 <section class="view active" id="v-home"><div class="hero"><div class="eyebrow">ORDEM DA REALIDADE • TERMINAL DE CAMPO</div><h2>O OUTRO LADO<br>ESTÁ MAIS PERTO.</h2><p>Cadastre agentes, faça testes automáticos e acompanhe as rolagens da sua sessão em um só lugar.</p><div class="actions"><button class="btn primary" onclick="view('roll')">⚄ Fazer rolagem</button><button class="btn ghost" onclick="openModal()">＋ Cadastrar agente</button></div></div><div class="grid stats"><div class="card"><div class="statlabel">AGENTES</div><div class="statval" id="nAgents">0</div></div><div class="card"><div class="statlabel">ROLAGENS</div><div class="statval" id="nRolls">0</div></div><div class="card"><div class="statlabel">SUCESSOS</div><div class="statval" id="nSuccess">0</div></div><div class="card"><div class="statlabel">FALHAS</div><div class="statval" id="nFail">0</div></div></div><div class="section"><h2>Acesso rápido</h2></div><div class="grid quick"><button class="card btn" onclick="view('agents')"><span class="qicon">♙</span><span><b>Gerenciar agentes</b><br><small class="muted">Fichas e recursos</small></span></button><button class="card btn" onclick="view('roll')"><span class="qicon">⚄</span><span><b>Teste de perícia</b><br><small class="muted">Dados e modificadores</small></span></button><button class="card btn" onclick="view('combat')"><span class="qicon">⚔</span><span><b>Resolver ataque</b><br><small class="muted">Ataque e dano</small></span></button></div><div class="section"><h2>Últimas rolagens</h2><button class="btn small ghost" onclick="view('history')">Ver histórico →</button></div><div class="list" id="homeHistory"></div></section>
 <section class="view" id="v-agents">
@@ -623,6 +624,93 @@
  </div>
 </div>
 
+
+<section class="view" id="v-enigmas">
+ <header class="mystery-hero">
+  <small>◇ TEMPUS CUSTODIA • O SEGREDO DOS SETE ANJOS</small>
+  <h2>ENIGMAS<br>INTERATIVOS.</h2>
+  <p>Decifre inscrições, descubra palavras antigas e atravesse mecanismos esquecidos. Cada resposta é verificada pelo servidor, sem revelar a solução no código do site. Resolver um enigma pode revelar uma nova pista no Mural de Investigação.</p>
+ </header>
+ <div class="mystery-shell">
+  <section class="mystery-panel" id="puzzleMasterPanel" hidden>
+   <h3>◇ Oficina de Enigmas do Mestre</h3>
+   <p class="mystery-intro">Escolha um modelo ou prepare um desafio único. A resposta secreta fica protegida no Supabase, e cada jogador tem oito tentativas. Você pode vincular a solução a uma pista oculta do mural.</p>
+   <div id="puzzleTemplates" class="mystery-templates"></div>
+   <div class="mystery-editor">
+    <label>TÍTULO DO ENIGMA<input type="text" id="puzzleTitle" maxlength="100" placeholder="O Cofre dos Cinco Símbolos"></label>
+    <label>ELEMENTO / TEMA
+     <select id="puzzleTheme"><option value="conhecimento">Conhecimento</option><option value="medo">Medo</option><option value="tempo">Tempo</option><option value="simbolos">Símbolos</option></select>
+    </label>
+    <label class="full">DESAFIO / INSCRIÇÃO<textarea id="puzzlePrompt" maxlength="1200" class="long" rows="4" placeholder="Descreva o mecanismo e a pergunta que os investigadores precisam resolver."></textarea></label>
+    <label class="full">DICA (OPCIONAL)<textarea id="puzzleHint" maxlength="420" rows="2" placeholder="Dica que os jogadores poderão abrir quando precisarem."></textarea></label>
+    <label>RESPOSTA SECRETA<input id="puzzleAnswer" type="text" maxlength="70" autocomplete="off" placeholder="Somente o mestre define a resposta"></label>
+    <label>LIBERAR UMA PISTA DO MURAL AO RESOLVER
+     <select id="puzzleUnlock"><option value="">Não desbloquear pista automaticamente</option></select>
+    </label>
+   </div>
+   <div class="mystery-actions"><button type="button" class="btn primary" id="puzzleCreate">✦ Publicar enigma</button></div>
+  </section>
+  <section class="mystery-panel">
+   <div class="mystery-section-head"><h3>Enigmas da campanha</h3><button class="btn small" type="button" id="puzzleReload">↻ Atualizar</button></div>
+   <p class="mystery-intro">As inscrições respondem às descobertas do grupo. Quem encontrar a resposta certa pode desbloquear novos caminhos.</p>
+   <p class="mystery-feedback" id="puzzleStatus" role="status" aria-live="polite"></p>
+   <div class="mystery-puzzle-grid" id="puzzleList"></div>
+  </section>
+ </div>
+</section>
+<section class="view" id="v-mural">
+ <header class="mystery-hero">
+  <small>⌕ TEMPUS CUSTODIA • INVESTIGAÇÃO COMPARTILHADA</small>
+  <h2>MURAL DE<br>INVESTIGAÇÃO.</h2>
+  <p>Uma vila que desapareceu, documentos esquecidos e símbolos que se repetem no tempo. Todos os investigadores podem criar anotações e conectar pistas reveladas. O mestre controla quando cada segredo aparece.</p>
+ </header>
+ <div class="mystery-shell">
+  <section class="mystery-panel" id="clueMasterPanel" hidden>
+   <h3>⌕ Arquivo de Pistas do Mestre</h3>
+   <p class="mystery-intro">Crie documentos, locais, testemunhos e fotografias. Toda pista começa <strong>oculta</strong>. Revele manualmente ou vincule-a à solução de um enigma. Conteúdos ocultos não ficam disponíveis para outras contas.</p>
+   <div class="mystery-editor">
+    <label>TÍTULO DA PISTA<input id="clueTitle" maxlength="100" placeholder="O bilhete encontrado na taverna"></label>
+    <label>TIPO DE EVIDÊNCIA
+     <select id="clueCategory"><option value="pista">Pista</option><option value="documento">Documento</option><option value="local">Local</option><option value="testemunho">Testemunho</option><option value="imagem">Imagem</option></select>
+    </label>
+    <label class="full">DESCRIÇÃO / INFORMAÇÃO REVELÁVEL<textarea id="clueDetails" maxlength="1500" rows="4" placeholder="O que os investigadores poderão ler quando esta pista for revelada?"></textarea></label>
+    <label class="full">LINK DA IMAGEM (HTTPS, OPCIONAL)<input id="clueImage" maxlength="500" type="url" placeholder="https://exemplo.com/documento.png"></label>
+   </div>
+   <div class="mystery-actions"><button type="button" class="btn primary" id="clueCreate">＋ Guardar pista oculta</button></div>
+  </section>
+ </div>
+ <div class="mystery-board-layout">
+  <section class="mystery-panel">
+   <div class="mystery-section-head"><h3>Painel de evidências</h3><button class="btn small" type="button" id="clueReload">↻ Sincronizar</button></div>
+   <p class="mystery-intro">Selecione os cartões para analisar os detalhes. As pistas reveladas são compartilhadas com os outros jogadores.</p>
+   <p class="mystery-feedback" id="clueStatus" role="status" aria-live="polite"></p>
+   <div class="mystery-corkboard" id="clueList"></div>
+  </section>
+  <section class="mystery-panel">
+   <h3>Documento selecionado</h3>
+   <div class="mystery-detail" id="clueDetail"><p class="mystery-muted">Selecione um cartão para examiná-lo.</p></div>
+   <h3 style="margin-top:21px">Anotações do grupo</h3>
+   <p class="mystery-muted">Escreva hipóteses para os demais investigadores. Essas notas são compartilhadas.</p>
+   <div class="mystery-notes" id="clueNotes"></div>
+   <div class="mystery-notes-editor">
+    <textarea id="clueNoteText" maxlength="500" rows="3" placeholder="O que essa pista significa?"></textarea>
+    <button class="btn small" type="button" id="clueNoteSend">✎ Adicionar anotação</button>
+   </div>
+  </section>
+  <section class="mystery-panel" style="grid-column:1/-1">
+   <h3>Conectar pistas</h3>
+   <p class="mystery-intro">Encontre relações entre documentos, lugares e testemunhos. Cada ligação passa a fazer parte do mural compartilhado.</p>
+   <div class="mystery-connections-editor">
+    <select id="clueConnectA" aria-label="Primeira pista"><option value="">Primeira pista</option></select>
+    <select id="clueConnectB" aria-label="Segunda pista"><option value="">Segunda pista</option></select>
+    <input id="clueInsight" maxlength="240" placeholder="O que conecta essas duas evidências? (opcional)" aria-label="Explicação da ligação">
+    <button class="btn primary" type="button" id="clueConnect">✧ Conectar evidências</button>
+   </div>
+   <div class="mystery-string-list" id="clueConnections"></div>
+  </section>
+ </div>
+</section>
+
 <section class="view" id="v-roll"><div class="section" style="margin-top:0"><div><h2>Central de rolagens</h2><p>O sistema escolhe o melhor d20 (ou o pior, para atributo 0) e aplica os bônus.</p></div></div><div class="grid cols"><div class="card"><div class="form"><div class="field full"><label>AGENTE</label><select id="rAgent"></select></div><div class="field"><label>TIPO</label><select id="rType" onchange="toggleRoll()"><option value="skill">Teste de perícia</option><option value="attr">Teste de atributo</option></select></div><div class="field"><label>DT</label><input id="rDT" type="number" placeholder="Ex.: 15"></div><div class="field full" id="rSkillBox"><label>PERÍCIA</label><select id="rSkill"></select></div><div class="field full" id="rAttrBox" style="display:none"><label>ATRIBUTO</label><select id="rAttr"><option value="agi">Agilidade</option><option value="for">Força</option><option value="int">Intelecto</option><option value="pre">Presença</option><option value="vig">Vigor</option></select></div><div class="field"><label>DADOS DE BÔNUS (+d20)</label><input id="rBonus" type="number" min="0" max="20" value="0"></div><div class="field"><label>DADOS DE PENALIDADE (−d20)</label><input id="rPenalty" type="number" min="0" max="20" value="0"></div><div class="field"><label>BÔNUS FIXO</label><input id="rFlat" type="number" value="0"></div><div class="field"><label>OBSERVAÇÃO</label><input id="rNote" placeholder="Ex.: sob pressão"></div></div><label class="checkline" style="margin-top:10px"><input id="rLoadPenalty" type="checkbox"> Aplicar também –5 a outra perícia afetada pela carga (as marcadas no livro são automáticas)</label><button class="btn primary" style="margin-top:14px" onclick="rollTest()">⚄ Rolar teste</button><p class="muted">Atributo 0: rola dois d20 e considera o pior. Um 20 natural no dado escolhido é sucesso automático.</p></div><div class="card"><div class="eyebrow">RESULTADO</div><div class="result" id="rollResult" style="margin-top:10px">Aguardando rolagem…<div style="font-size:46px;margin-top:15px">⚄</div></div><div class="note">O mestre define a DT e interpreta as consequências narrativas.</div></div></div><div class="section"><h2>Dados livres</h2></div><div class="card"><div class="form"><div class="field"><label>EXPRESSÃO</label><input id="freeExpr" value="1d20" placeholder="2d8+3"></div><div class="field"><label>IDENTIFICAÇÃO</label><input id="freeName" placeholder="Dano da arma"></div></div><button class="btn primary" style="margin-top:12px" onclick="rollFree()">Rolar dados livres</button><div id="freeResult" class="muted" style="margin-top:12px"></div></div></section>
 <section class="view" id="v-combat"><div class="section" style="margin-top:0"><div><h2>Terminal de combate</h2><p>Teste Luta/Pontaria contra Defesa e role dano em caso de acerto.</p></div></div><div class="grid cols"><div class="card"><div class="form"><div class="field full"><label>AGENTE</label><select id="cAgent"></select></div><div class="field"><label>PERÍCIA DE ATAQUE</label><select id="cSkill"><option>Luta</option><option>Pontaria</option></select></div><div class="field"><label>DEFESA DO ALVO</label><input id="cDefense" type="number" value="15"></div><div class="field"><label>BÔNUS FIXO NO ATAQUE</label><input id="cBonus" type="number" value="0"></div><div class="field"><label>EXPRESSÃO DE DANO</label><input id="cDamage" value="1d8+0" placeholder="2d6+3"></div><div class="field"><label>ARMA / ATAQUE</label><input id="cWeapon" placeholder="Ex.: Revólver"></div></div><button class="btn primary" style="margin-top:14px" onclick="attack()">⚔ Realizar ataque</button></div><div class="card"><div class="eyebrow">RELATÓRIO DE COMBATE</div><div class="result" id="combatResult" style="margin-top:10px">Aguardando ação…<div style="font-size:46px;margin-top:15px">⚔</div></div><div class="note">Informe bônus, Defesa e dano conforme a arma e as regras da mesa. Críticos, resistências e efeitos especiais ainda são resolvidos pelo mestre.</div></div></div></section>
 <section class="view" id="v-history"><div class="section" style="margin-top:0"><div><h2>Histórico de rolagens</h2><p>Registros salvos neste navegador.</p></div><button class="btn ghost small" onclick="clearHistory()">Limpar histórico</button></div><div class="list" id="historyList"></div></section><div class="foot">Ferramenta independente de apoio à mesa. Não é um produto oficial de Ordem Paranormal, Cellbit ou Ordo Realitas. Regras de inventário baseadas em Ordem Paranormal RPG 1.3, p. 53–57 e 66; Sobrevivendo ao Horror 1.3.1.</div></main></div>
@@ -639,7 +727,7 @@ let agents=JSON.parse(localStorage.getItem('op_agents')||'[]'),hist=JSON.parse(l
 const $=id=>document.getElementById(id),clamp=(x,a,b)=>Math.max(a,Math.min(b,Number.isFinite(+x)?+x:a));
 function db(){localStorage.setItem('op_agents',JSON.stringify(agents));localStorage.setItem('op_hist',JSON.stringify(hist))}function say(s){$('toast').textContent=s;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2200)}function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function focusAgentSection(id){let el=$(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
-function view(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));$('v-'+v).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));$('title').textContent=({home:'Painel de operações',cadastro:'Cadastrar personagem',agents:'Agentes cadastrados',intro:'Apresentações',cenas:'Diretor de cenas',sussurros:'Sussurros privados',occult:'Transcender',grimorio:'Grimório',roll:'Central de rolagens',combat:'Terminal de combate',history:'Histórico de rolagens'})[v];if(v==='occult')startVoidAudio();else stopVoidAudio();render()};document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>view(b.dataset.view));
+function view(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));$('v-'+v).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));$('title').textContent=({home:'Painel de operações',cadastro:'Cadastrar personagem',agents:'Agentes cadastrados',intro:'Apresentações',cenas:'Diretor de cenas',sussurros:'Sussurros privados',enigmas:'Enigmas interativos',mural:'Mural de investigação',occult:'Transcender',grimorio:'Grimório',roll:'Central de rolagens',combat:'Terminal de combate',history:'Histórico de rolagens'})[v];if(v==='occult')startVoidAudio();else stopVoidAudio();render()};document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>view(b.dataset.view));
 
 function peLimitFor(c,kind='general'){let limit=stats(c).limit||1,pp=c.powers?.paranormal||[];if(pp.includes('Encarar a Morte'))limit+=(c.encararMorteAffinity?3:1);if(kind==='ritual'&&c.class==='ocultista'&&c.trail==='Intuitivo'&&+c.nex>=40)limit+=(+c.attrs.pre||0);return Math.max(1,limit)}
 function consumePE(c,cost,opts={}){cost=Math.floor(+cost||0);if(cost<1)return false;let limit=peLimitFor(c,opts.kind||'general'),spent=+c.peSpentTurn||0,minCost=Math.max(1,+opts.minCost||cost),exception=spent===0&&cost===minCost&&cost>limit;if(cost>limit&&!exception){say('O custo excede o limite de PE por uso ('+limit+').');return false}if(spent+cost>limit&&!exception){say('Limite de PE por turno atingido: '+spent+'/'+limit+'.');return false}if(opts.payWithPV){let pvCost=cost*2;if((+c.pvNow||0)<pvCost){say('PV insuficientes: o Poder do Flagelo exige '+pvCost+' PV.');return false}c.pvNow-=pvCost;c.flageloSpentPV=(+c.flageloSpentPV||0)+pvCost}else{let temp=Math.max(0,+c.peTemp||0),normal=Math.max(0,+c.peNow||0);if(temp+normal<cost){say('PE insuficientes. Disponível: '+(temp+normal)+'.');return false}let used=Math.min(temp,cost);c.peTemp=temp-used;c.peNow=normal-(cost-used)}if(opts.countTurn!==false)c.peSpentTurn=spent+cost;return true}
@@ -1378,6 +1466,6 @@ function renderTranscendProgression(){
 }
 
 function render(){$('nAgents').textContent=agents.length;renderAgents();fillSelect();renderHistory();renderInventory();renderSkillPage();renderOccultPage();renderTranscendProgression();renderGrimoirePage()};setupInventoryPresets();populateOrigins();renderTrailOptions('');['class','nex','aAgi','aFor','aInt','aPre','aVig'].forEach(id=>$(id).addEventListener('input',()=>{if(id==='class')classHint();else{if(id==='nex')renderTrailOptions($('trail').value);refreshBuildEditors()}$('classSkillSummary').textContent=classSkillText($('class').value,+$('aInt').value)}));$('origin').addEventListener('change',onOriginChange);$('trail').addEventListener('change',refreshBuildEditors);render();
-</script><script src="./auth-config.js?v=supabase-online-2"></script><script src="./contas.js?v=template-samurais-pd-9"></script>
-<script src="./intro-personagens.js?v=tempus-intro-5"></script><script src="./diretor-cenas.js?v=tempus-cenas-1"></script><script src="./sussurros.js?v=tempus-sussurros-2"></script><script src="./ficha-mestre.js?v=cinco-samurais-1"></script><script src="./mestre-ferramentas.js?v=narrativa-mestre-1"></script><script src="./samurai-fichas.js?v=cinco-samurais-fichas-1"></script>
+</script><script src="./auth-config.js?v=supabase-online-2"></script><script src="./contas.js?v=template-samurais-pd-10"></script>
+<script src="./intro-personagens.js?v=tempus-intro-5"></script><script src="./diretor-cenas.js?v=tempus-cenas-1"></script><script src="./sussurros.js?v=tempus-sussurros-2"></script><script src="./ficha-mestre.js?v=cinco-samurais-1"></script><script src="./enigmas-mural.js?v=tempus-investigacao-1"></script><script src="./mestre-ferramentas.js?v=narrativa-mestre-2"></script><script src="./samurai-fichas.js?v=cinco-samurais-fichas-1"></script>
 <script src="./rituais-executor.js?v=rituais-execucao-1"></script></body></html>
