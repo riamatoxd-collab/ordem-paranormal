@@ -32,7 +32,9 @@ const PRESETS=[
 const els={panel:byId('introMasterPanel'),catalog:byId('introCatalog'),history:byId('introPublished'),feedback:byId('introFeedback'),overlay:byId('introCinema')};
 if(!els.panel||!els.overlay)return;
 let entries=[],activePreset=PRESETS[0],isBusy=false,fetching=false;
-let lastAccount='',firstSync=true,lastId=0,activeAuto=null,finishing=false,openingSheet=false;
+let lastAccount='',firstSync=true,lastId=0,activeAuto=null,finishing=false,openingSheet=false,assignedSlot=null;
+const completedKey=()=> 'tempus_samurai_intro_completed_v3_'+currentId();
+const assignedPreset=slot=>{const p=PRESETS.find(x=>x.key===slot?.slug);return p?{...p,name:slot.name||p.name,accent:slot.color||p.accent,samurai_slug:p.key,preset_key:p.key}:null};
 function readLocal(){try{return JSON.parse(localStorage.getItem(localKey())||'[]')}catch{return []}}
 function writeLocal(rows){localStorage.setItem(localKey(),JSON.stringify(rows))}
 function glyph(item){
@@ -108,23 +110,21 @@ function close(){
  byId('introCinemaPortrait')?.removeAttribute('src');
 }
 async function finishAutomatic(){
- if(!activeAuto||finishing||!auth()||!online())return;
+ if(!activeAuto||finishing||!auth())return;
  const event=activeAuto,button=byId('introCinemaFinish'),status=byId('introCinemaStatus');
  finishing=true;button.disabled=true;button.textContent='Registrando conclusão...';
  if(status)status.textContent='';
  try{
-  const completed_at=new Date().toISOString();
-  await window.OPAccounts.introRequest('/rest/v1/character_introductions?id=eq.'+Number(event.id),'PATCH',{completed_at});
-  event.completed_at=completed_at;
-  entries=entries.map(e=>Number(e.id)===Number(event.id)?{...e,completed_at}:e);
-  showHistory();
+  // Conclusão atrelada à conta deste navegador; nunca armazenar dados de outra conta.
+  localStorage.setItem(completedKey(),event.samurai_slug);
   byId('introCinemaStage').classList.add('is-final');
   byId('introCinemaEnd').hidden=false;
   byId('introCinemaFinalName').textContent=event.name;
   byId('introCinemaOpenSheet').focus({preventScroll:true});
+  showHistory();
  }catch(error){
   button.disabled=false;button.textContent='✦ Tentar finalizar introdução';
-  if(status)status.textContent='Não foi possível registrar a conclusão. Confira a conexão e tente novamente: '+error.message;
+  if(status)status.textContent='Não foi possível guardar a conclusão neste navegador: '+error.message;
  }finally{finishing=false}
 }
 async function enterAssignedSheet(){
@@ -154,7 +154,8 @@ function showHistory(){
 function authChanged(){
  const id=auth()?currentId():'';
  if(id===lastAccount)return;
- lastAccount=id;firstSync=true;lastId=0;entries=[];
+ lastAccount=id;firstSync=true;lastId=0;entries=[];assignedSlot=null;
+ if(activeAuto){activeAuto=null;els.overlay.hidden=true}
  els.panel.hidden=!master();
  if(auth())showHistory();
 }
@@ -167,34 +168,39 @@ async function refresh(){
  authChanged();
  fetching=true;
  try{
-  let data;
-  if(online()){
-   data=await window.OPAccounts.introRequest('/rest/v1/character_introductions?select=id,name,subtitle,quote,description,chapter,kind,samurai_slug,recipient_id,completed_at,accent,portrait_url,created_at&order=id.desc&limit=80');
-  }else data=readLocal().slice().sort((a,b)=>b.id-a.id).slice(0,40);
+  const [data,slot]=await Promise.all([
+   online()?window.OPAccounts.introRequest('/rest/v1/character_introductions?select=id,name,subtitle,quote,description,chapter,kind,samurai_slug,accent,portrait_url,created_at&order=id.desc&limit=40')
+           :Promise.resolve(readLocal().slice().sort((a,b)=>b.id-a.id).slice(0,40)),
+   online()&&!master()?window.OPAccounts.introAssignedSamurai():Promise.resolve(null)
+  ]);
   if(!Array.isArray(data))throw Error('Resposta inválida do arquivo.');
-  entries=data;showHistory();
-  // Eventos de atribuição ficam pendentes, mesmo que o jogador faça login dias depois.
-  const pending=online()&&!master()?data.filter(e=>e.kind==='samurai'&&e.recipient_id===currentId()&&!e.completed_at).sort((a,b)=>Number(a.id)-Number(b.id))[0]:null;
-  if(pending&&els.overlay.hidden){
-   markSeen(pending.id);
-   display(pending,true);
+  if(!auth())return;
+  entries=data;
+  assignedSlot=slot;
+  if(online()&&!master()&&!slot){
+   // Se o mestre desatribuir a ficha, uma atribuição futura poderá iniciar nova apresentação.
+   localStorage.removeItem(completedKey());
   }
-  // NPCs e apresentações manuais continuam sendo exibidos quando publicados.
-  const newestPublic=data.find(e=>!e.recipient_id);
+  showHistory();
+  // Detecta a atribuição pela ficha já protegida por RLS no Supabase.
+  // Não depende do botão "Publicar" nem de o jogador estar online no momento.
+  const pending=slot&&localStorage.getItem(completedKey())!==slot.slug?assignedPreset(slot):null;
+  if(pending&&els.overlay.hidden)display(pending,true);
+  const newestPublic=data[0];
   const stored=Number(localStorage.getItem(seenKey())||0);
   if(firstSync){
    firstSync=false;lastId=Math.max(lastId,stored);
    if(newestPublic&&Number(newestPublic.id)>lastId){
     if(Date.now()-new Date(newestPublic.created_at).getTime()<180000&&!pending&&els.overlay.hidden){
      markSeen(newestPublic.id);display(newestPublic);
-    }else if(!pending){markSeen(newestPublic.id)}
+    }else{markSeen(newestPublic.id)}
    }
   }else if(newestPublic&&Number(newestPublic.id)>lastId&&!pending&&els.overlay.hidden){
    markSeen(newestPublic.id);display(newestPublic);
   }
   if(els.feedback?.dataset.connection==='error'){
    els.feedback.dataset.connection='';
-   feedback('Arquivo conectado. Samurai atribuído abre automaticamente somente para o jogador responsável.');
+   feedback('Arquivo conectado. Atribuições dos samurais são reveladas automaticamente para seus jogadores.');
   }
  }catch(e){
   if(els.feedback&&(!master()||!els.feedback.textContent.startsWith('Prévia'))){
