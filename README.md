@@ -370,7 +370,7 @@ Arquivos: `intro-personagens.js`, `intro-personagens.css`, `index.html`, `contas
 
 A aba **Diretor de cenas** sincroniza revelações para as contas dos jogadores autenticados no Supabase.
 
-**Fluxo do mestre**: abrir **Painel do Mestre → Direção da sessão → Diretor de Cenas** → escolher uma das seis cenas prontas ou criar cena personalizada → editar título, subtítulo, episódio, narração, cor, imagem HTTPS opcional, som HTTPS opcional e até quatro escolhas → clicar em **Prévia local** para ensaiar → clicar **Iniciar para todos**. Enquanto houver uma cena ativa, o botão de iniciar fica desabilitado. O mestre acompanha a quantidade de respostas por opção e clica **Encerrar cena** quando quiser liberar a próxima.
+**Fluxo do mestre**: abrir **Painel do Mestre → Diretor de Cenas** → escolher uma das seis cenas prontas ou criar cena personalizada → editar título, subtítulo, episódio, narração, cor, imagem HTTPS opcional, som HTTPS opcional e até quatro escolhas → clicar em **Prévia local** para ensaiar → clicar **Iniciar para todos**. Enquanto houver uma cena ativa, o botão de iniciar fica desabilitado. O mestre acompanha a quantidade de respostas por opção e clica **Encerrar cena** quando quiser liberar a próxima.
 
 **Fluxo dos jogadores**: qualquer aba do site pode receber uma cena; o sistema consulta o servidor a cada quatro segundos. O palco cinematográfico abre em tela cheia, com a narração e as escolhas. Se houver escolhas, cada jogador pode registrar uma única resposta; se não, pode simplesmente clicar **Concluir cena**. O som é opcional e **nunca inicia automaticamente**: o jogador precisa clicar **Ativar som**. Ao concluir, a cena não reaparece naquele navegador/conta. Se o jogador entrar enquanto a cena ainda está ativa, também a receberá. Se uma introdução de samurai estiver ocupando a tela, a cena aguarda.
 
@@ -388,7 +388,7 @@ A aba **Diretor de cenas** sincroniza revelações para as contas dos jogadores 
 
 A aba **✧ Sussurros** permite que o mestre entregue **pistas secretas e presságios para uma única conta de jogador**, sem revelar a mensagem aos demais. Jogadores podem **responder ao mestre** a partir de uma mensagem recebida. O sistema usa as contas já existentes; não cria novos logins.
 
-**Mestre:** abra **Painel do Mestre → Direção da sessão → Sussurros**, selecione o jogador responsável pelo segredo, preencha o título, o tipo (sussurro, pista secreta ou presságio) e o texto (até 1.500 caracteres). Os modelos **Pista oculta**, **Lembrança estranha** e **Voz distante** ajudam a criar a mensagem; eles não enviam automaticamente. Clique em **Enviar sussurro**. O histórico **Enviadas** mostra a entrega registrada no banco e se foi marcada como lida pelo destinatário. Nomes de jogador repetidos são diferenciados pelos últimos caracteres do identificador da conta.
+**Mestre:** abra **Painel do Mestre → Sussurros**, selecione o jogador responsável pelo segredo, preencha o título, o tipo (sussurro, pista secreta ou presságio) e o texto (até 1.500 caracteres). Os modelos **Pista oculta**, **Lembrança estranha** e **Voz distante** ajudam a criar a mensagem; eles não enviam automaticamente. Clique em **Enviar sussurro**. O histórico **Enviadas** mostra a entrega registrada no banco e se foi marcada como lida pelo destinatário. Nomes de jogador repetidos são diferenciados pelos últimos caracteres do identificador da conta.
 
 **Jogadores:** assim que receber uma mensagem, o menu apresenta o número de não lidas. Fora das apresentações cinematográficas, uma revelação reservada aparece automaticamente. Use **Marcar como lida** para registrar a leitura ou **Ler depois** para manter na caixa de entrada. O botão **Responder ao mestre** abre um editor privado pré-endereçado ao autor do sussurro. O mestre recebe a resposta na própria caixa, com aviso de não lida.
 
@@ -400,13 +400,35 @@ A aba **✧ Sussurros** permite que o mestre entregue **pistas secretas e press�
 
 **Arquivos:** `sussurros.js`, `sussurros.css`, `sussurros-supabase.sql`, `index.html` e `contas.js`. A estrutura SQL já foi aplicada ao projeto Supabase **eita**.
 
-## Direção da sessão — ferramentas no Painel do Mestre
+## Central do Mestre — navegação com páginas próprias
 
-A conta **mestre** encontra quatro abas — **◈ Diretor de Cenas**, **✧ Sussurros**, **◇ Enigmas interativos** e **⌕ Mural de investigação** — dentro de **Painel do Mestre → Direção da sessão**, logo após o controle de PE e antes das fichas dos samurais. Os antigos botões separados do menu lateral ficam ocultos **somente** para o mestre; os jogadores continuam usando **Diretor de cenas** (consultar histórico), **Sussurros** (ler e responder), **Enigmas** (resolver) e **Mural de investigação** (conectar pistas e anotar).
+O **Painel do Mestre** foi reorganizado como uma **Central de Comando**, com identidade visual paranormal (vinho, grafite e dourado), layout responsivo e **cartões grandes** na página inicial. O mestre não precisa mais rolar por todos os formulários para encontrar um controle. Basta clicar no cartão da ferramenta: apenas **aquela página** aparece, com **Voltar à Central** e uma barra de atalhos para navegar entre as demais.
 
-O código `mestre-ferramentas.js` **move os elementos DOM originais**, sem recriar formulários ou IDs. Portanto, preserva listeners, estados e recursos existentes de início/encerramento de cenas, votações, histórico, envio de sussurros e leitura de respostas. Ao trocar uma conta de mestre por uma conta de jogador no mesmo navegador, os conteúdos voltam para suas abas originais. As janelas de cena e de sussurro permanecem fora dessas abas para abrir sobre qualquer tela do site. O mestre recebe um contador de mensagens não lidas na aba interna.
+### Páginas da Central
 
-A alteração é **apenas de organização de interface**: as regras de privacidade e autorização continuam aplicadas no Supabase, não no PIN visual do painel. Arquivos: `mestre-ferramentas.js`, `mestre-ferramentas.css`, `index.html`.
+| Página do Mestre | Controles disponíveis |
+| --- | --- |
+| **Diretor de Cenas** | Criar, pré-visualizar, publicar e encerrar cenas ao vivo; acompanhar respostas |
+| **Sussurros** | Enviar mensagens privadas, ler respostas e consultar não lidas |
+| **NPCs e Apresentações** | Pré-visualizar e apresentar personagens, samurais e NPCs |
+| **Enigmas e Baús** | Criador personalizado, rascunhos, respostas secretas, código de quatro dígitos e conteúdo do baú |
+| **Mural de Investigação** | Criar, ocultar e revelar pistas, fotografar cartas, conectar pistas e fazer anotações |
+| **Personagens e PE** | Monitorar PE, gerenciar os cinco samurais e consultar fichas cadastradas |
+| **Registros da Sessão** | Filtrar e consultar ações, rituais, poderes e histórico dos agentes |
+
+A **página inicial** da Central mostra os cartões agrupados por Narrativa, Investigação e Gestão, além dos resumos locais de agentes, indicadores de cena ativa, enigmas ativos, pistas do mural e sussurros não lidos. Os indicadores do Supabase são atualizados pelos módulos existentes; não são números inventados nem substituem as consultas reais.
+
+### Compatibilidade e acesso
+
+- O arquivo \`mestre-ferramentas.js\` **move os elementos DOM originais para suas páginas internas**, sem cloná-los nem recriar IDs. Isso preserva eventos, sessões, dados, rascunhos, entradas cinematográficas, fotografias, formulários e botões das ferramentas existentes.
+- **A conta de mestre conectada** recebe essas páginas dentro do painel. Os botões separados **Cenas, Sussurros, NPCs/Apresentações, Enigmas e Mural** desaparecem do menu lateral **somente para o mestre**; os jogadores conservam as páginas deles no menu, incluindo as opções de investigação e respostas.
+- Ao sair da conta do mestre e entrar como jogador, os conteúdos voltam aos lugares originais. O painel de mestre mantém seu **PIN local** e os controles de bloquear/reproduzir som; o PIN não substitui as permissões de banco do Supabase.
+- Os pop-ups de apresentações, sussurros e cenas continuam fora das páginas internas, para funcionar sobre qualquer tela. As políticas de autorização e RLS **não foram modificadas** nesta alteração visual.
+- Se o Supabase não estiver conectado ou a sessão não for de mestre, os recursos remotos ficam indisponíveis, enquanto os controles locais de fichas e registros mantêm o funcionamento possível nesse modo.
+- A navegação adapta o layout a desktop, tablet e celular: cartões em uma coluna nos telefones, indicadores compactos e atalhos horizontais roláveis.
+- Não são URLs distintas; as páginas são **subseções com navegação própria dentro do Painel do Mestre**, com apenas uma visível por vez. O teste visual em dispositivos reais continua recomendado.
+
+**Arquivos alterados:** \`mestre-ferramentas.js\`, \`mestre-ferramentas.css\`, \`ficha-mestre.js\`, \`index.html\`. Esta alteração não requer migração Supabase.
 
 ### Enigmas em destaque no Painel do jogador
 
@@ -414,11 +436,11 @@ Além da aba **Enigmas** no menu, cada jogador autenticado agora vê uma seção
 
 Um contador ao lado do botão **Enigmas** no menu indica quantos enigmas ativos existem. Ao publicar ou encerrar um enigma, esses indicadores são atualizados na próxima sincronização (aproximadamente cinco segundos, com a aba do site aberta). Caso não exista nenhum enigma ativo, os enigmas já resolvidos ainda aparecerão como históricos. Apenas quando não houver nenhum enigma publicado o jogador verá **Nenhum enigma publicado por enquanto**.
 
-Rascunhos permanecem restritos ao mestre. Enigmas resolvidos ou encerrados ficam no histórico da aba Enigmas e podem ser revistos pelo Painel inicial, sem permitir novas tentativas. A seção de destaque e o contador são ocultados para o mestre; a criação e publicação continuam dentro do **Painel do Mestre → Direção da Sessão → Enigmas Interativos**.
+Rascunhos permanecem restritos ao mestre. Enigmas resolvidos ou encerrados ficam no histórico da aba Enigmas e podem ser revistos pelo Painel inicial, sem permitir novas tentativas. A seção de destaque e o contador são ocultados para o mestre; a criação e publicação continuam dentro do **Painel do Mestre → Enigmas e Baús**.
 
 ## Enigmas interativos e Mural de Investigação — Tempus Custodia
 
-As duas ferramentas funcionam no Supabase, vinculadas às contas existentes. **Mestre:** abra **Painel do Mestre → Direção da Sessão** e selecione as novas abas **◇ Enigmas interativos** ou **⌕ Mural de investigação**. **Jogadores:** encontram **Enigmas** e **Mural de investigação** no menu lateral, sem os formulários administrativos. O menu do mestre oculta esses botões separados para manter a organização.
+As duas ferramentas funcionam no Supabase, vinculadas às contas existentes. **Mestre:** abra **Painel do Mestre** e selecione as novas abas **◇ Enigmas interativos** ou **⌕ Mural de investigação**. **Jogadores:** encontram **Enigmas** e **Mural de investigação** no menu lateral, sem os formulários administrativos. O menu do mestre oculta esses botões separados para manter a organização.
 
 ### Mural — preparar e revelar pistas
 1. No **Mural**, o mestre cria cartões com título, tipo (pista, documento, local, testemunho ou imagem), descrição e URL HTTPS opcional. **Toda pista nasce OCULTA.**
@@ -446,7 +468,7 @@ As duas ferramentas funcionam no Supabase, vinculadas às contas existentes. **M
 
 ## Baús com senha de 4 dígitos — enigma interativo
 
-**Fluxo no Painel do Mestre:** abra **Painel do Mestre → Direção da Sessão → Enigmas Interativos**, expanda **＋ Criar baú com senha de 4 dígitos**, preencha nome, descrição do desafio, uma senha **exatamente com quatro algarismos** (zeros iniciais são válidos), dica opcional, título do conteúdo e texto do que será encontrado dentro. Opcionalmente inclua uma imagem HTTPS e selecione uma pista do Mural a ser revelada após a abertura. Clique **Publicar baú** para disponibilizar imediatamente ou **Guardar como rascunho** para prepará-lo sem exibi-lo aos jogadores. Baús em rascunho podem ser publicados posteriormente pelo mestre.
+**Fluxo no Painel do Mestre:** abra **Painel do Mestre → Enigmas e Baús**, expanda **＋ Criar baú com senha de 4 dígitos**, preencha nome, descrição do desafio, uma senha **exatamente com quatro algarismos** (zeros iniciais são válidos), dica opcional, título do conteúdo e texto do que será encontrado dentro. Opcionalmente inclua uma imagem HTTPS e selecione uma pista do Mural a ser revelada após a abertura. Clique **Publicar baú** para disponibilizar imediatamente ou **Guardar como rascunho** para prepará-lo sem exibi-lo aos jogadores. Baús em rascunho podem ser publicados posteriormente pelo mestre.
 
 **Fluxo de quem joga:** os baús publicados aparecem na aba **Enigmas** e nos destaques do Painel inicial. O jogador vê a descrição e um cadeado com **quatro espaços**. Deve encontrar os números na narrativa ou nas pistas reveladas, digitá-los com o teclado numérico na tela (ou teclado físico) e clicar **Tentar destrancar**. São permitidas **oito tentativas por jogador e por baú**, assim como nos demais enigmas. A combinação errada mantém o baú fechado e consome uma tentativa. A primeira correta resolve o desafio para **todo o grupo**; a tampa se abre, aparece o botão **Entrar no baú** e uma tela especial mostra o título, o conteúdo e a imagem opcional. Outros jogadores também poderão entrar nesse interior depois de sincronizar.
 
