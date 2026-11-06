@@ -62,7 +62,7 @@
    // Introduções são apenas INSERT: não converter em UPSERT (exigiria UPDATE e falharia com 403).
    headers.Prefer=(path==='/rest/v1/rpg_puzzles?select=id'||path==='/rest/v1/rpc/create_chest_puzzle')&&method==='POST'
     ?'return=representation'
-    :/^\/rest\/v1\/(character_introductions|cinematic_scenes|cinematic_scene_votes|private_whispers|rpg_puzzles|rpg_puzzle_answers|rpg_puzzle_attempts|rpg_chest_contents|investigation_clues|investigation_links|investigation_notes)(\?|$)/.test(path)
+    :/^\/rest\/v1\/(character_introductions|cinematic_scenes|cinematic_scene_votes|private_whispers|rpg_puzzles|rpg_puzzle_answers|rpg_puzzle_attempts|rpg_chest_contents|investigation_clues|investigation_links|investigation_notes|campaign_decisions)(\?|$)/.test(path)
      ?'return=minimal':'resolution=merge-duplicates,return=minimal';
   }
   return fetch(base+path,{method,headers,body:data!==null?JSON.stringify(data):undefined}).then(async res=>{
@@ -155,6 +155,7 @@
   window.TempusIntroducoes?.atualizar?.();
   window.TempusSussurros?.atualizar?.();
   window.TempusInvestigacao?.atualizar?.();
+  window.TempusDecisoes?.atualizar?.();
  }
  async function hashLocalPassword(password,salt){
   if(!window.crypto?.subtle)throw new Error('O navegador exige HTTPS para proteger senhas locais.');
@@ -314,6 +315,35 @@
   },
   investigationPhotoUpload(path,blob){return requestInvestigationPhoto(path,'POST',blob)},
   investigationPhotoDownload(path){return requestInvestigationPhoto(path,'GET')},
+  decisionRequest(path,method='GET',body=null){
+   if(!authReady||!account||!online||account.role!=='mestre')
+    return Promise.reject(Error('Somente a conta de mestre conectada pode acessar decisões secretas.'));
+   if(!['GET','POST','PATCH'].includes(method)||
+      !/^\/rest\/v1\/campaign_decisions(?:\?|$)/.test(path))
+    return Promise.reject(Error('Requisição de decisão não permitida.'));
+   if(method==='GET'){
+    if(body!==null)return Promise.reject(Error('Consulta sem corpo esperada.'));
+    return api(path,'GET');
+   }
+   if(!body||typeof body!=='object'||Array.isArray(body))
+    return Promise.reject(Error('Registro de decisão inválido.'));
+   const allowed=new Set(['title','choice_text','participants','episode','impact',
+    'consequence_text','trigger_condition','master_notes','next_tool',
+    'status','updated_at','resolved_at']);
+   if(method==='POST'){
+    if(path!=='/rest/v1/campaign_decisions'||body.created_by!==account.id||
+       body.status!=='pendente'||body.resolved_at!==null||
+       Object.keys(body).some(k=>!allowed.has(k)&&k!=='created_by'))
+     return Promise.reject(Error('Criação de decisão inválida.'));
+   }else{
+    if(!/^\/rest\/v1\/campaign_decisions\?id=eq\.[1-9]\d*$/.test(path)||
+       Object.keys(body).some(k=>!allowed.has(k))||!Object.keys(body).length)
+     return Promise.reject(Error('Alteração de decisão inválida.'));
+    if(Object.hasOwn(body,'status')&&!['pendente','preparada','executada','arquivada'].includes(body.status))
+     return Promise.reject(Error('Estado de decisão inválido.'));
+   }
+   return api(path,method,body);
+  },
   mysteryRequest(path,method='GET',body=null){
    if(!authReady||!account||!online)
     return Promise.reject(Error('Entre com sua conta conectada para utilizar enigmas e investigação.'));
