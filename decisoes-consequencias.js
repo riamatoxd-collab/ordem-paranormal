@@ -193,7 +193,7 @@
   let values;
   try{values=collect()}catch(error){return notice(error.message,true)}
   busy=true;E.save.disabled=true;
-  const owner=account,editing=editId;
+  const owner=account,editing=editId;let saved=false;
   try{
    const now=new Date().toISOString();
    const data=editing===null?{...values,status:'pendente',created_by:owner,
@@ -204,9 +204,10 @@
    if(owner!==accountId())return;
    clearForm();notice(editing===null?'Decisão registrada. Prepare a consequência quando chegar a hora.':
      'Registro atualizado. As informações secretas continuam só no arquivo do mestre.');
-   await refresh();
+   saved=true;
   }catch(e){notice('Não foi possível salvar: '+str(e.message||e).slice(0,200),true)}
   finally{busy=false;E.save.disabled=false}
+  if(saved)await refresh();
  }
  function openEdit(id){
   if(!role()||busy)return;
@@ -223,7 +224,7 @@
   const item=rows.find(x=>Number(x.id)===id);if(!item||item.status===newStatus)return;
   if(newStatus==='executada'&&!confirm('Marcar esta consequência como executada? Esta ação registra a decisão, mas NÃO inicia uma cena automaticamente.'))return;
   if(newStatus==='arquivada'&&!confirm('Arquivar este registro? Você ainda poderá reabri-lo no histórico.'))return;
-  busy=true;const owner=accountId();
+  busy=true;const owner=accountId();let updated=false;
   try{
    const now=new Date().toISOString();
    await api('/rest/v1/campaign_decisions?id=eq.'+id,'PATCH',{
@@ -234,9 +235,10 @@
     newStatus==='executada'?'Consequência executada e registrada no histórico.':
     newStatus==='arquivada'?'Registro arquivado. Use o filtro Arquivadas para reencontrá-lo.':
     'Registro reaberto para a próxima sessão.');
-   await refresh();
+   updated=true;
   }catch(e){notice('Não foi possível atualizar a etapa: '+str(e.message||e).slice(0,200),true)}
   finally{busy=false}
+  if(updated)await refresh();
  }
  async function refresh(){
   if(!syncAccount()||loading||busy)return;
