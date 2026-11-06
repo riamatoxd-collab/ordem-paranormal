@@ -125,8 +125,8 @@
   if(next==='central')renderOverview();
   if(masterView.classList.contains('active')){
    const scrollArea=document.querySelector('main');
-   if(scrollArea&&scrollArea.scrollTop>50)scrollArea.scrollTo({top:0,behavior:'instant'});
-   window.scrollTo?.({top:0,behavior:'instant'});
+   if(scrollArea&&scrollArea.scrollTop>50)scrollArea.scrollTo({top:0,behavior:'auto'});
+   window.scrollTo?.({top:0,behavior:'auto'});
   }
  }
  root.addEventListener('click',e=>{
