@@ -204,7 +204,7 @@ function focusChest(id){
  const c=chests.find(x=>Number(x.id)===Number(id));
  if(c?.status==='solved')enterInside(Number(id));
 }
-$('chestCreateForm').addEventListener('submit',e=>{e.preventDefault();createChest(true)});
+$('chestCreateForm').addEventListener('submit',e=>{e.preventDefault();return createChest(true)});
 $('chestSaveDraft').addEventListener('click',()=>createChest(false));
 $('chestBuildCode').addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,4)});
 area.addEventListener('input',e=>{
@@ -228,7 +228,7 @@ area.addEventListener('click',e=>{
 });
 area.addEventListener('submit',e=>{
  const f=e.target.closest('[data-chest-form]');if(!f)return;
- e.preventDefault();tryCode(Number(f.dataset.chestForm),f);
+ e.preventDefault();return tryCode(Number(f.dataset.chestForm),f);
 });
 $('chestInsideClose').addEventListener('click',closeInside);
 $('chestInsideReturn').addEventListener('click',closeInside);
