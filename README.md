@@ -455,3 +455,21 @@ As duas ferramentas funcionam no Supabase, vinculadas às contas existentes. **M
 **Arquivos:** \`bau-enigmas.js\`, \`bau-enigmas.css\`, \`baus-enigmas-supabase.sql\`, \`enigmas-mural.js\`, \`contas.js\`, \`index.html\`. O banco já foi configurado no Supabase; o HTML e os scripts devem ser atualizados no navegador com \`Ctrl + Shift + R\`.
 
 **Limites:** encontrar os quatro números faz parte da investigação; o sistema não inventa a solução ou publica quatro pistas automaticamente. Cabe ao mestre revelar pistas, cartas, símbolos ou números na narrativa e/ou no Mural. As aberturas são compartilhadas entre jogadores, não representam inventários pessoais. O teste de fluxo com contas simuladas e a validação SQL passaram; o teste visual ao vivo entre diferentes navegadores é recomendado.
+
+## Fotografar cartas e conectar evidências no Mural
+
+Agora **jogadores e mestre** podem colocar fotografias diretamente no **Mural de investigação**, sem hospedar imagens externamente. No celular, abra **Mural de investigação → Fotografar evidência → Tirar foto** para utilizar a câmera traseira, ou **Escolher imagem** para usar uma foto já salva. No computador, é possível selecionar um arquivo da galeria/pasta. Se o navegador não oferecer câmera, use a opção de escolher arquivo.
+
+Após escolher a foto, o site mostra uma **prévia**, solicita título e observação, e disponibiliza **Adicionar foto ao mural**. A imagem é redimensionada e convertida no navegador para **JPEG de até 3 MB**, removendo metadados originais do arquivo durante a conversão. As imagens de origem podem ter até 12 MB. Alguns formatos de foto não suportados pelo navegador, como certas versões de HEIC, podem precisar ser salvos em JPEG primeiro.
+
+**Fotos de jogadores** são publicadas como pistas da categoria **Imagem**, visíveis imediatamente às contas da campanha, com miniatura no cartão e versão maior no detalhe. Em **Conectar pistas**, uma foto recém-publicada aparece nas mesmas listas que documentos, locais e testemunhos: escolha dois cartões e escreva a relação que encontrou. Fotos carregadas pelo **mestre** começam como pistas ocultas, que ele pode revelar manualmente.
+
+### Proteção das imagens
+
+- As imagens vão para o bucket **privado** `investigation-photos` do Supabase Storage. A pasta de cada upload pertence à conta que está enviando. Os arquivos têm nomes UUID novos e não são sobrescritos.
+- O site carrega fotografias por **requisições autenticadas** usando o token de sessão, e cria URLs locais temporárias no navegador. Não são publicados links diretos de acesso público às imagens.
+- As políticas RLS de Storage só autorizam leitura de um arquivo relacionado a uma pista **visível ao grupo**, ou acesso do mestre a pistas ocultas. Jogadores só podem criar pistas fotográficas visíveis com sua própria conta; não podem desbloquear pistas ocultas do mestre nem publicar como outra pessoa.
+- A equipe deve fotografar apenas cartas, pistas e objetos do RPG, evitando fotos de rostos, documentos pessoais ou informações privadas. Uma fotografia enviada por um jogador fica visível a todos os jogadores autenticados da campanha.
+- A sincronização do mural ocorre aproximadamente a cada cinco segundos enquanto o site estiver aberto. Fotos e anotações permanecem no Supabase para consulta posterior.
+- **Limitação atual:** ainda não há botão de apagar ou editar fotografias já enviadas; se uma foto for publicada por engano, o mestre pode ocultar a pista, mas o arquivo permanece armazenado. Se o upload terminar e a criação do cartão falhar, poderá restar um arquivo sem cartão no Storage.
+- Arquivos: `investigacao-fotos.js`, `investigacao-fotos.css`, `investigacao-fotos-supabase.sql`, `investigacao-fotos-ajuste-rls.sql`, além de `enigmas-mural.js`, `index.html` e `contas.js`. O acesso às fotos requer site HTTPS e login Supabase válido.
