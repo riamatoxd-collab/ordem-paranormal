@@ -145,3 +145,8 @@
  .mystery-spotlight-entry{flex-direction:column;align-items:stretch;gap:12px}
  .mystery-spotlight-entry .btn{width:100%}
 }
+
+.mystery-spotlight-entry[data-status=solved]{border-left-color:#85b9a3}
+.mystery-spotlight-entry[data-status=closed]{border-left-color:#837e8c}
+.mystery-spotlight-entry[data-status=solved] small{color:#a9dbc1}
+.mystery-spotlight-entry[data-status=closed] small{color:#bcb7c7}
