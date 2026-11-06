@@ -408,6 +408,14 @@ O código `mestre-ferramentas.js` **move os elementos DOM originais**, sem recri
 
 A alteração é **apenas de organização de interface**: as regras de privacidade e autorização continuam aplicadas no Supabase, não no PIN visual do painel. Arquivos: `mestre-ferramentas.js`, `mestre-ferramentas.css`, `index.html`.
 
+### Enigmas em destaque no Painel do jogador
+
+Além da aba **Enigmas** no menu, cada jogador autenticado agora vê uma seção **Enigmas do Mestre** na página inicial **Painel**, abaixo de **Acesso rápido**. O sistema mostra até três enigmas ativos com título, tema e início do desafio, e o botão **Resolver enigma** abre a aba Enigmas posicionando o desafio escolhido. Quando há mais de três enigmas, o botão **Abrir área de enigmas** dá acesso à lista completa.
+
+Um contador ao lado do botão **Enigmas** no menu indica quantos enigmas ativos existem. Ao publicar ou encerrar um enigma, esses indicadores são atualizados na próxima sincronização (aproximadamente cinco segundos, com a aba do site aberta). Caso ainda não exista um enigma ativo, o jogador verá **Nenhum enigma ativo por enquanto** na página inicial.
+
+Rascunhos permanecem restritos ao mestre. Enigmas resolvidos ou encerrados ficam no histórico da aba Enigmas, mas não são apresentados como desafios ativos no Painel inicial. A seção de destaque e o contador são ocultados para o mestre; a criação e publicação continuam dentro do **Painel do Mestre → Direção da Sessão → Enigmas Interativos**.
+
 ## Enigmas interativos e Mural de Investigação — Tempus Custodia
 
 As duas ferramentas funcionam no Supabase, vinculadas às contas existentes. **Mestre:** abra **Painel do Mestre → Direção da Sessão** e selecione as novas abas **◇ Enigmas interativos** ou **⌕ Mural de investigação**. **Jogadores:** encontram **Enigmas** e **Mural de investigação** no menu lateral, sem os formulários administrativos. O menu do mestre oculta esses botões separados para manter a organização.
