@@ -119,3 +119,29 @@
 .mystery-preview-top small{color:#d2aa85;letter-spacing:.15em;font-size:10px}
 .mystery-builder-preview .mystery-puzzle-card{max-width:750px;margin:0 auto 12px}
 .mystery-builder-preview .mystery-answer-row input:disabled,.mystery-builder-preview .mystery-answer-row button:disabled{opacity:.65;cursor:default}
+
+/* Os desafios ativos são destacados no início da conta do jogador. */
+#playerPuzzleSpotlight[hidden],#puzzleActiveBadge[hidden]{display:none!important}
+.mystery-nav-badge{display:inline-grid;place-items:center;margin-left:7px;vertical-align:middle;min-width:22px;height:22px;border-radius:30px;padding:2px 6px;background:#d6ad82;color:#1e1315;font:800 11px/1 system-ui,sans-serif}
+.mystery-player-spotlight{margin:25px 0 27px;padding:20px 22px;border:1px solid #a17b61;border-radius:17px;background:radial-gradient(ellipse at 90% 0,#ad7c7036,transparent 65%),linear-gradient(145deg,#25171f,#0d1119);box-shadow:0 10px 36px #0005}
+.mystery-spotlight-heading{display:flex;align-items:start;justify-content:space-between;gap:15px;margin-bottom:14px;flex-wrap:wrap}
+.mystery-spotlight-heading small{display:block;font:700 10px system-ui,sans-serif;color:#d7b08c;letter-spacing:.2em}
+.mystery-spotlight-heading h2{font:500 clamp(24px,3vw,34px)/1.15 Georgia,serif;color:#f6e4d4;margin:8px 0}
+.mystery-spotlight-heading p{font-size:12px;color:#cdbeb3;line-height:1.6;margin:0;max-width:590px}
+.mystery-spotlight-total{border:1px solid #b08c6e;border-radius:50px;padding:7px 12px;font:700 11px system-ui,sans-serif;color:#edc6a2;background:#36242a;white-space:nowrap}
+.mystery-spotlight-list{display:grid;gap:10px}
+.mystery-spotlight-entry{display:flex;align-items:center;justify-content:space-between;gap:18px;background:#11131a;border:1px solid #66534b;border-left:3px solid #c79e79;border-radius:10px;padding:15px}
+.mystery-spotlight-entry[data-theme=medo]{border-left-color:#c17b91}
+.mystery-spotlight-entry[data-theme=tempo]{border-left-color:#7dabbd}
+.mystery-spotlight-entry>div{min-width:0;flex:1}
+.mystery-spotlight-entry small{display:block;color:#cdb099;font-size:10px;letter-spacing:.1em}
+.mystery-spotlight-entry strong{display:block;margin:6px 0;color:#f5e9dc;font:600 19px/1.2 Georgia,serif;overflow-wrap:anywhere}
+.mystery-spotlight-entry p{color:#c5b9af;margin:5px 0 0;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.mystery-spotlight-entry .btn{white-space:nowrap;flex:0 0 auto;font-size:12px}
+.mystery-spotlight-empty{padding:16px;border:1px dashed #756157;border-radius:9px;background:#15121a;color:#c7baad;font-size:13px;line-height:1.6}
+.mystery-spotlight-all{margin-top:13px}
+@media(max-width:620px){
+ .mystery-player-spotlight{padding:15px 13px}
+ .mystery-spotlight-entry{flex-direction:column;align-items:stretch;gap:12px}
+ .mystery-spotlight-entry .btn{width:100%}
+}
