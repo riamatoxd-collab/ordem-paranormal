@@ -209,7 +209,8 @@ function renderClueDetail(){
  else{
   ui.clueDetail.innerHTML='<small class="mystery-detail-type">'+esc(c.category.toUpperCase())+'</small>'+
    '<h3>'+esc(c.title)+'</h3><p class="mystery-detail-body">'+esc(c.details||'Uma pista que ainda precisa ser analisada.')+'</p>'+
-   (safeUrl(c.image_url)?'<img class="mystery-detail-photo" src="'+esc(safeUrl(c.image_url))+'" alt="Imagem da pista '+esc(c.title)+'" loading="lazy">':'')+
+   (c.storage_path?'<img class="mystery-detail-photo" data-investigation-photo="'+esc(c.storage_path)+'" alt="Foto da pista '+esc(c.title)+'" loading="lazy" hidden>':
+   (safeUrl(c.image_url)?'<img class="mystery-detail-photo" src="'+esc(safeUrl(c.image_url))+'" alt="Imagem da pista '+esc(c.title)+'" loading="lazy">':''))+
    '<small>'+esc(c.visible?'Revelada ao grupo':'Oculta — somente mestre')+' • '+esc(date(c.created_at))+'</small>';
  }
  renderNotes();
@@ -219,7 +220,9 @@ function renderBoard(){
  ui.clueList.innerHTML=cards.length?cards.map(c=>
   '<article class="mystery-clue'+(Number(selectedClue)===Number(c.id)?' is-selected':'')+(!c.visible?' is-secret':'')+'" data-kind="'+esc(c.category)+'">'+
   '<button type="button" class="mystery-clue-pick" data-clue-pick="'+Number(c.id)+'">'+
-  '<span class="mystery-clue-icon" aria-hidden="true">'+esc(ICONS[c.category]||'✧')+'</span>'+
+  (c.storage_path?
+   '<span class="mystery-photo-label">FOTO REGISTRADA</span><img class="mystery-clue-photo" data-investigation-photo="'+esc(c.storage_path)+'" alt="" loading="lazy" hidden>':
+   '<span class="mystery-clue-icon" aria-hidden="true">'+esc(ICONS[c.category]||'✧')+'</span>')+
   '<small>'+esc(c.category.toUpperCase())+' • '+(c.visible?'REVELADA':'OCULTA')+'</small>'+
   '<strong>'+esc(c.title)+'</strong>'+
   '<p>'+esc(c.details||'Uma pista ainda sem observações.')+'</p>'+
@@ -228,6 +231,7 @@ function renderBoard(){
   '</article>').join(''):
   '<div class="mystery-empty">A investigação ainda não tem pistas reveladas. Os primeiros documentos aparecerão aqui quando o mestre liberá-los.</div>';
  renderClueDetail();renderConnections();renderClueOptions();
+ window.TempusFotos?.hydrate?.();
 }
 function renderAll(){
  const p=JSON.stringify([puzzles,attempts]);
@@ -241,7 +245,7 @@ async function refresh(){
  try{
   if(!online())return;
   const requests=[
-   rpc('/rest/v1/investigation_clues?select=id,title,details,category,image_url,visible,created_by,created_at,revealed_at&order=id.desc&limit=100'),
+   rpc('/rest/v1/investigation_clues?select=id,title,details,category,image_url,storage_path,visible,created_by,created_at,revealed_at&order=id.desc&limit=100'),
    rpc('/rest/v1/investigation_links?select=id,clue_a,clue_b,insight,created_by,created_at&order=id.asc&limit=300'),
    rpc('/rest/v1/investigation_notes?select=id,clue_id,body,created_by,created_at&order=id.desc&limit=250'),
    rpc('/rest/v1/rpg_puzzles?select=id,title,prompt,hint,theme,status,puzzle_kind,unlock_clue_id,created_at,solved_at&order=id.desc&limit=80'),
