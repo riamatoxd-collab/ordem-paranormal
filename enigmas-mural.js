@@ -49,6 +49,7 @@ function syncAccount(){
  if(account===id)return;
  account=id;selectedClue=null;puzzles=[];attempts=[];clues=[];links=[];notes=[];puzzleSnapshot='';clueSnapshot='';
  ui.puzzleMaster.hidden=!master();ui.clueMaster.hidden=!master();
+ renderPuzzleSpotlight();
  if(ui.puzzleList)ui.puzzleList.innerHTML='';
  if(ui.clueList)ui.clueList.innerHTML='';
  message('puzzle',online()?'Enigmas sincronizados com a campanha.':'Entre com sua conta conectada para jogar.');
@@ -60,6 +61,76 @@ function renderPuzzleTemplates(){
   '<button class="mystery-template mystery-custom-template" type="button" data-puzzle-custom="1"><b>＋ Criar meu próprio enigma</b><small>Começar com os campos em branco</small></button>'+
   PUZZLE_TEMPLATES.map((p,i)=>
   '<button class="mystery-template" type="button" data-puzzle-template="'+i+'"><b>'+esc(p.title)+'</b><small>'+esc(THEMES[p.theme])+'</small></button>').join('');
+}
+// Os enigmas publicados também aparecem em destaque no Painel inicial do jogador.
+// O menu recebe um contador de enigmas ativos; nenhum rascunho ou gabarito é enviado.
+let puzzleSpotlight=null,puzzleSpotlightList=null,puzzleCountBadge=null;
+function setupPuzzleSpotlight(){
+ const home=$('v-home');
+ const nav=document.querySelector('.nav button[data-view="enigmas"]');
+ if(!home||!nav)return;
+ if(!$('puzzleActiveBadge')){
+  puzzleCountBadge=document.createElement('span');
+  puzzleCountBadge.id='puzzleActiveBadge';
+  puzzleCountBadge.className='mystery-nav-badge';
+  puzzleCountBadge.hidden=true;
+  puzzleCountBadge.setAttribute('aria-label','Enigmas disponíveis');
+  nav.appendChild(puzzleCountBadge);
+ }else puzzleCountBadge=$('puzzleActiveBadge');
+ if($('playerPuzzleSpotlight')){
+  puzzleSpotlight=$('playerPuzzleSpotlight');
+  puzzleSpotlightList=$('playerPuzzleSpotlightList');
+  return;
+ }
+ const section=document.createElement('section');
+ section.id='playerPuzzleSpotlight';
+ section.className='mystery-player-spotlight';
+ section.hidden=true;
+ section.setAttribute('aria-label','Enigmas disponíveis para jogadores');
+ section.innerHTML=
+  '<div class="mystery-spotlight-heading"><div><small>◇ DESAFIOS DA INVESTIGAÇÃO</small>'+
+  '<h2>Enigmas do Mestre</h2>'+
+  '<p>Os desafios publicados aparecem aqui automaticamente. Resolva os enigmas e desbloqueie pistas para o grupo.</p></div>'+
+  '<span class="mystery-spotlight-total" id="playerPuzzleSpotlightCount">0 ativos</span></div>'+
+  '<div class="mystery-spotlight-list" id="playerPuzzleSpotlightList"></div>'+
+  '<button type="button" class="btn mystery-spotlight-all" data-open-puzzle="all">◇ Abrir área de enigmas</button>';
+ const quick=home.querySelector('.grid.quick');
+ if(quick)quick.insertAdjacentElement('afterend',section);
+ else home.appendChild(section);
+ puzzleSpotlight=section;
+ puzzleSpotlightList=$('playerPuzzleSpotlightList');
+ section.addEventListener('click',event=>{
+  const btn=event.target.closest('[data-open-puzzle]');
+  if(!btn)return;
+  const id=Number(btn.dataset.openPuzzle);
+  if(typeof window.view==='function')window.view('enigmas');
+  if(Number.isInteger(id)&&id>0){
+   const card=$('puzzleCard'+id);
+   if(card&&typeof card.scrollIntoView==='function')card.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+ });
+}
+function renderPuzzleSpotlight(){
+ if(!puzzleSpotlight)return;
+ const forPlayer=auth()&&!master();
+ const active=forPlayer?puzzles.filter(p=>p.status==='active'):[];
+ puzzleSpotlight.hidden=!forPlayer;
+ if(puzzleCountBadge){
+  puzzleCountBadge.hidden=!forPlayer||active.length===0;
+  puzzleCountBadge.textContent=active.length>9?'9+':String(active.length);
+  puzzleCountBadge.setAttribute('aria-label',active.length+' enigmas ativos');
+ }
+ const total=$('playerPuzzleSpotlightCount');
+ if(total)total.textContent=active.length===1?'1 enigma ativo':active.length+' enigmas ativos';
+ if(!forPlayer||!puzzleSpotlightList)return;
+ puzzleSpotlightList.innerHTML=active.length?active.slice(0,3).map(p=>
+  '<article class="mystery-spotlight-entry" data-theme="'+esc(p.theme)+'">'+
+  '<div><small>'+esc(THEMES[p.theme]||'ENIGMA')+' • DISPONÍVEL</small>'+
+  '<strong>'+esc(p.title)+'</strong>'+
+  '<p>'+esc(str(p.prompt).slice(0,170))+(str(p.prompt).length>170?'…':'')+'</p></div>'+
+  '<button type="button" class="btn primary" data-open-puzzle="'+Number(p.id)+'">Resolver enigma</button></article>'
+ ).join('')+(active.length>3?'<p class="mystery-muted">Mais '+(active.length-3)+' enigmas na área de desafios.</p>':''):
+ '<div class="mystery-spotlight-empty">Nenhum enigma ativo por enquanto. Quando o mestre publicar um, ele aparecerá aqui automaticamente.</div>';
 }
 function renderPuzzles(){
  const rows=puzzles.filter(x=>master()||x.status!=='draft');
@@ -79,13 +150,14 @@ function renderPuzzles(){
    '<small>'+triesLeft+' tentativa(s) restantes</small></form>':'';
   const solved=done?'<div class="mystery-solved"><span>✦</span> Enigma resolvido'+(p.unlock_clue_id?' • uma pista foi liberada no Mural':'')+'</div>':'';
   const closed=!master()&&p.status==='closed'?'<p class="mystery-muted">Esse enigma foi encerrado pelo mestre.</p>':'';
-  return '<article class="mystery-puzzle-card" data-theme="'+esc(p.theme)+'">'+
+  return '<article id="puzzleCard'+Number(p.id)+'" class="mystery-puzzle-card" data-theme="'+esc(p.theme)+'">'+
    '<div class="mystery-puzzle-top"><small>'+esc(THEMES[p.theme]||'ENIGMA')+'</small><span class="mystery-state '+esc(p.status)+'">'+esc(STATUS[p.status]||'')+'</span></div>'+
    '<h3>'+esc(p.title)+'</h3><p class="mystery-prompt">'+esc(p.prompt)+'</p>'+
    (p.hint?'<details class="mystery-hint"><summary>◈ Examinar dica</summary><p>'+esc(p.hint)+'</p></details>':'')+
    solved+closed+playerForm+(!master()&&!done&&p.status==='active'&&triesLeft===0?'<small>Sem tentativas restantes. Peça uma dica ao mestre.</small>':'')+
    masterTools+'</article>';
  }).join(''):'<div class="mystery-empty">Ainda não há enigmas publicados. O mestre poderá abrir o primeiro quando a investigação começar.</div>';
+ renderPuzzleSpotlight();
 }
 function renderClueOptions(){
  const options=clues.filter(c=>master()||c.visible);
@@ -404,7 +476,7 @@ ui.noteSend?.addEventListener('click',createNote);
 $('puzzleReload')?.addEventListener('click',refresh);
 $('clueReload')?.addEventListener('click',refresh);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
-renderPuzzleTemplates();setupPuzzleBuilder();syncAccount();renderAll();
+renderPuzzleTemplates();setupPuzzleBuilder();setupPuzzleSpotlight();syncAccount();renderAll();
 setInterval(()=>{syncAccount();if(auth()&&!document.hidden)refresh()},5000);
 setTimeout(()=>{syncAccount();if(auth())refresh()},950);
 window.TempusInvestigacao={atualizar:refresh};
