@@ -113,7 +113,10 @@ function setupPuzzleSpotlight(){
 function renderPuzzleSpotlight(){
  if(!puzzleSpotlight)return;
  const forPlayer=auth()&&!master();
- const active=forPlayer?puzzles.filter(p=>p.status==='active'):[];
+ const available=forPlayer?puzzles.filter(p=>['active','solved','closed'].includes(p.status)):[];
+ const active=available.filter(p=>p.status==='active');
+ const history=available.filter(p=>p.status!=='active');
+ const featured=[...active,...history];
  puzzleSpotlight.hidden=!forPlayer;
  if(puzzleCountBadge){
   puzzleCountBadge.hidden=!forPlayer||active.length===0;
@@ -121,16 +124,19 @@ function renderPuzzleSpotlight(){
   puzzleCountBadge.setAttribute('aria-label',active.length+' enigmas ativos');
  }
  const total=$('playerPuzzleSpotlightCount');
- if(total)total.textContent=active.length===1?'1 enigma ativo':active.length+' enigmas ativos';
+ if(total)total.textContent=active.length+' ativo(s) • '+history.length+' no histórico';
  if(!forPlayer||!puzzleSpotlightList)return;
- puzzleSpotlightList.innerHTML=active.length?active.slice(0,3).map(p=>
-  '<article class="mystery-spotlight-entry" data-theme="'+esc(p.theme)+'">'+
-  '<div><small>'+esc(THEMES[p.theme]||'ENIGMA')+' • DISPONÍVEL</small>'+
-  '<strong>'+esc(p.title)+'</strong>'+
-  '<p>'+esc(str(p.prompt).slice(0,170))+(str(p.prompt).length>170?'…':'')+'</p></div>'+
-  '<button type="button" class="btn primary" data-open-puzzle="'+Number(p.id)+'">Resolver enigma</button></article>'
- ).join('')+(active.length>3?'<p class="mystery-muted">Mais '+(active.length-3)+' enigmas na área de desafios.</p>':''):
- '<div class="mystery-spotlight-empty">Nenhum enigma ativo por enquanto. Quando o mestre publicar um, ele aparecerá aqui automaticamente.</div>';
+ puzzleSpotlightList.innerHTML=featured.length?featured.slice(0,3).map(p=>{
+  const isActive=p.status==='active';
+  const state=isActive?'DISPONÍVEL':p.status==='solved'?'RESOLVIDO':'ENCERRADO';
+  return '<article class="mystery-spotlight-entry" data-theme="'+esc(p.theme)+'" data-status="'+esc(p.status)+'">'+
+   '<div><small>'+esc(THEMES[p.theme]||'ENIGMA')+' • '+state+'</small>'+
+   '<strong>'+esc(p.title)+'</strong>'+
+   '<p>'+esc(str(p.prompt).slice(0,170))+(str(p.prompt).length>170?'…':'')+'</p></div>'+
+   '<button type="button" class="btn '+(isActive?'primary':'')+'" data-open-puzzle="'+Number(p.id)+'">'+
+   (isActive?'Resolver enigma':'Rever enigma')+'</button></article>';
+ }).join('')+(featured.length>3?'<p class="mystery-muted">Mais '+(featured.length-3)+' enigmas na área de desafios.</p>':''):
+ '<div class="mystery-spotlight-empty">Nenhum enigma publicado por enquanto. Quando o mestre publicar um, ele aparecerá aqui automaticamente.</div>';
 }
 function renderPuzzles(){
  const rows=puzzles.filter(x=>master()||x.status!=='draft');
