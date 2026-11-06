@@ -105,6 +105,8 @@ function setupPuzzleSpotlight(){
   const id=Number(btn.dataset.openPuzzle);
   if(typeof window.view==='function')window.view('enigmas');
   if(Number.isInteger(id)&&id>0){
+   const puzzle=puzzles.find(x=>Number(x.id)===id);
+   if(puzzle?.puzzle_kind==='chest'&&window.TempusBaus?.focar){window.TempusBaus.focar(id);return}
    const card=$('puzzleCard'+id);
    if(card&&typeof card.scrollIntoView==='function')card.scrollIntoView({behavior:'smooth',block:'center'});
   }
@@ -134,12 +136,12 @@ function renderPuzzleSpotlight(){
    '<strong>'+esc(p.title)+'</strong>'+
    '<p>'+esc(str(p.prompt).slice(0,170))+(str(p.prompt).length>170?'…':'')+'</p></div>'+
    '<button type="button" class="btn '+(isActive?'primary':'')+'" data-open-puzzle="'+Number(p.id)+'">'+
-   (isActive?'Resolver enigma':'Rever enigma')+'</button></article>';
+   (p.puzzle_kind==='chest'?(isActive?'Abrir cadeado':'Entrar no baú'):(isActive?'Resolver enigma':'Rever enigma'))+'</button></article>';
  }).join('')+(featured.length>3?'<p class="mystery-muted">Mais '+(featured.length-3)+' enigmas na área de desafios.</p>':''):
  '<div class="mystery-spotlight-empty">Nenhum enigma publicado por enquanto. Quando o mestre publicar um, ele aparecerá aqui automaticamente.</div>';
 }
 function renderPuzzles(){
- const rows=puzzles.filter(x=>master()||x.status!=='draft');
+ const rows=puzzles.filter(x=>(master()||x.status!=='draft')&&x.puzzle_kind!=='chest');
  ui.puzzleList.innerHTML=rows.length?rows.map(p=>{
   const related=attempts.filter(a=>Number(a.puzzle_id)===Number(p.id));
   const mine=related.filter(a=>a.player_id===uid());
@@ -242,7 +244,7 @@ async function refresh(){
    rpc('/rest/v1/investigation_clues?select=id,title,details,category,image_url,visible,created_by,created_at,revealed_at&order=id.desc&limit=100'),
    rpc('/rest/v1/investigation_links?select=id,clue_a,clue_b,insight,created_by,created_at&order=id.asc&limit=300'),
    rpc('/rest/v1/investigation_notes?select=id,clue_id,body,created_by,created_at&order=id.desc&limit=250'),
-   rpc('/rest/v1/rpg_puzzles?select=id,title,prompt,hint,theme,status,unlock_clue_id,created_at,solved_at&order=id.desc&limit=80'),
+   rpc('/rest/v1/rpg_puzzles?select=id,title,prompt,hint,theme,status,puzzle_kind,unlock_clue_id,created_at,solved_at&order=id.desc&limit=80'),
    rpc('/rest/v1/rpg_puzzle_attempts?select=id,puzzle_id,player_id,guess,correct,created_at&order=id.desc&limit=150')
   ];
   const [c,l,n,p,a]=await Promise.all(requests);
