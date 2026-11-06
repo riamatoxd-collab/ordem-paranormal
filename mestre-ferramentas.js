@@ -134,6 +134,10 @@
   if(!button||!root.contains(button)||!masterView.classList.contains('active'))return;
   openPage(button.dataset.masterOpen);
  });
+ // Cada nova entrada pelo menu principal começa na Central, inclusive
+ // se a sessão anterior terminou antes da próxima sincronização.
+ const mainMasterButton=document.querySelector('.nav button[data-view="mestre"]');
+ mainMasterButton?.addEventListener('click',()=>openPage('central'));
  function renderOverview(){
   const allowed=hasMasterAccount();
   byId('mcAccountNotice').hidden=allowed;
