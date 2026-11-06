@@ -40,10 +40,11 @@
   {key:'cenas',number:'01',icon:'◈',name:'Diretor de Cenas',description:'Prepare e inicie revelações cinematográficas para a mesa.',group:'NARRATIVA',flag:'CENAS AO VIVO',featured:true},
   {key:'sussurros',number:'02',icon:'✧',name:'Sussurros',description:'Envie segredos individuais e acompanhe respostas privadas.',group:'NARRATIVA',flag:'MENSAGENS PRIVADAS'},
   {key:'npcs',number:'03',icon:'♙',name:'NPCs e Apresentações',description:'Revele personagens, use retratos e apresente novos encontros.',group:'NARRATIVA',flag:'REVELAÇÕES'},
-  {key:'enigmas',number:'04',icon:'◇',name:'Enigmas e Baús',description:'Crie códigos, desafios, rascunhos e baús de quatro dígitos.',group:'INVESTIGAÇÃO',flag:'DESAFIOS'},
-  {key:'mural',number:'05',icon:'⌕',name:'Mural de Investigação',description:'Revele pistas, veja fotografias e conecte evidências.',group:'INVESTIGAÇÃO',flag:'ARQUIVO DE PISTAS'},
-  {key:'personagens',number:'06',icon:'♜',name:'Personagens e PE',description:'Controle recursos, cinco samurais e fichas dos jogadores.',group:'GESTÃO',flag:'FICHAS E RECURSOS'},
-  {key:'registros',number:'07',icon:'◷',name:'Registros da Sessão',description:'Filtre ações, rolagens, poderes e acontecimentos.',group:'GESTÃO',flag:'HISTÓRICO'}
+  {key:'decisoes',number:'04',icon:'♢',name:'Decisões e Consequências',description:'Registre escolhas, prepare efeitos secretos e acompanhe seus gatilhos.',group:'NARRATIVA',flag:'DESTINO DA CAMPANHA'},
+  {key:'enigmas',number:'05',icon:'◇',name:'Enigmas e Baús',description:'Crie códigos, desafios, rascunhos e baús de quatro dígitos.',group:'INVESTIGAÇÃO',flag:'DESAFIOS'},
+  {key:'mural',number:'06',icon:'⌕',name:'Mural de Investigação',description:'Revele pistas, veja fotografias e conecte evidências.',group:'INVESTIGAÇÃO',flag:'ARQUIVO DE PISTAS'},
+  {key:'personagens',number:'07',icon:'♜',name:'Personagens e PE',description:'Controle recursos, cinco samurais e fichas dos jogadores.',group:'GESTÃO',flag:'FICHAS E RECURSOS'},
+  {key:'registros',number:'08',icon:'◷',name:'Registros da Sessão',description:'Filtre ações, rolagens, poderes e acontecimentos.',group:'GESTÃO',flag:'HISTÓRICO'}
  ];
  const safeKey=key=>areas.some(x=>x.key===key)||key==='central'?key:'central';
  const card=a=>'<button type="button" class="mc-card'+(a.featured?' mc-card-featured':'')+'" data-master-open="'+a.key+'"'+
@@ -52,6 +53,7 @@
   '<div class="mc-card-bottom"><h4>'+a.name+'</h4><p>'+a.description+'</p>'+
   '<span class="mc-card-cta">ACESSAR FERRAMENTA <span aria-hidden="true">↗</span></span></div>'+
   (a.key==='sussurros'?'<span id="mcWhisperCardBadge" class="mc-card-badge" hidden>0</span>':'')+
+  (a.key==='decisoes'?'<span id="mcDecisionCardBadge" class="mc-card-badge" hidden>0</span>':'')+
   '</button>';
  const cardsGroup=(group,title,desc)=>
   '<div class="mc-group"><div class="mc-group-heading"><div><small>'+group+'</small><h3>'+title+'</h3></div><p>'+desc+'</p></div>'+
@@ -77,6 +79,7 @@
     '<div class="mc-status"><span class="mc-status-glyph">◇</span><div><small>ENIGMAS ATIVOS</small><strong id="mcPuzzleCount">—</strong></div></div>'+
     '<div class="mc-status"><span class="mc-status-glyph">✧</span><div><small>SUSSURROS NÃO LIDOS</small><strong id="mcUnreadCount">—</strong></div></div>'+
     '<div class="mc-status"><span class="mc-status-glyph">⌕</span><div><small>PISTAS NO MURAL</small><strong id="mcClueCount">—</strong></div></div>'+
+    '<div class="mc-status"><span class="mc-status-glyph">♢</span><div><small>CONSEQUÊNCIAS EM ABERTO</small><strong id="mcDecisionCount">—</strong></div></div>'+
    '</div>'+
    '<div class="mc-local-summary"><div class="mc-group-heading"><div><small>VISÃO GERAL</small><h3>Seu terminal de campo</h3></div><p>Registros locais dos agentes desta sessão.</p></div><div id="mcSummaryDock"></div></div>'+
    '<div id="mcAccountNotice" class="mc-account-notice" hidden>Para transmitir cenas, revelar pistas e gerenciar mensagens entre dispositivos, entre com a <strong>conta de mestre conectada ao Supabase</strong>. Os recursos locais continuam disponíveis.</div>'+
@@ -95,7 +98,7 @@
  let mounted=null,activeAccount='',currentPage='central',masterWasActive=false;
  const hasMasterAccount=()=>window.OPAccounts?.authenticated===true&&
   window.OPAccounts?.online===true&&window.OPAccounts?.masterRole===true;
- const remoteKeys=new Set(['cenas','sussurros','npcs','enigmas','mural']);
+ const remoteKeys=new Set(['cenas','sussurros','npcs','decisoes','enigmas','mural']);
  function openPage(key){
   const next=safeKey(key);
   if(next!=='central'&&remoteKeys.has(next)&&!hasMasterAccount())return;
@@ -122,6 +125,7 @@
   if(next==='sussurros')window.TempusSussurros?.atualizar?.();
   if(next==='enigmas'||next==='mural')window.TempusInvestigacao?.atualizar?.();
   if(next==='npcs')window.TempusIntroducoes?.atualizar?.();
+  if(next==='decisoes')window.TempusDecisoes?.atualizar?.();
   if(next==='central')renderOverview();
   if(masterView.classList.contains('active')){
    const scrollArea=document.querySelector('main');
@@ -159,6 +163,15 @@
   byId('mcUnreadCount').textContent=allowed?unread:'—';
   const cardBadge=byId('mcWhisperCardBadge');
   if(cardBadge){cardBadge.textContent=unread;cardBadge.hidden=!allowed||unread==='0'}
+  const decisionStats=allowed?window.TempusDecisoes?.resumo?.():null;
+  const openDecisions=decisionStats?.carregado?decisionStats.abertas:null;
+  const decisionText=openDecisions===null?'—':String(openDecisions);
+  byId('mcDecisionCount').textContent=decisionText;
+  const decisionBadge=byId('mcDecisionCardBadge');
+  if(decisionBadge){
+   decisionBadge.textContent=decisionText;
+   decisionBadge.hidden=!allowed||openDecisions===null||openDecisions===0;
+  }
  }
  function hideMasterOnlyForms(){
   for(const id of ['sceneMasterPanel','whisperMasterPanel','whisperComposer','puzzleMasterPanel','clueMasterPanel','introMasterPanel']){
@@ -186,6 +199,7 @@
      for(const node of sourceNodes[key])page.appendChild(node);
     }
     hideMasterOnlyForms();
+    window.TempusDecisoes?.limpar?.();
     if(masterView.classList.contains('active')&&typeof window.view==='function')window.view('home');
     if(currentPage!=='central')openPage('central');
    }
