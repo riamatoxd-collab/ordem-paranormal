@@ -60,9 +60,9 @@
   if(data!==null)headers['Content-Type']='application/json';
   if(path.startsWith('/rest/v1/')&&method!=='GET'){
    // Introduções são apenas INSERT: não converter em UPSERT (exigiria UPDATE e falharia com 403).
-   headers.Prefer=path==='/rest/v1/rpg_puzzles?select=id'&&method==='POST'
+   headers.Prefer=(path==='/rest/v1/rpg_puzzles?select=id'||path==='/rest/v1/rpc/create_chest_puzzle')&&method==='POST'
     ?'return=representation'
-    :/^\/rest\/v1\/(character_introductions|cinematic_scenes|cinematic_scene_votes|private_whispers|rpg_puzzles|rpg_puzzle_answers|rpg_puzzle_attempts|investigation_clues|investigation_links|investigation_notes)(\?|$)/.test(path)
+    :/^\/rest\/v1\/(character_introductions|cinematic_scenes|cinematic_scene_votes|private_whispers|rpg_puzzles|rpg_puzzle_answers|rpg_puzzle_attempts|rpg_chest_contents|investigation_clues|investigation_links|investigation_notes)(\?|$)/.test(path)
      ?'return=minimal':'resolution=merge-duplicates,return=minimal';
   }
   return fetch(base+path,{method,headers,body:data!==null?JSON.stringify(data):undefined}).then(async res=>{
@@ -292,10 +292,17 @@
   mysteryRequest(path,method='GET',body=null){
    if(!authReady||!account||!online)
     return Promise.reject(Error('Entre com sua conta conectada para utilizar enigmas e investigação.'));
-   const match=path.match(/^\/rest\/v1\/(rpg_puzzles|rpg_puzzle_answers|rpg_puzzle_attempts|investigation_clues|investigation_links|investigation_notes)(?:\?|$)/);
+   const isMaster=account.role==='mestre';
+   if(path==='/rest/v1/rpc/create_chest_puzzle'){
+    if(method!=='POST'||!isMaster||!body||!/^\d{4}$/.test(String(body.p_code||''))||
+      !body.p_title||!body.p_prompt||!body.p_loot_title||!body.p_contents)
+     return Promise.reject(Error('Apenas o mestre pode criar um baú com senha de quatro dígitos.'));
+    return api(path,method,body);
+   }
+   const match=path.match(/^\/rest\/v1\/(rpg_puzzles|rpg_puzzle_answers|rpg_puzzle_attempts|rpg_chest_contents|investigation_clues|investigation_links|investigation_notes)(?:\?|$)/);
    if(!match||!['GET','POST','PATCH'].includes(method))return Promise.reject(Error('Ação de investigação não permitida.'));
-   const table=match[1],isMaster=account.role==='mestre';
-   if(method==='POST'&&['rpg_puzzles','rpg_puzzle_answers','investigation_clues'].includes(table)&&!isMaster)
+   const table=match[1];
+   if(method==='POST'&&['rpg_puzzles','rpg_puzzle_answers','rpg_chest_contents','investigation_clues'].includes(table)&&!isMaster)
     return Promise.reject(Error('Somente o mestre pode criar enigmas e pistas.'));
    if(method==='POST'&&table==='rpg_puzzle_attempts'){
     if(isMaster||!body||Object.keys(body).sort().join(',')!=='guess,player_id,puzzle_id'||body.player_id!==account.id)
