@@ -75,7 +75,7 @@
 #v-mestre .mc-orbit-inner{inset:25%;border:2px solid #c29881a3;box-shadow:0 0 30px #c66c6b40}
 #v-mestre .mc-hero-art>span{z-index:1;font:clamp(62px,8vw,92px)/1 Georgia,serif;text-shadow:0 0 20px #dd85758c}
 #v-mestre .mc-hero-art>small{position:absolute;bottom:-15px;color:#d0ab98;font:700 8px/1.6 system-ui,sans-serif;letter-spacing:.34em;text-align:center}
-#v-mestre .mc-status-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+#v-mestre .mc-status-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:11px}
 #v-mestre .mc-status{
  min-width:0;display:flex;align-items:center;gap:12px;
  border:1px solid #59464a;border-radius:12px;padding:15px 14px;
@@ -232,4 +232,16 @@
  #v-mestre .mc-subpage{animation:none}
  #v-mestre .mc-experience button{transition:none}
  #v-mestre .mc-experience button:hover{transform:none}
+}
+
+/* Novo arquivo narrativo — decisões e consequências */
+#v-mestre .mc-card[data-master-open="decisoes"]{
+ background:radial-gradient(ellipse at 92% 0%,#d0a37336,transparent 58%),
+ linear-gradient(145deg,#2c202b,#16151c);
+ border-color:#a07b68;
+}
+#v-mestre .mc-card[data-master-open="decisoes"] .mc-card-icon{color:#f0c99d;border-color:#bc9878}
+#v-mestre #mcDock-decisoes{display:block}
+@media(min-width:1171px) and (max-width:1400px){
+ #v-mestre .mc-status-row{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
