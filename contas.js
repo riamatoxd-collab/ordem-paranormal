@@ -229,6 +229,29 @@
   copy.hidden=!account||claimed||count===0;
   if(!copy.hidden)copy.querySelector('p').textContent=count+' ficha(s) antigas deste navegador podem ser importadas para sua conta. Isso não remove o backup original.';
  }
+ async function requestInvestigationPhoto(path,method='GET',payload=null,retry=true){
+  if(!authReady||!account||!online||!token)throw Error('Entre com sua conta conectada para usar fotos no mural.');
+  if(!/^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}\/[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}[.]jpg$/.test(path)||!['POST','GET'].includes(method))
+   throw Error('Arquivo de fotografia inválido.');
+  if(method==='POST'){
+   if(!path.startsWith(account.id+'/'))throw Error('Envie apenas fotos da sua conta.');
+   if(!(payload instanceof Blob)||payload.type!=='image/jpeg'||payload.size>3145728||payload.size===0)
+    throw Error('Use uma foto JPEG de até 3 MB.');
+  }
+  const route=method==='POST'?'/storage/v1/object/investigation-photos/':'/storage/v1/object/authenticated/investigation-photos/';
+  const headers={apikey:anon,Authorization:'Bearer '+token};
+  if(method==='POST'){headers['Content-Type']='image/jpeg';headers['x-upsert']='false';}
+  const response=await fetch(base+route+path,{method,headers,body:method==='POST'?payload:undefined});
+  if(response.status===401&&retry&&refreshToken){
+   await refreshCloudSession();
+   return requestInvestigationPhoto(path,method,payload,false);
+  }
+  if(!response.ok){
+   const raw=await response.text();let parsed=null;try{parsed=JSON.parse(raw)}catch{}
+   throw Error(String(parsed?.message||parsed?.error||parsed?.msg||'Erro '+response.status+' ao acessar a foto').slice(0,220));
+  }
+  return method==='GET'?response.blob():response.json().catch(()=>null);
+ }
  window.OPAccounts={
   get current(){return account},
   get online(){return online},
@@ -289,6 +312,8 @@
     return Promise.reject(Error('Somente o mestre pode consultar a lista de jogadores.'));
    return api('/rest/v1/profiles?role=eq.jogador&select=id,display_name,role&order=display_name.asc');
   },
+  investigationPhotoUpload(path,blob){return requestInvestigationPhoto(path,'POST',blob)},
+  investigationPhotoDownload(path){return requestInvestigationPhoto(path,'GET')},
   mysteryRequest(path,method='GET',body=null){
    if(!authReady||!account||!online)
     return Promise.reject(Error('Entre com sua conta conectada para utilizar enigmas e investigação.'));
@@ -302,8 +327,16 @@
    const match=path.match(/^\/rest\/v1\/(rpg_puzzles|rpg_puzzle_answers|rpg_puzzle_attempts|rpg_chest_contents|investigation_clues|investigation_links|investigation_notes)(?:\?|$)/);
    if(!match||!['GET','POST','PATCH'].includes(method))return Promise.reject(Error('Ação de investigação não permitida.'));
    const table=match[1];
-   if(method==='POST'&&['rpg_puzzles','rpg_puzzle_answers','rpg_chest_contents','investigation_clues'].includes(table)&&!isMaster)
-    return Promise.reject(Error('Somente o mestre pode criar enigmas e pistas.'));
+   if(method==='POST'&&['rpg_puzzles','rpg_puzzle_answers','rpg_chest_contents','investigation_clues'].includes(table)&&!isMaster){
+    const photo=table==='investigation_clues'&&body&&
+     Object.keys(body).sort().join(',')==='category,created_by,details,image_url,revealed_at,storage_path,title,visible'&&
+     body.category==='imagem'&&body.visible===true&&body.image_url===null&&body.created_by===account.id&&
+     typeof body.title==='string'&&body.title.trim().length>0&&body.title.length<=100&&
+     typeof body.details==='string'&&body.details.length<=1500&&
+     typeof body.storage_path==='string'&&body.storage_path.startsWith(account.id+'/')&&
+     /^[0-9]{4}-[0-9]{2}-[0-9]{2}T/.test(String(body.revealed_at));
+    if(!photo)return Promise.reject(Error('Somente o mestre cria enigmas; jogadores podem publicar fotos das cartas.'));
+   }
    if(method==='POST'&&table==='rpg_puzzle_attempts'){
     if(isMaster||!body||Object.keys(body).sort().join(',')!=='guess,player_id,puzzle_id'||body.player_id!==account.id)
      return Promise.reject(Error('Tentativa de enigma inválida.'));
