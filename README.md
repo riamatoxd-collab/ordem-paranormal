@@ -411,6 +411,7 @@ O **Painel do Mestre** foi reorganizado como uma **Central de Comando**, com ide
 | **Diretor de Cenas** | Criar, pré-visualizar, publicar e encerrar cenas ao vivo; acompanhar respostas |
 | **Sussurros** | Enviar mensagens privadas, ler respostas e consultar não lidas |
 | **NPCs e Apresentações** | Pré-visualizar e apresentar personagens, samurais e NPCs |
+| **Decisões e Consequências** | Registrar escolhas do grupo, criar consequências secretas, preparar gatilhos e acompanhar a execução |
 | **Enigmas e Baús** | Criador personalizado, rascunhos, respostas secretas, código de quatro dígitos e conteúdo do baú |
 | **Mural de Investigação** | Criar, ocultar e revelar pistas, fotografar cartas, conectar pistas e fazer anotações |
 | **Personagens e PE** | Monitorar PE, gerenciar os cinco samurais e consultar fichas cadastradas |
@@ -495,3 +496,28 @@ Após escolher a foto, o site mostra uma **prévia**, solicita título e observa
 - A sincronização do mural ocorre aproximadamente a cada cinco segundos enquanto o site estiver aberto. Fotos e anotações permanecem no Supabase para consulta posterior.
 - **Limitação atual:** ainda não há botão de apagar ou editar fotografias já enviadas; se uma foto for publicada por engano, o mestre pode ocultar a pista, mas o arquivo permanece armazenado. Se o upload terminar e a criação do cartão falhar, poderá restar um arquivo sem cartão no Storage.
 - Arquivos: `investigacao-fotos.js`, `investigacao-fotos.css`, `investigacao-fotos-supabase.sql`, `investigacao-fotos-ajuste-rls.sql`, `investigacao-fotos-leitura-rls.sql`, além de `enigmas-mural.js`, `index.html` e `contas.js`. O acesso às fotos requer site HTTPS e login Supabase válido.
+
+## Painel de Decisões e Consequências — Central do Mestre
+
+A página **♢ Decisões e Consequências** fica disponível como um cartão na **Central do Mestre**, no grupo **Narrativa**, com layout paranormal responsivo. A Central mostra também um indicador de quantas consequências permanecem **em aberto** (pendentes + preparadas).
+
+### Fluxo do mestre
+
+1. Abra **Painel do Mestre → Decisões e Consequências** com sua conta de mestre autenticada no Supabase.
+2. Clique em um dos três **exemplos editáveis** (confiar no monge, abrir o baú ou reunir símbolos) ou preencha a ficha do zero. Exemplos não são escolhas já ocorridas; revise os textos antes de registrá-los.
+3. Registre **título**, **escolha real do grupo**, **episódio**, **participantes**, **consequência secreta**, **gatilho** (quando deve ocorrer), **impacto** (baixo/médio/alto/crítico) e observações opcionais. Você também pode associar uma ferramenta existente: Cenas, Sussurros, NPCs, Enigmas e Baús, Mural ou Personagens e PE.
+4. **Registrar decisão** salva o arquivo no Supabase, começando como **Pendente**. Quando a consequência estiver pronta, clique **Preparar**: ela ficará em destaque. Quando narrar o acontecimento de fato, clique **Executar** e confirme. O sistema registra a data.
+5. Use **Editar** para ajustar o conteúdo, **Arquivar** para retirar um registro das pendências ou **Reabrir** para voltar a planejar. Não há exclusão permanente nesta versão, preservando o histórico.
+6. O painel oferece filtros **Em aberto, Todas, Pendentes, Preparadas, Executadas e Arquivadas**, busca textual e estatísticas por estado. Ao clicar em **Ver consequência secreta**, o mestre pode consultar o texto completo e usar **Ir para [ferramenta]** para navegar diretamente à página associada.
+
+**Importante:** registrar ou executar uma consequência **não publica, inicia nem encerra automaticamente** uma cena, enigma ou pista. A ferramenta vinculada funciona como **atalho**, e o mestre continua responsável por acionar a revelação no momento narrativo correto. O campo **gatilho** é um lembrete textual, não um agendamento que executa sozinho.
+
+### Segurança e persistência
+
+- Os registros ficam na tabela **\`public.campaign_decisions\`**, criada pela migração **\`decisoes-consequencias-supabase.sql\`**, com RLS ativada.
+- O mestre autenticado só pode acessar seus próprios registros; jogadores, contas sem papel de mestre e visitantes não conseguem listar, criar ou alterar consequências. \`created_by\` não tem privilégio de UPDATE para clientes autenticados.
+- Os textos são escapados antes de serem mostrados em HTML. A página apaga os dados carregados da interface ao mudar de conta, e a Central bloqueia seu acesso para contas que não sejam do mestre.
+- O aplicativo consulta até **200 registros mais recentes** por sincronização a aproximadamente cada **6,5 segundos** quando a aba está aberta, além de atualizar depois de salvar ou mudar o estado.
+- Arquivos: \`decisoes-consequencias.js\`, \`decisoes-consequencias.css\`, \`decisoes-consequencias-supabase.sql\`, \`mestre-ferramentas.js\`, \`mestre-ferramentas.css\`, \`contas.js\` e \`index.html\`.
+- Fluxos de criar, editar, preparar, executar, arquivar, reabrir, limpar após troca de conta e atalhos foram validados em simulação. Os testes de transação SQL confirmaram a privacidade em contas de mestre e jogador. Recomenda-se um teste visual final nos navegadores dos participantes.
+
