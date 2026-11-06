@@ -31,7 +31,7 @@ overlay.setAttribute('aria-labelledby','chestInsideTitle');
 overlay.innerHTML="<section class=\"chest-inside-box\">\n <button type=\"button\" id=\"chestInsideClose\" class=\"chest-inside-close\">✕ Voltar aos enigmas</button>\n <div class=\"chest-inside-symbol\" aria-hidden=\"true\">✧</div>\n <small>O SEGREDO FOI REVELADO</small>\n <h2 id=\"chestInsideTitle\">Dentro do baú</h2>\n <img id=\"chestInsideImage\" alt=\"Imagem do tesouro encontrado\" hidden>\n <p id=\"chestInsideText\"></p>\n <button type=\"button\" class=\"btn primary\" id=\"chestInsideReturn\">Voltar à investigação</button>\n </section>";
 document.body.appendChild(overlay);
 let chests=[],attempts=[],contents=[],clues=[];
-let account='',loading=false,saving=false,updating=false;
+let account='',loading=false,saving=false,updating=false,lastSnapshot='';
 const digits=new Map(),feedbacks=new Map();
 const onlyFour=v=>/^[0-9]{4}$/.test(txt(v));
 const message=(s,bad=false)=>{const p=$('chestBuildStatus');if(p){p.textContent=s;p.classList.toggle('is-error',bad)}};
@@ -44,7 +44,7 @@ function resetAccount(){
  const id=auth()?uid():'';
  if(id===account)return;
  account=id;chests=[];attempts=[];contents=[];clues=[];
- digits.clear();feedbacks.clear();closeInside();creator.hidden=!master();render();
+ digits.clear();feedbacks.clear();lastSnapshot='';closeInside();creator.hidden=!master();render();
 }
 function renderUnlockOptions(){
  const box=$('chestBuildUnlock');if(!box||!master())return;
@@ -100,6 +100,10 @@ function render(){
  area.hidden=!auth();
  const list=$('chestPuzzleList');if(!list)return;
  const visible=chests.filter(c=>master()||c.status!=='draft');
+ const signature=JSON.stringify([visible,attempts,Array.from(feedbacks.entries()),master(),uid()]);
+ // Não reconstruir o formulário a cada sincronização: preserve a digitação e o foco.
+ if(signature===lastSnapshot)return;
+ lastSnapshot=signature;
  $('chestPanelCount').textContent=visible.length+' baú(s)';
  list.innerHTML=visible.length?visible.map(card).join(''):
   '<p class="chest-empty">Ainda não há baús publicados. Quando o mestre preparar um, o cadeado de quatro números aparecerá aqui.</p>';
