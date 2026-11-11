@@ -17,7 +17,8 @@ const STATUS={draft:'Rascunho',active:'Em andamento',solved:'Resolvido',closed:'
 const PUZZLE_TEMPLATES=[
  {title:'O Cofre dos Cinco Símbolos',prompt:'Cinco símbolos antigos cercam uma inscrição. Observe as pistas recolhidas pelo grupo e descubra qual palavra ou sequência abre o mecanismo.',hint:'Os detalhes estão espalhados pelo templo e pela vila.',theme:'simbolos'},
  {title:'O Sino que Ecoa Duas Vezes',prompt:'Uma frase retorna sempre ao tocar do sino. Qual palavra da inscrição explica a repetição?',hint:'Talvez o passado e o presente não estejam tão separados.',theme:'tempo'},
- {title:'O Juramento Esquecido',prompt:'Um antigo juramento foi fragmentado. Encontre nos documentos a resposta exigida pelo selo.',hint:'Investigue as anotações do monge e os registros da vila.',theme:'conhecimento'}
+ {title:'O Juramento Esquecido',prompt:'Um antigo juramento foi fragmentado. Encontre nos documentos a resposta exigida pelo selo.',hint:'Investigue as anotações do monge e os registros da vila.',theme:'conhecimento'},
+ {title:'As Três Alavancas do Tempo',prompt:'Três alavancas se erguem na sala de engrenagens da mina. Suas placas dizem PASSADO, PRESENTE e FUTURO. Uma carta encontrada no dormitório explica como inverter o fluxo temporal. Acione as três alavancas na ordem correta para despertar o mecanismo.',hint:'Consulte a carta do supervisor. Não é uma caminhada rumo ao amanhã, mas uma tentativa de recuperar o ontem.',theme:'tempo'}
 ];
 // Os modelos não trazem respostas prontas, evitando que um jogador descubra o gabarito pelo código.
 const ui={
