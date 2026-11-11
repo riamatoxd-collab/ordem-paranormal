@@ -47,3 +47,11 @@
  .tempo-mechanism-form{flex-direction:column}
 }
 @media(prefers-reduced-motion:reduce){.tempo-lever,.tempo-lever-stick,.tempo-lever-knob{transition:none}}
+
+/* Atalho para o mestre na Oficina de Enigmas */
+.tempo-quickstart{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:17px 19px;margin:12px 0 20px;border:1px solid #8e7961;border-radius:12px;background:linear-gradient(115deg,#2f2525,#17242c)}
+.tempo-quickstart small{display:block;letter-spacing:.16em;font:700 9px system-ui,sans-serif;color:#d6b79e;margin-bottom:7px}
+.tempo-quickstart strong{display:block;color:#f0e5d8;font:600 22px Georgia,serif}
+.tempo-quickstart p{color:#bfb8b2;font:12px/1.6 system-ui,sans-serif;margin:5px 0 0}
+.tempo-quickstart button{white-space:normal;min-width:175px}
+@media(max-width:650px){.tempo-quickstart{flex-direction:column;align-items:stretch}.tempo-quickstart button{width:100%}}
