@@ -1,0 +1,49 @@
+/* As Três Alavancas do Tempo — visual do painel da mina */
+.tempo-mechanism{position:relative;overflow:hidden;margin:18px 0 10px;padding:16px;border:1px solid #637781;border-radius:13px;background:radial-gradient(ellipse at top,#4f6e7c20,transparent 67%),linear-gradient(140deg,#141e28,#0b0f16);box-shadow:inset 0 1px #bcd5dd22,0 10px 25px #0004}
+.tempo-mechanism:before{content:"";position:absolute;inset:0;opacity:.13;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 28px,#9bc0ca22 29px 30px)}
+.tempo-mechanism>*{position:relative}
+.tempo-mechanism-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tempo-mechanism-head span{font:700 10px system-ui,sans-serif;letter-spacing:.14em;color:#9bc4d3}
+.tempo-mechanism-head strong{font:700 9px system-ui,sans-serif;letter-spacing:.06em;color:#d6c3a4;background:#273039;border:1px solid #526775;border-radius:30px;padding:5px 9px}
+.tempo-mechanism-intro{color:#d0c5b9;font:12px/1.65 system-ui,sans-serif;margin:12px 0 18px}
+.tempo-levers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.tempo-lever{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;cursor:pointer;padding:12px 5px 11px;color:#e1d4c6;border:1px solid #596572;border-radius:10px;background:linear-gradient(155deg,#273039,#161c25);transition:background .2s,border-color .2s,box-shadow .2s}
+.tempo-lever:not(:disabled):hover{border-color:#b1cbd4;background:#34414e}
+.tempo-lever:focus-visible,.tempo-mechanism-form button:focus-visible{outline:2px solid #96d8e5;outline-offset:3px}
+.tempo-lever:disabled{cursor:default;opacity:.7}
+.tempo-lever.is-pulled{border-color:#75bbc7;background:#203c46;opacity:1;box-shadow:0 0 20px #4cc8e321,inset 0 0 14px #78ceeb11}
+.tempo-lever-track{position:relative;display:block;width:35px;height:88px;margin:4px auto 0;background:linear-gradient(90deg,#080b11,#24303b 37%,#1a2029 63%,#07090e);border:2px solid #73808a;border-radius:17px;box-shadow:inset 0 0 9px #000b,0 2px 5px #0007}
+.tempo-lever-track:before{content:"";position:absolute;left:4px;right:4px;top:50%;height:2px;background:#a2abb349}
+.tempo-lever-stick{position:absolute;width:8px;height:49px;left:12px;top:20px;border-radius:6px;background:linear-gradient(90deg,#4f606d,#e1d6bb,#657785);box-shadow:2px 0 4px #0006;transform-origin:50% 50%;transition:transform .3s}
+.tempo-lever-knob{position:absolute;left:5px;top:9px;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 33% 27%,#d1c4b1,#64727d 65%,#26313b);border:1px solid #bdaf92;box-shadow:0 2px 8px #000c;transition:transform .3s,background .3s}
+.tempo-lever.is-pulled .tempo-lever-stick{transform:rotate(180deg)}
+.tempo-lever.is-pulled .tempo-lever-knob{transform:translateY(48px);background:radial-gradient(circle at 33% 27%,#c9fbff,#4d9fae 65%,#194351)}
+.tempo-lever-name{font:600 13px Georgia,serif;overflow-wrap:anywhere;text-align:center}
+.tempo-lever small{font:700 8px system-ui,sans-serif;letter-spacing:.07em;color:#a7a5a0}
+.tempo-lever.is-pulled small{color:#98e2ec}
+.tempo-mechanism-caption{margin-top:18px;color:#a3b4ba;font:700 9px system-ui,sans-serif;letter-spacing:.18em}
+.tempo-sequence{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:8px}
+.tempo-sequence-slot{display:grid;place-items:center;min-height:50px;padding:6px 4px;border:1px dashed #52616a;border-radius:8px;background:#111823;color:#76868d}
+.tempo-sequence-slot.is-filled{border-style:solid;border-color:#83aebb;color:#e2edf0;background:#223741}
+.tempo-sequence-slot small{font:700 9px system-ui,sans-serif;color:#92a3ab}
+.tempo-sequence-slot b{font:600 12px Georgia,serif;text-align:center;overflow-wrap:anywhere}
+.tempo-mechanism-form{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid #4d5f69;margin-top:17px;padding-top:14px}
+.tempo-mechanism-form button{min-height:39px;flex:1}
+.tempo-mechanism-form button:disabled{opacity:.45;cursor:not-allowed}
+.tempo-mechanism-form small{flex-basis:100%;color:#aeb8b8;line-height:1.6}
+.tempo-mechanism-note{color:#b8ad9f;font:11px/1.7 system-ui,sans-serif;margin:13px 0 2px}
+.tempo-mechanism.is-solved{border-color:#74b5a1;box-shadow:inset 0 0 35px #6be0af17,0 0 24px #6be0af14}
+.tempo-mechanism.is-solved .tempo-mechanism-head strong{color:#b2ead1;border-color:#578b79}
+.tempo-mechanism-success{padding:13px 11px;background:#193d344e;border:1px solid #699e8c;border-radius:8px;color:#caefdd;font:12px/1.7 system-ui,sans-serif;margin-top:16px}
+.tempo-mechanism-success strong{color:#f0e4c7}
+.tempo-preview{margin-top:13px}
+#puzzleBuilderPreview .mystery-answer-form[hidden]{display:none!important}
+@media(max-width:520px){
+ .tempo-mechanism{padding:12px 9px}
+ .tempo-levers{gap:6px}
+ .tempo-lever{padding:9px 2px}
+ .tempo-lever-name{font-size:11px}
+ .tempo-lever-track{transform:scale(.87);margin:-1px auto -4px}
+ .tempo-mechanism-form{flex-direction:column}
+}
+@media(prefers-reduced-motion:reduce){.tempo-lever,.tempo-lever-stick,.tempo-lever-knob{transition:none}}
