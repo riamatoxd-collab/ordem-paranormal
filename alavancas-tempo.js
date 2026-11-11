@@ -6,6 +6,22 @@
 var TITLE='As Três Alavancas do Tempo';
 var LABELS=['Passado','Presente','Futuro'];
 var sequences=new Map(),remainingById=new Map();
+/* Botão destacado para o mestre localizar o modelo na oficina. */
+var prepare=document.getElementById('tempoPreparePuzzle');
+if(prepare)prepare.addEventListener('click',function(){
+ var template=Array.from(document.querySelectorAll('#puzzleTemplates [data-puzzle-template]'))
+  .find(function(button){return button.textContent.includes(TITLE)});
+ if(!template){
+  var status=document.getElementById('puzzleStatus');
+  if(status)status.textContent='Entre como mestre e abra a Oficina de Enigmas para preparar o desafio.';
+  return;
+ }
+ template.click();
+ var title=document.getElementById('puzzleTitle');
+ title?.scrollIntoView({behavior:'smooth',block:'center'});
+ title?.focus({preventScroll:true});
+});
+
 var list=document.getElementById('puzzleList');
 if(!list)return;
 function matchesTitle(value){
