@@ -55,3 +55,82 @@
 .tempo-quickstart p{color:#bfb8b2;font:12px/1.6 system-ui,sans-serif;margin:5px 0 0}
 .tempo-quickstart button{white-space:normal;min-width:175px}
 @media(max-width:650px){.tempo-quickstart{flex-direction:column;align-items:stretch}.tempo-quickstart button{width:100%}}
+
+
+/* Layout 01 - console cinematografico das tres alavancas (v2) */
+#puzzleList .tempo-puzzle-card{grid-column:1/-1;max-width:none;background:radial-gradient(ellipse at top right,#3c647d24,transparent 52%),linear-gradient(145deg,#101820,#121219);border-color:#74715f;padding:clamp(14px,2.3vw,25px)}
+.tempo-puzzle-card .mystery-prompt{max-width:900px}
+.tempo-mechanism{color:#e8e5db;position:relative;isolation:isolate;margin-top:19px;border:1px solid #596874;background:linear-gradient(145deg,#111924,#090f17);border-radius:15px;overflow:hidden;box-shadow:0 16px 32px #0005}
+.tempo-mechanism:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 82% 0,#5b88a61d,transparent 65%);pointer-events:none;z-index:-1}
+.tempo-mechanism-head{padding:15px clamp(12px,2vw,23px);display:flex;justify-content:space-between;align-items:center;gap:14px;border-bottom:1px solid #485965;background:linear-gradient(110deg,#252e36,#171e27)}
+.tempo-title-stack small{display:block;color:#c6a77d;letter-spacing:.13em;font:700 10px system-ui,sans-serif}
+.tempo-title-stack strong{display:block;color:#f5e5cd;font:normal clamp(20px,3vw,31px)/1.15 Georgia,serif;margin-top:6px}
+.tempo-console-counter{padding:5px 11px;min-width:102px;display:grid;gap:1px;justify-items:end;border-left:1px solid #64707a}
+.tempo-console-counter>span{color:#a4b6bd;font-size:9px;letter-spacing:.15em;font-weight:700}
+.tempo-console-counter strong{font:normal 29px Georgia,serif;color:#e5c89b;font-variant-numeric:tabular-nums}
+.tempo-console-counter em{font:normal 13px Georgia,serif;color:#a1adb6}
+.tempo-console{position:relative;padding:19px clamp(12px,2.6vw,28px) 22px;background:repeating-linear-gradient(90deg,#19252d55 0 36px,transparent 37px 39px)}
+.tempo-console-status{display:flex;align-items:center;gap:8px;min-height:25px;color:#b7c7cc;font:700 10px system-ui,sans-serif;letter-spacing:.13em}
+.tempo-indicator{width:8px;height:8px;border-radius:50%;background:#b99667;box-shadow:0 0 11px #c29e6a8a}
+.tempo-gear-cluster{margin-left:auto;display:flex;align-items:center;gap:0;color:#7e979f;opacity:.55}
+.tempo-gear-cluster span{display:block;font:normal 30px/1 Georgia,serif}
+.tempo-gear-cluster span:first-child{animation:tempo-rotate 9s linear infinite}
+.tempo-gear-cluster span:last-child{font-size:20px;margin:-8px 0 0 -3px;animation:tempo-rotate-rev 6s linear infinite}
+.tempo-mechanism-intro{margin:12px 0 19px;font:13px/1.75 system-ui,sans-serif;color:#b7bbc0;max-width:670px}
+.tempo-mechanism .tempo-levers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,2vw,18px);max-width:780px;margin:0 auto}
+.tempo-mechanism .tempo-lever{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:15px 6px 12px;background:linear-gradient(145deg,#29343f,#111b25 66%,#222a32);border:1px solid #526676;border-radius:12px;color:#f0e4d8;min-width:0;min-height:224px;cursor:pointer;transition:background .2s,border-color .2s,box-shadow .2s,transform .2s}
+.tempo-mechanism .tempo-lever:not(:disabled):hover{background:linear-gradient(145deg,#364753,#1a2832);border-color:#d2b184;transform:translateY(-2px)}
+.tempo-mechanism .tempo-lever.is-pulled{border-color:#87c6cd;background:linear-gradient(140deg,#23414d,#162a35);box-shadow:0 0 20px #79d8e022,inset 0 0 22px #82dfe30a;opacity:1}
+.tempo-mechanism .tempo-lever:disabled:not(.is-pulled){opacity:.7;cursor:default}
+.tempo-mechanism .tempo-lever:focus-visible{outline:2px solid #c2f8ff;outline-offset:3px}
+.tempo-lever-symbol{font:normal 19px/1 Georgia,serif;color:#d7b98c}
+.tempo-lever.is-pulled .tempo-lever-symbol{color:#adf2ff}
+.tempo-mechanism .tempo-lever-track{display:block;position:relative;width:42px;height:112px;margin:3px 0 8px;border-radius:23px;border:3px solid #677986;background:linear-gradient(90deg,#080e15,#344552 47%,#0b111a);box-shadow:inset 0 0 13px #000c,0 3px 10px #0006}
+.tempo-mechanism .tempo-lever-stick{position:absolute;left:16px;top:16px;width:6px;height:74px;border-radius:5px;background:linear-gradient(90deg,#6d7b84,#ddd0b0,#556875);box-shadow:0 0 2px #000}
+.tempo-mechanism .tempo-lever-knob{position:absolute;top:7px;left:3px;width:30px;height:30px;border:2px solid #e1cfaa;border-radius:50%;background:radial-gradient(circle at 30% 25%,#f5e9cb,#7d8e98 60%,#2b343f);box-shadow:0 4px 8px #000b;transition:top .38s cubic-bezier(.22,.73,.2,1),background .35s}
+.tempo-mechanism .tempo-lever.is-pulled .tempo-lever-knob{top:74px;background:radial-gradient(circle at 30% 25%,#e5ffff,#5cb6c5 60%,#265d6a)}
+.tempo-mechanism .tempo-lever-name{font:normal clamp(12px,1.6vw,16px) Georgia,serif;text-align:center;overflow-wrap:anywhere;color:#f0e2d0}
+.tempo-mechanism .tempo-lever small{color:#a1a5ac;font:700 9px system-ui,sans-serif;letter-spacing:.12em}
+.tempo-mechanism .tempo-lever.is-pulled small{color:#a0e7e8}
+.tempo-console-floor{padding-top:21px}
+.tempo-floor-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:9px}
+.tempo-floor-head span{color:#c6ae89;font-size:10px;letter-spacing:.14em;font-weight:700}
+.tempo-floor-head small{font-size:10px;color:#9cabb2}
+.tempo-mechanism .tempo-sequence{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.tempo-mechanism .tempo-slot{min-height:61px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;background:#0f1b25;border:1px dashed #52636b;border-radius:9px;color:#8c9da7}
+.tempo-mechanism .tempo-slot.is-filled{background:#203942;border-color:#86bac7;border-style:solid;box-shadow:inset 0 0 14px #79d8e514;color:#e7f4f5}
+.tempo-mechanism .tempo-slot small{font:700 9px system-ui,sans-serif;color:#9db2bf}
+.tempo-mechanism .tempo-slot strong{font:600 13px Georgia,serif}
+.tempo-mechanism .tempo-mechanism-form{border:0;border-top:1px solid #435460;margin:0;padding:14px clamp(12px,2.6vw,28px);background:#0d141d;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.tempo-mechanism .tempo-mechanism-form button{flex:1;min-height:42px;white-space:normal}
+.tempo-mechanism .tempo-mechanism-form button:disabled{opacity:.46;cursor:not-allowed}
+.tempo-mechanism .tempo-mechanism-form small{width:100%;flex-basis:100%;color:#aeb9bd;font:11px/1.5 system-ui,sans-serif}
+.tempo-mechanism .tempo-mechanism-note{margin:0;padding:14px 18px;color:#b8c1c2;font-size:12px}
+.tempo-mechanism .tempo-mechanism-feedback{min-height:0;margin:0;padding:0 clamp(12px,2vw,24px);color:#c2d6d9;font:12px/1.6 system-ui,sans-serif}
+.tempo-mechanism .tempo-mechanism-feedback:not(:empty){padding-top:12px;padding-bottom:12px;border-top:1px solid #516b74;background:#1c323c}
+.tempo-mechanism.is-solved{border-color:#7db8a1;box-shadow:0 0 37px #a4f6d021,inset 0 0 22px #8ddbcc0a}
+.tempo-mechanism.is-solved .tempo-indicator{background:#9de6bc;box-shadow:0 0 14px #8ef5b7}
+.tempo-mechanism .tempo-mechanism-success{margin:0;border:0;border-top:1px solid #699b8d;padding:19px clamp(12px,2vw,25px);background:linear-gradient(145deg,#193b3659,#111d1b);color:#cdebdc;font-size:12px;line-height:1.7}
+.tempo-mechanism .tempo-mechanism-success strong{font:600 20px Georgia,serif;color:#d9ffeb}
+.tempo-mechanism .tempo-mechanism-success p{margin:7px 0 0}
+.tempo-mechanism .tempo-mechanism-success b{color:#f1d7a5}
+@keyframes tempo-rotate{to{transform:rotate(360deg)}}
+@keyframes tempo-rotate-rev{to{transform:rotate(-360deg)}}
+@media(max-width:560px){
+ #puzzleList .tempo-puzzle-card{padding:12px}
+ .tempo-mechanism-head{padding:11px}
+ .tempo-console-counter{min-width:65px;padding-left:7px}
+ .tempo-console-counter strong{font-size:23px}
+ .tempo-mechanism .tempo-lever{min-height:187px;padding:9px 3px}
+ .tempo-mechanism .tempo-lever-track{transform:scale(.84);margin:-4px 0}
+ .tempo-mechanism .tempo-lever.is-pulled .tempo-lever-knob{top:74px}
+ .tempo-mechanism .tempo-lever-name{font-size:11px}
+ .tempo-mechanism .tempo-lever small{font-size:8px}
+ .tempo-mechanism .tempo-mechanism-form{flex-direction:column}
+ .tempo-mechanism .tempo-mechanism-form button{width:100%}
+ .tempo-floor-head small{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+ .tempo-mechanism .tempo-lever,.tempo-mechanism .tempo-lever-knob{transition:none}
+ .tempo-gear-cluster span{animation:none}
+}
